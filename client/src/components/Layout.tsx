@@ -51,6 +51,13 @@ export default function Layout({ children }: LayoutProps) {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/strumenti">
+                    <a className={`text-gray-300 hover:text-white hover:underline ${location === "/strumenti" ? "font-bold text-white" : ""}`}>
+                      Strumenti
+                    </a>
+                  </Link>
+                </li>
+                <li>
                   <Link href="/contatti">
                     <a className={`text-gray-300 hover:text-white hover:underline ${location === "/contatti" ? "font-bold text-white" : ""}`}>
                       Contatti
@@ -119,6 +126,11 @@ export default function Layout({ children }: LayoutProps) {
                 <li>
                   <Link href="/notizie">
                     <a className="text-gray-400 hover:text-white">Notizie</a>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/strumenti">
+                    <a className="text-gray-400 hover:text-white">Strumenti</a>
                   </Link>
                 </li>
                 <li>

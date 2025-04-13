@@ -10,6 +10,7 @@ import ModulesPage from "@/pages/ModulesPage";
 import TutorialsPage from "@/pages/TutorialsPage";
 import NewsPage from "@/pages/NewsPage";
 import ContactPage from "@/pages/ContactPage";
+import UtilitiesPage from "@/pages/UtilitiesPage";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
         <Route path="/moduli/:formType" component={FormPage} />
         <Route path="/tutorial" component={TutorialsPage} />
         <Route path="/notizie" component={NewsPage} />
+        <Route path="/strumenti" component={UtilitiesPage} />
         <Route path="/contatti" component={ContactPage} />
         <Route component={NotFound} />
       </Switch>
