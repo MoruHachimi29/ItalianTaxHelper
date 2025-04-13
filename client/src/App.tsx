@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import Layout from "@/components/Layout";
 import Home from "@/pages/Home";
 import FormPage from "@/pages/FormPage";
+import ModulesPage from "@/pages/ModulesPage";
 import TutorialsPage from "@/pages/TutorialsPage";
 import NewsPage from "@/pages/NewsPage";
 import ContactPage from "@/pages/ContactPage";
@@ -15,6 +16,7 @@ function Router() {
     <Layout>
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/moduli" component={ModulesPage} />
         <Route path="/moduli/:formType" component={FormPage} />
         <Route path="/tutorial" component={TutorialsPage} />
         <Route path="/notizie" component={NewsPage} />

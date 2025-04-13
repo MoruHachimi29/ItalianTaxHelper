@@ -30,7 +30,7 @@ export default function Layout({ children }: LayoutProps) {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/moduli/f24-ordinario">
+                  <Link href="/moduli">
                     <a className={`text-gray-300 hover:text-white hover:underline ${location.startsWith("/moduli") ? "font-bold text-white" : ""}`}>
                       Moduli
                     </a>
