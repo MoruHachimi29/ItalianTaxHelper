@@ -22,6 +22,27 @@ const toolsList = [
     description: "Converti facilmente file firmati digitalmente con estensione .p7m in formato PDF leggibile, mantenendo l'integrità del documento originale.",
     icon: "📄",
     path: "/strumenti/p7m"
+  },
+  {
+    id: "xml-to-png",
+    title: "XML a PNG",
+    description: "Converti facilmente file XML in immagini PNG di alta qualità. Ideale per la visualizzazione di strutture XML in documenti o presentazioni.",
+    icon: "🖼️",
+    path: "/strumenti/xml-png"
+  },
+  {
+    id: "pdf-editor",
+    title: "Editor PDF",
+    description: "Modifica facilmente i tuoi PDF: aggiungi testo, immagini, ruota pagine, aggiungi filigrane e altro. Ottimo per compilare o correggere documenti.",
+    icon: "✏️",
+    path: "/strumenti/pdf-editor"
+  },
+  {
+    id: "pdf-to-word",
+    title: "PDF a Word",
+    description: "Converti documenti PDF in file Word editabili, mantenendo la formattazione originale, immagini e layout. Ideale per modificare documenti bloccati.",
+    icon: "📝",
+    path: "/strumenti/pdf-word"
   }
 ];
 
