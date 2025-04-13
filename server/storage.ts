@@ -1,4 +1,6 @@
 import { users, type User, type InsertUser, forms, type Form, type InsertForm, tutorials, type Tutorial, type InsertTutorial, news, type News, type InsertNews } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc, count } from "drizzle-orm";
 
 // Expanded interface with CRUD methods for all entities
 export interface IStorage {
@@ -27,37 +29,143 @@ export interface IStorage {
   createNews(newsItem: InsertNews): Promise<News>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private forms: Map<number, Form>;
-  private tutorials: Map<number, Tutorial>;
-  private newsItems: Map<number, News>;
-  
-  private userCurrentId: number;
-  private formCurrentId: number;
-  private tutorialCurrentId: number;
-  private newsCurrentId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.forms = new Map();
-    this.tutorials = new Map();
-    this.newsItems = new Map();
-    
-    this.userCurrentId = 1;
-    this.formCurrentId = 1;
-    this.tutorialCurrentId = 1;
-    this.newsCurrentId = 1;
-    
-    // Initialize with some tutorial data
-    this.initializeTutorials();
-    
-    // Initialize with some news data
-    this.initializeNews();
+export class DatabaseStorage implements IStorage {
+  // User methods
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
-  // Initialize tutorials
-  private initializeTutorials() {
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+  
+  // Form methods
+  async getForm(id: number): Promise<Form | undefined> {
+    const [form] = await db.select().from(forms).where(eq(forms.id, id));
+    return form || undefined;
+  }
+  
+  async getFormsByUserId(userId: number): Promise<Form[]> {
+    return await db.select().from(forms).where(eq(forms.userId, userId));
+  }
+  
+  async createForm(insertForm: InsertForm): Promise<Form> {
+    const now = new Date();
+    const formWithTimestamps = {
+      ...insertForm,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    const [form] = await db
+      .insert(forms)
+      .values(formWithTimestamps)
+      .returning();
+    
+    return form;
+  }
+  
+  async updateForm(id: number, data: Partial<Form>): Promise<Form | undefined> {
+    const [updatedForm] = await db
+      .update(forms)
+      .set({
+        ...data,
+        updatedAt: new Date()
+      })
+      .where(eq(forms.id, id))
+      .returning();
+    
+    return updatedForm || undefined;
+  }
+  
+  async deleteForm(id: number): Promise<boolean> {
+    const result = await db
+      .delete(forms)
+      .where(eq(forms.id, id));
+    
+    return true; // PostgreSQL driver doesn't return rowCount, but we assume success if no exception
+  }
+  
+  // Tutorial methods
+  async getTutorial(id: number): Promise<Tutorial | undefined> {
+    const [tutorial] = await db.select().from(tutorials).where(eq(tutorials.id, id));
+    return tutorial || undefined;
+  }
+  
+  async getTutorials(): Promise<Tutorial[]> {
+    return await db.select().from(tutorials);
+  }
+  
+  async getTutorialsByType(type: string): Promise<Tutorial[]> {
+    return await db.select().from(tutorials).where(eq(tutorials.type, type));
+  }
+  
+  async createTutorial(insertTutorial: InsertTutorial): Promise<Tutorial> {
+    const tutorialWithTimestamp = {
+      ...insertTutorial,
+      createdAt: new Date()
+    };
+    
+    const [tutorial] = await db
+      .insert(tutorials)
+      .values(tutorialWithTimestamp)
+      .returning();
+    
+    return tutorial;
+  }
+  
+  // News methods
+  async getNews(id: number): Promise<News | undefined> {
+    const [newsItem] = await db.select().from(news).where(eq(news.id, id));
+    return newsItem || undefined;
+  }
+  
+  async getAllNews(): Promise<News[]> {
+    return await db
+      .select()
+      .from(news)
+      .orderBy(desc(news.publishDate));
+  }
+  
+  async getLatestNews(limit: number): Promise<News[]> {
+    return await db
+      .select()
+      .from(news)
+      .orderBy(desc(news.publishDate))
+      .limit(limit);
+  }
+  
+  async createNews(insertNews: InsertNews): Promise<News> {
+    const newsWithTimestamp = {
+      ...insertNews,
+      publishDate: new Date()
+    };
+    
+    const [newsItem] = await db
+      .insert(news)
+      .values(newsWithTimestamp)
+      .returning();
+    
+    return newsItem;
+  }
+}
+
+// Initialize the database with sample data
+async function initializeDatabase() {
+  // Check if tutorials exist
+  const existingTutorials = await db.select({ count: count() }).from(tutorials);
+  if (existingTutorials[0].count === 0) {
+    // Sample tutorials for each form type
     const tutorialData: InsertTutorial[] = [
       {
         title: "Come compilare il modello F24 ordinario",
@@ -82,13 +190,13 @@ export class MemStorage implements IStorage {
       }
     ];
     
-    for (const tutorial of tutorialData) {
-      this.createTutorial(tutorial);
-    }
+    await db.insert(tutorials).values(tutorialData);
   }
   
-  // Initialize news
-  private initializeNews() {
+  // Check if news exist
+  const existingNews = await db.select({ count: count() }).from(news);
+  if (existingNews[0].count === 0) {
+    // Sample news items
     const newsData: InsertNews[] = [
       {
         title: "Nuove scadenze fiscali: cosa sapere sui pagamenti",
@@ -107,127 +215,11 @@ export class MemStorage implements IStorage {
       }
     ];
     
-    for (const item of newsData) {
-      this.createNews(item);
-    }
-  }
-
-  // User methods
-  async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.userCurrentId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
-  }
-  
-  // Form methods
-  async getForm(id: number): Promise<Form | undefined> {
-    return this.forms.get(id);
-  }
-  
-  async getFormsByUserId(userId: number): Promise<Form[]> {
-    return Array.from(this.forms.values()).filter(
-      (form) => form.userId === userId
-    );
-  }
-  
-  async createForm(insertForm: InsertForm): Promise<Form> {
-    const id = this.formCurrentId++;
-    const now = new Date();
-    const form: Form = { 
-      ...insertForm, 
-      id, 
-      createdAt: now, 
-      updatedAt: now 
-    };
-    this.forms.set(id, form);
-    return form;
-  }
-  
-  async updateForm(id: number, data: Partial<Form>): Promise<Form | undefined> {
-    const form = this.forms.get(id);
-    if (!form) {
-      return undefined;
-    }
-    
-    const updatedForm: Form = {
-      ...form,
-      ...data,
-      updatedAt: new Date()
-    };
-    
-    this.forms.set(id, updatedForm);
-    return updatedForm;
-  }
-  
-  async deleteForm(id: number): Promise<boolean> {
-    return this.forms.delete(id);
-  }
-  
-  // Tutorial methods
-  async getTutorial(id: number): Promise<Tutorial | undefined> {
-    return this.tutorials.get(id);
-  }
-  
-  async getTutorials(): Promise<Tutorial[]> {
-    return Array.from(this.tutorials.values());
-  }
-  
-  async getTutorialsByType(type: string): Promise<Tutorial[]> {
-    return Array.from(this.tutorials.values()).filter(
-      (tutorial) => tutorial.type === type
-    );
-  }
-  
-  async createTutorial(insertTutorial: InsertTutorial): Promise<Tutorial> {
-    const id = this.tutorialCurrentId++;
-    const now = new Date();
-    const tutorial: Tutorial = {
-      ...insertTutorial,
-      id,
-      createdAt: now
-    };
-    this.tutorials.set(id, tutorial);
-    return tutorial;
-  }
-  
-  // News methods
-  async getNews(id: number): Promise<News | undefined> {
-    return this.newsItems.get(id);
-  }
-  
-  async getAllNews(): Promise<News[]> {
-    return Array.from(this.newsItems.values())
-      .sort((a, b) => b.publishDate.getTime() - a.publishDate.getTime());
-  }
-  
-  async getLatestNews(limit: number): Promise<News[]> {
-    return Array.from(this.newsItems.values())
-      .sort((a, b) => b.publishDate.getTime() - a.publishDate.getTime())
-      .slice(0, limit);
-  }
-  
-  async createNews(insertNews: InsertNews): Promise<News> {
-    const id = this.newsCurrentId++;
-    const now = new Date();
-    const newsItem: News = {
-      ...insertNews,
-      id,
-      publishDate: now
-    };
-    this.newsItems.set(id, newsItem);
-    return newsItem;
+    await db.insert(news).values(newsData);
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
+
+// Initialize database with sample data when imported
+initializeDatabase().catch(console.error);
