@@ -11,48 +11,48 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="bg-white font-sans text-gray-900 min-h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b border-gray-200">
+      <header className="bg-black text-white border-b border-gray-700">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center mb-4 md:mb-0">
               <Link href="/">
-                <a className="text-2xl md:text-3xl font-serif font-bold">ModuliTax</a>
+                <a className="text-2xl md:text-3xl font-serif font-bold text-white">ModuliTax</a>
               </Link>
-              <span className="ml-2 text-sm bg-black text-white px-2 py-1 rounded">BETA</span>
+              <span className="ml-2 text-sm bg-white text-black px-2 py-1 rounded">BETA</span>
             </div>
             <nav>
               <ul className="flex space-x-6">
                 <li>
                   <Link href="/">
-                    <a className={`hover:underline ${location === "/" ? "font-bold" : ""}`}>
+                    <a className={`text-gray-300 hover:text-white hover:underline ${location === "/" ? "font-bold text-white" : ""}`}>
                       Home
                     </a>
                   </Link>
                 </li>
                 <li>
                   <Link href="/moduli/f24-ordinario">
-                    <a className={`hover:underline ${location.startsWith("/moduli") ? "font-bold" : ""}`}>
+                    <a className={`text-gray-300 hover:text-white hover:underline ${location.startsWith("/moduli") ? "font-bold text-white" : ""}`}>
                       Moduli
                     </a>
                   </Link>
                 </li>
                 <li>
                   <Link href="/tutorial">
-                    <a className={`hover:underline ${location === "/tutorial" ? "font-bold" : ""}`}>
+                    <a className={`text-gray-300 hover:text-white hover:underline ${location === "/tutorial" ? "font-bold text-white" : ""}`}>
                       Tutorial
                     </a>
                   </Link>
                 </li>
                 <li>
                   <Link href="/notizie">
-                    <a className={`hover:underline ${location === "/notizie" ? "font-bold" : ""}`}>
+                    <a className={`text-gray-300 hover:text-white hover:underline ${location === "/notizie" ? "font-bold text-white" : ""}`}>
                       Notizie
                     </a>
                   </Link>
                 </li>
                 <li>
                   <Link href="/contatti">
-                    <a className={`hover:underline ${location === "/contatti" ? "font-bold" : ""}`}>
+                    <a className={`text-gray-300 hover:text-white hover:underline ${location === "/contatti" ? "font-bold text-white" : ""}`}>
                       Contatti
                     </a>
                   </Link>
