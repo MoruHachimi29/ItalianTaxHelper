@@ -1,8 +1,24 @@
 import { jsPDF } from "jspdf";
+import { PDFDocument } from "pdf-lib";
+
+// Import form images
+import f24OrdinarioImage from "@/assets/forms/f24-ordinario.png";
+import f24SemplificatoImage from "@/assets/forms/f24-semplificato.png";
+import f24AcciseImage from "@/assets/forms/f24-accise.png";
+import f24ElideImage from "@/assets/forms/f24-elide.png";
+import f23Image from "@/assets/forms/f23.png";
 
 interface FormData {
   [key: string]: string;
 }
+
+const formBackgrounds = {
+  "f24-ordinario": f24OrdinarioImage,
+  "f24-semplificato": f24SemplificatoImage,
+  "f24-accise": f24AcciseImage,
+  "f24-elide": f24ElideImage,
+  "f23": f23Image
+};
 
 /**
  * Creates a PDF from form data
@@ -23,6 +39,37 @@ export async function createPDF(
     unit: "mm",
     format: "a4"
   });
+  
+  // Add the form background image with reduced opacity
+  try {
+    const backgroundImage = formBackgrounds[formType as keyof typeof formBackgrounds];
+    if (backgroundImage) {
+      const img = new Image();
+      img.src = backgroundImage;
+      
+      await new Promise<void>((resolve) => {
+        img.onload = () => {
+          // Add the image as a background with reduced opacity
+          doc.setGState(doc.addGState({ opacity: 0.1 }));
+          doc.addImage(
+            img,
+            'PNG',
+            10, // x position
+            30, // y position
+            190, // width
+            240, // height
+            `${formType}-background`, // alias
+            'NONE' // compression
+          );
+          // Reset opacity for text
+          doc.setGState(doc.addGState({ opacity: 1.0 }));
+          resolve();
+        };
+      });
+    }
+  } catch (error) {
+    console.error("Error adding background image:", error);
+  }
   
   // Set font styles
   doc.setFont("helvetica", "bold");

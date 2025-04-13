@@ -19,6 +19,13 @@ import {
 import { apiRequest } from "@/lib/queryClient";
 import { calculateTotal } from "@/lib/formUtils";
 
+// Import form images
+import f24OrdinarioImage from "@/assets/forms/f24-ordinario.png";
+import f24SemplificatoImage from "@/assets/forms/f24-semplificato.png";
+import f24AcciseImage from "@/assets/forms/f24-accise.png";
+import f24ElideImage from "@/assets/forms/f24-elide.png";
+import f23Image from "@/assets/forms/f23.png";
+
 interface FormViewerProps {
   formType: "f24-ordinario" | "f24-semplificato" | "f24-accise" | "f24-elide" | "f23";
 }
@@ -37,6 +44,14 @@ const formTitles = {
   "f24-accise": "F24 Accise",
   "f24-elide": "F24 Elide",
   "f23": "F23"
+};
+
+const formImages = {
+  "f24-ordinario": f24OrdinarioImage,
+  "f24-semplificato": f24SemplificatoImage,
+  "f24-accise": f24AcciseImage,
+  "f24-elide": f24ElideImage,
+  "f23": f23Image
 };
 
 export default function FormViewer({ formType }: FormViewerProps) {
@@ -209,9 +224,16 @@ export default function FormViewer({ formType }: FormViewerProps) {
         Compila {formTitles[formType]}
       </h1>
       
-      <div ref={formRef} className="form-overlay border border-gray-200 rounded-lg overflow-hidden mb-6 relative bg-white p-6">
-        {/* Form background would be set here */}
-        <div className="form-content">
+      <div ref={formRef} className="form-overlay border border-gray-200 rounded-lg overflow-hidden mb-6 relative bg-white">
+        {/* Form background image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={formImages[formType]} 
+            alt={`Modello ${formTitles[formType]}`}
+            className="w-full h-full object-contain opacity-20"
+          />
+        </div>
+        <div className="form-content relative z-10 p-6">
           <form onSubmit={form.handleSubmit(saveForm)}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="md:col-span-1">
