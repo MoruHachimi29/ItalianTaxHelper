@@ -14,6 +14,9 @@ import UtilitiesPage from "@/pages/UtilitiesPage";
 import CurrencyConverterPage from "@/pages/CurrencyConverterPage";
 import DutyCalculatorPage from "@/pages/DutyCalculatorPage";
 import P7mConverterPage from "@/pages/P7mConverterPage";
+import XmlToPngConverterPage from "@/pages/XmlToPngConverterPage";
+import PdfEditorPage from "@/pages/PdfEditorPage";
+import PdfToWordConverterPage from "@/pages/PdfToWordConverterPage";
 
 function Router() {
   return (
@@ -28,6 +31,9 @@ function Router() {
         <Route path="/strumenti/valuta" component={CurrencyConverterPage} />
         <Route path="/strumenti/dazi" component={DutyCalculatorPage} />
         <Route path="/strumenti/p7m" component={P7mConverterPage} />
+        <Route path="/strumenti/xml-png" component={XmlToPngConverterPage} />
+        <Route path="/strumenti/pdf-editor" component={PdfEditorPage} />
+        <Route path="/strumenti/pdf-word" component={PdfToWordConverterPage} />
         <Route path="/contatti" component={ContactPage} />
         <Route component={NotFound} />
       </Switch>
