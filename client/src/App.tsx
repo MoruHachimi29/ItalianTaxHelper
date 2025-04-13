@@ -11,6 +11,9 @@ import TutorialsPage from "@/pages/TutorialsPage";
 import NewsPage from "@/pages/NewsPage";
 import ContactPage from "@/pages/ContactPage";
 import UtilitiesPage from "@/pages/UtilitiesPage";
+import CurrencyConverterPage from "@/pages/CurrencyConverterPage";
+import DutyCalculatorPage from "@/pages/DutyCalculatorPage";
+import P7mConverterPage from "@/pages/P7mConverterPage";
 
 function Router() {
   return (
@@ -22,6 +25,9 @@ function Router() {
         <Route path="/tutorial" component={TutorialsPage} />
         <Route path="/notizie" component={NewsPage} />
         <Route path="/strumenti" component={UtilitiesPage} />
+        <Route path="/strumenti/valuta" component={CurrencyConverterPage} />
+        <Route path="/strumenti/dazi" component={DutyCalculatorPage} />
+        <Route path="/strumenti/p7m" component={P7mConverterPage} />
         <Route path="/contatti" component={ContactPage} />
         <Route component={NotFound} />
       </Switch>
