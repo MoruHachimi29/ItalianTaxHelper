@@ -96,7 +96,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         `apiKey=${NEWS_API_KEY}`
       );
       
-      const data = await response.json();
+      const data = await response.json() as {
+        status: string;
+        articles: Array<{
+          title: string;
+          description: string;
+          source: { name: string };
+          url: string;
+          urlToImage: string | null;
+          publishedAt: string;
+          author: string | null;
+        }>;
+        totalResults: number;
+        message?: string;
+      };
       
       if (data.status === "error") {
         console.error("Error fetching economic news:", data.message);
@@ -154,7 +167,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         `apiKey=${NEWS_API_KEY}`
       );
       
-      const data = await response.json();
+      const data = await response.json() as {
+        status: string;
+        articles: Array<{
+          title: string;
+          description: string;
+          source: { name: string };
+          url: string;
+          urlToImage: string | null;
+          publishedAt: string;
+          author: string | null;
+        }>;
+        totalResults: number;
+        message?: string;
+      };
       
       if (data.status === "error") {
         console.error(`Error fetching ${category} news:`, data.message);
@@ -207,7 +233,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         `apiKey=${NEWS_API_KEY}`
       );
       
-      const data = await response.json();
+      const data = await response.json() as {
+        status: string;
+        articles: Array<{
+          title: string;
+          description: string;
+          source: { name: string };
+          url: string;
+          urlToImage: string | null;
+          publishedAt: string;
+          author: string | null;
+        }>;
+        totalResults: number;
+        message?: string;
+      };
       
       if (data.status === "error") {
         console.error("Error searching news:", data.message);

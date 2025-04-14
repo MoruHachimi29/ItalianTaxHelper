@@ -63,7 +63,7 @@ export default function EconomicNewsList({
   // Fetch news based on active filters
   const { data, isLoading, isError, error } = useQuery<NewsResponse>({
     queryKey: getQueryKey(),
-    keepPreviousData: true
+    staleTime: 60 * 1000 // 1 minute
   });
   
   // Handle category change
