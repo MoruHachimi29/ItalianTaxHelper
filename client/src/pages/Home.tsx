@@ -4,6 +4,7 @@ import HowItWorks from "@/components/HowItWorks";
 import TutorialsList from "@/components/TutorialsList";
 import NewsList from "@/components/NewsList";
 import FAQSection from "@/components/FAQSection";
+import NewsletterSignup from "@/components/NewsletterSignup";
 
 export default function Home() {
   return (
@@ -40,6 +41,9 @@ export default function Home() {
       
       {/* FAQ */}
       <FAQSection />
+      
+      {/* Newsletter Signup */}
+      <NewsletterSignup />
     </>
   );
 }
