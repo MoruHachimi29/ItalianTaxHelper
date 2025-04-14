@@ -15,15 +15,11 @@ export default function Home() {
             <h1 className="font-serif text-3xl md:text-4xl font-bold mb-4">Compila i tuoi moduli fiscali online</h1>
             <p className="text-lg mb-8">Compila moduli F24 ordinario, F24 semplificato, F24 accise, F24 elide e F23 direttamente online e scaricali in PDF.</p>
             <div className="inline-flex flex-wrap justify-center gap-4">
-              <Link href="#moduli">
-                <a className="bg-black text-white px-6 py-3 rounded shadow hover:bg-gray-900 transition-colors">
-                  Inizia ora
-                </a>
+              <Link href="/moduli" className="bg-black text-white px-6 py-3 rounded shadow hover:bg-gray-900 transition-colors">
+                Inizia ora
               </Link>
-              <Link href="#tutorial">
-                <a className="border border-black px-6 py-3 rounded shadow hover:bg-gray-100 transition-colors">
-                  Guida ai moduli
-                </a>
+              <Link href="/tutorial" className="border border-black px-6 py-3 rounded shadow hover:bg-gray-100 transition-colors">
+                Guida ai moduli
               </Link>
             </div>
           </div>
