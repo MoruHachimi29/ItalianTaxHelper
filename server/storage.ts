@@ -197,25 +197,70 @@ async function initializeDatabase() {
   const existingNews = await db.select({ count: count() }).from(news);
   if (existingNews[0].count === 0) {
     // Sample news items
-    const newsData: InsertNews[] = [
+    // Funzione per creare date relative all'attuale
+    const createDate = (daysAgo: number) => {
+      const date = new Date();
+      date.setDate(date.getDate() - daysAgo);
+      return date;
+    };
+    
+    // Inserisci news con date diverse
+    await db.insert(news).values([
       {
         title: "Nuove scadenze fiscali: cosa sapere sui pagamenti",
         content: "L'Agenzia delle Entrate ha annunciato nuove scadenze per i pagamenti di alcune imposte. Ecco tutte le informazioni.",
-        author: "Team ModuliTax"
+        author: "Team ModuliTax",
+        publishDate: createDate(0) // Oggi
       },
       {
         title: "Modifiche alla compilazione dell'F24: le novità",
         content: "Importanti aggiornamenti nella compilazione dei modelli F24. Scopri quali cambiamenti dovrai considerare.",
-        author: "Team ModuliTax"
+        author: "Team ModuliTax",
+        publishDate: createDate(1) // Ieri
       },
       {
         title: "Incentivi fiscali per le imprese: guida completa",
         content: "Una panoramica completa sugli incentivi fiscali disponibili per le imprese italiane nel 2023.",
-        author: "Team ModuliTax"
+        author: "Team ModuliTax",
+        publishDate: createDate(2) // 2 giorni fa
+      },
+      {
+        title: "Dichiarazione dei Redditi 2025: le nuove tempistiche",
+        content: "Il Ministero dell'Economia ha pubblicato le nuove tempistiche per la dichiarazione dei redditi 2025. Ecco cosa cambia per i contribuenti.",
+        author: "Redazione Fiscale",
+        publishDate: createDate(3) // 3 giorni fa
+      },
+      {
+        title: "Bonus edilizi: tutte le detrazioni disponibili nel 2025",
+        content: "Panoramica completa dei bonus edilizi e delle agevolazioni fiscali disponibili per ristrutturazioni e interventi edilizi nell'anno in corso.",
+        author: "Marco Rossi",
+        publishDate: createDate(4) // 4 giorni fa
+      },
+      {
+        title: "Fatturazione elettronica: novità per professionisti e microimprese",
+        content: "Dal 1° gennaio 2025 cambia la normativa sulla fatturazione elettronica per alcune categorie. Scopri se sei interessato dalle modifiche.",
+        author: "Paola Bianchi",
+        publishDate: createDate(5) // 5 giorni fa
+      },
+      {
+        title: "IVA agevolata: i settori che beneficeranno delle riduzioni",
+        content: "Il governo ha approvato nuove aliquote IVA agevolate per alcuni settori strategici. Analisi dettagliata dei benefici e dei settori coinvolti.",
+        author: "Andrea Verdi",
+        publishDate: createDate(6) // 6 giorni fa
+      },
+      {
+        title: "Scadenze fiscali di aprile 2025: il calendario completo",
+        content: "Tutte le scadenze fiscali del mese di aprile 2025: versamenti, comunicazioni e adempimenti da non dimenticare.",
+        author: "Team ModuliTax",
+        publishDate: createDate(7) // 1 settimana fa
+      },
+      {
+        title: "INPS: nuove aliquote contributive per artigiani e commercianti",
+        content: "L'INPS ha aggiornato le aliquote contributive per artigiani e commercianti. Ecco come calcolare i nuovi importi e le scadenze dei versamenti.",
+        author: "Luca Ferrari",
+        publishDate: createDate(8) // 8 giorni fa
       }
-    ];
-    
-    await db.insert(news).values(newsData);
+    ]);
   }
 }
 
