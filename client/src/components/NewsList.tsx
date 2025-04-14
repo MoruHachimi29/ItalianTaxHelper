@@ -61,10 +61,8 @@ export default function NewsList({
                         </div>
                         <h3 className="text-xl font-bold mb-2">{item.title}</h3>
                         <p className="text-sm text-gray-600 mb-4">{item.content}</p>
-                        <Link href={`/notizie/${item.id}`}>
-                          <a className="text-black font-medium hover:underline flex items-center">
-                            Leggi l'articolo <span className="material-icons text-sm ml-1">arrow_forward</span>
-                          </a>
+                        <Link href={`/notizie/${item.id}`} className="text-black font-medium hover:underline flex items-center">
+                          Leggi l'articolo <span className="material-icons text-sm ml-1">arrow_forward</span>
                         </Link>
                       </div>
                     </article>
@@ -74,10 +72,8 @@ export default function NewsList({
               
               {showViewAllButton && (
                 <div className="text-center">
-                  <Link href="/notizie">
-                    <a className="inline-flex items-center bg-white border border-black px-6 py-3 rounded shadow hover:bg-gray-100 transition-colors">
-                      Tutti gli editoriali <span className="material-icons text-sm ml-1">arrow_forward</span>
-                    </a>
+                  <Link href="/notizie" className="inline-flex items-center bg-white border border-black px-6 py-3 rounded shadow hover:bg-gray-100 transition-colors">
+                    Tutti gli editoriali <span className="material-icons text-sm ml-1">arrow_forward</span>
                   </Link>
                 </div>
               )}
@@ -94,10 +90,8 @@ export default function NewsList({
                 
                 {showViewAllButton && (
                   <div className="text-center mt-8">
-                    <Link href="/notizie">
-                      <a className="inline-flex items-center bg-white border border-black px-6 py-3 rounded shadow hover:bg-gray-100 transition-colors">
-                        Tutte le notizie in tempo reale <span className="material-icons text-sm ml-1">arrow_forward</span>
-                      </a>
+                    <Link href="/notizie" className="inline-flex items-center bg-white border border-black px-6 py-3 rounded shadow hover:bg-gray-100 transition-colors">
+                      Tutte le notizie in tempo reale <span className="material-icons text-sm ml-1">arrow_forward</span>
                     </Link>
                   </div>
                 )}
@@ -130,10 +124,8 @@ export default function NewsList({
                       </div>
                       <h3 className="text-xl font-bold mb-2">{item.title}</h3>
                       <p className="text-sm text-gray-600 mb-4">{item.content}</p>
-                      <Link href={`/notizie/${item.id}`}>
-                        <a className="text-black font-medium hover:underline flex items-center">
-                          Leggi l'articolo <span className="material-icons text-sm ml-1">arrow_forward</span>
-                        </a>
+                      <Link href={`/notizie/${item.id}`} className="text-black font-medium hover:underline flex items-center">
+                        Leggi l'articolo <span className="material-icons text-sm ml-1">arrow_forward</span>
                       </Link>
                     </div>
                   </article>
@@ -143,10 +135,8 @@ export default function NewsList({
             
             {showViewAllButton && (
               <div className="text-center">
-                <Link href="/notizie">
-                  <a className="inline-flex items-center bg-white border border-black px-6 py-3 rounded shadow hover:bg-gray-100 transition-colors">
-                    Tutte le notizie <span className="material-icons text-sm ml-1">arrow_forward</span>
-                  </a>
+                <Link href="/notizie" className="inline-flex items-center bg-white border border-black px-6 py-3 rounded shadow hover:bg-gray-100 transition-colors">
+                  Tutte le notizie <span className="material-icons text-sm ml-1">arrow_forward</span>
                 </Link>
               </div>
             )}
