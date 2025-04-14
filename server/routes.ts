@@ -85,12 +85,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const page = parseInt(req.query.page as string) || 1;
       const pageSize = parseInt(req.query.pageSize as string) || 10;
       
+      // Get today's date in ISO format for the API call
+      const today = new Date();
+      // Get a date two days ago to ensure we have enough articles
+      const twoDaysAgo = new Date();
+      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+      
+      // Format dates for API
+      const todayFormatted = today.toISOString().split('T')[0];
+      const twoDaysAgoFormatted = twoDaysAgo.toISOString().split('T')[0];
+      
       // Fetch economic news in Italian language
       const response = await fetch(
         `${NEWS_API_URL}/everything?` +
         `q=economia OR finanza OR tasse OR fisco OR tributario&` +
         `language=it&` +
         `sortBy=publishedAt&` +
+        `from=${twoDaysAgoFormatted}&` +
+        `to=${todayFormatted}&` +
         `page=${page}&` +
         `pageSize=${pageSize}&` +
         `apiKey=${NEWS_API_KEY}`
@@ -157,11 +169,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const query = categoryQueries[category] || category;
       
+      // Get today's date in ISO format for the API call
+      const today = new Date();
+      // Get a date two days ago to ensure we have enough articles
+      const twoDaysAgo = new Date();
+      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+      
+      // Format dates for API
+      const todayFormatted = today.toISOString().split('T')[0];
+      const twoDaysAgoFormatted = twoDaysAgo.toISOString().split('T')[0];
+      
       const response = await fetch(
         `${NEWS_API_URL}/everything?` +
         `q=${query}&` +
         `language=it&` +
         `sortBy=publishedAt&` +
+        `from=${twoDaysAgoFormatted}&` +
+        `to=${todayFormatted}&` +
         `page=${page}&` +
         `pageSize=${pageSize}&` +
         `apiKey=${NEWS_API_KEY}`
@@ -223,11 +247,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Search query is required" });
       }
       
+      // Get today's date in ISO format for the API call
+      const today = new Date();
+      // Get a date two days ago to ensure we have enough articles
+      const twoDaysAgo = new Date();
+      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+      
+      // Format dates for API
+      const todayFormatted = today.toISOString().split('T')[0];
+      const twoDaysAgoFormatted = twoDaysAgo.toISOString().split('T')[0];
+      
       const response = await fetch(
         `${NEWS_API_URL}/everything?` +
         `q=${searchQuery}&` +
         `language=it&` +
         `sortBy=publishedAt&` +
+        `from=${twoDaysAgoFormatted}&` +
+        `to=${todayFormatted}&` +
         `page=${page}&` +
         `pageSize=${pageSize}&` +
         `apiKey=${NEWS_API_KEY}`
