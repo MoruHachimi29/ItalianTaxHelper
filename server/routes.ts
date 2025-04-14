@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import fetch from "node-fetch";
 import { 
   insertFormSchema, 
   insertTutorialSchema, 
@@ -12,6 +13,9 @@ import {
   f23Schema
 } from "@shared/schema";
 import { PDFDocument } from "pdf-lib";
+
+const NEWS_API_KEY = process.env.NEWS_API_KEY;
+const NEWS_API_URL = "https://newsapi.org/v2";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API routes - all prefixed with /api
@@ -71,6 +75,167 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(newsItem);
     } catch (error) {
       res.status(500).json({ message: "Errore nel recupero della notizia" });
+    }
+  });
+  
+  // Get the latest economic news from Italy and the world using NewsAPI
+  app.get("/api/economic-news", async (req, res) => {
+    try {
+      // Get query parameters with defaults
+      const page = parseInt(req.query.page as string) || 1;
+      const pageSize = parseInt(req.query.pageSize as string) || 10;
+      
+      // Fetch economic news in Italian language
+      const response = await fetch(
+        `${NEWS_API_URL}/everything?` +
+        `q=economia OR finanza OR tasse OR fisco OR tributario&` +
+        `language=it&` +
+        `sortBy=publishedAt&` +
+        `page=${page}&` +
+        `pageSize=${pageSize}&` +
+        `apiKey=${NEWS_API_KEY}`
+      );
+      
+      const data = await response.json();
+      
+      if (data.status === "error") {
+        console.error("Error fetching economic news:", data.message);
+        return res.status(500).json({ error: data.message });
+      }
+      
+      // Format the response to match our news schema
+      const formattedNews = data.articles.map((article: any) => ({
+        title: article.title,
+        content: article.description,
+        source: article.source.name,
+        url: article.url,
+        imageUrl: article.urlToImage,
+        publishedAt: article.publishedAt,
+        author: article.author
+      }));
+      
+      return res.json({
+        articles: formattedNews,
+        totalResults: data.totalResults,
+        currentPage: page,
+        pageSize: pageSize,
+        totalPages: Math.ceil(data.totalResults / pageSize)
+      });
+    } catch (error) {
+      console.error("Error in economic-news route:", error);
+      return res.status(500).json({ error: "Failed to fetch economic news" });
+    }
+  });
+  
+  // Get news by category (economia, fisco, finanza)
+  app.get("/api/economic-news/category/:category", async (req, res) => {
+    try {
+      const { category } = req.params;
+      const page = parseInt(req.query.page as string) || 1;
+      const pageSize = parseInt(req.query.pageSize as string) || 10;
+      
+      // Map categories to search queries
+      const categoryQueries: {[key: string]: string} = {
+        "economia": "economia OR pil OR inflazione",
+        "fisco": "fisco OR tasse OR tributario OR imposte",
+        "finanza": "finanza OR borsa OR investimenti OR mercati",
+        "lavoro": "lavoro OR occupazione OR contratti OR stipendi"
+      };
+      
+      const query = categoryQueries[category] || category;
+      
+      const response = await fetch(
+        `${NEWS_API_URL}/everything?` +
+        `q=${query}&` +
+        `language=it&` +
+        `sortBy=publishedAt&` +
+        `page=${page}&` +
+        `pageSize=${pageSize}&` +
+        `apiKey=${NEWS_API_KEY}`
+      );
+      
+      const data = await response.json();
+      
+      if (data.status === "error") {
+        console.error(`Error fetching ${category} news:`, data.message);
+        return res.status(500).json({ error: data.message });
+      }
+      
+      // Format the response
+      const formattedNews = data.articles.map((article: any) => ({
+        title: article.title,
+        content: article.description,
+        source: article.source.name,
+        url: article.url,
+        imageUrl: article.urlToImage,
+        publishedAt: article.publishedAt,
+        author: article.author
+      }));
+      
+      return res.json({
+        articles: formattedNews,
+        totalResults: data.totalResults,
+        currentPage: page,
+        pageSize: pageSize,
+        totalPages: Math.ceil(data.totalResults / pageSize),
+        category: category
+      });
+    } catch (error) {
+      console.error("Error in economic-news/category route:", error);
+      return res.status(500).json({ error: "Failed to fetch news by category" });
+    }
+  });
+  
+  // Search economic news
+  app.get("/api/economic-news/search", async (req, res) => {
+    try {
+      const searchQuery = req.query.q as string;
+      const page = parseInt(req.query.page as string) || 1;
+      const pageSize = parseInt(req.query.pageSize as string) || 10;
+      
+      if (!searchQuery) {
+        return res.status(400).json({ error: "Search query is required" });
+      }
+      
+      const response = await fetch(
+        `${NEWS_API_URL}/everything?` +
+        `q=${searchQuery}&` +
+        `language=it&` +
+        `sortBy=publishedAt&` +
+        `page=${page}&` +
+        `pageSize=${pageSize}&` +
+        `apiKey=${NEWS_API_KEY}`
+      );
+      
+      const data = await response.json();
+      
+      if (data.status === "error") {
+        console.error("Error searching news:", data.message);
+        return res.status(500).json({ error: data.message });
+      }
+      
+      // Format the response
+      const formattedNews = data.articles.map((article: any) => ({
+        title: article.title,
+        content: article.description,
+        source: article.source.name,
+        url: article.url,
+        imageUrl: article.urlToImage,
+        publishedAt: article.publishedAt,
+        author: article.author
+      }));
+      
+      return res.json({
+        articles: formattedNews,
+        totalResults: data.totalResults,
+        currentPage: page,
+        pageSize: pageSize,
+        totalPages: Math.ceil(data.totalResults / pageSize),
+        searchQuery: searchQuery
+      });
+    } catch (error) {
+      console.error("Error in economic-news/search route:", error);
+      return res.status(500).json({ error: "Failed to search news" });
     }
   });
   
