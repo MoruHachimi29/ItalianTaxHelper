@@ -16,7 +16,7 @@ export default function Home() {
             <p className="text-lg mb-8">Compila moduli F24 ordinario, F24 semplificato, F24 accise, F24 elide e F23 direttamente online e scaricali in PDF.</p>
             <div className="inline-flex flex-wrap justify-center gap-4">
               <Link href="/moduli" className="bg-black text-white px-6 py-3 rounded shadow hover:bg-gray-900 transition-colors">
-                Inizia ora
+                Compila i moduli
               </Link>
               <Link href="/tutorial" className="border border-black px-6 py-3 rounded shadow hover:bg-gray-100 transition-colors">
                 Guida ai moduli
