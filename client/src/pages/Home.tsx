@@ -4,10 +4,34 @@ import TutorialsList from "@/components/TutorialsList";
 import NewsList from "@/components/NewsList";
 import FAQSection from "@/components/FAQSection";
 import NewsletterSignup from "@/components/NewsletterSignup";
+import SEO from "@/components/SEO";
 
 export default function Home() {
+  // Schema.org data
+  const homeSchemaData = {
+    "@type": "WebSite",
+    "url": "https://f24editabile.replit.app/",
+    "name": "F24Editabile",
+    "description": "Compila moduli F24 ordinario, F24 semplificato, F24 accise, F24 elide e F23 direttamente online e scaricali in PDF.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://f24editabile.replit.app/notizie?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "EUR",
+      "availability": "https://schema.org/InStock"
+    }
+  };
+
   return (
     <>
+      <SEO 
+        schemaData={homeSchemaData}
+        canonicalPath="/"
+      />
       {/* Hero Section */}
       <section className="bg-gray-100 py-10 md:py-16">
         <div className="container mx-auto px-4">
