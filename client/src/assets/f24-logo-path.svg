@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="180" height="40" viewBox="0 0 180 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background rectangle with rounded corners -->
+  <rect width="40" height="40" rx="8" fill="black"/>
+  
+  <!-- F24 in white inside the black box (using paths instead of text) -->
+  <path d="M12 10H24V14H16V17H22V21H16V30H12V10Z" fill="white"/>
+  <path d="M25 30V10H29L32 21H33L36 10H40V30H36V19H35L32 30H28L25 19H24V30H25Z" fill="white"/>
+  
+  <!-- Editabile text next to the box (using paths instead of text) -->
+  <path d="M52 10H65V14H56V17H64V21H56V26H65V30H52V10Z" fill="black"/>
+  <path d="M67 10H71V26H79V30H67V10Z" fill="black"/>
+  <path d="M81 10H85V30H81V10Z" fill="black"/>
+  <path d="M88 10H92V26H100V30H88V10Z" fill="black"/>
+  <path d="M102 20C102 14 106 9 112 9C118 9 122 14 122 20C122 26 118 31 112 31C106 31 102 26 102 20ZM106 20C106 24 108 27 112 27C116 27 118 24 118 20C118 16 116 13 112 13C108 13 106 16 106 20Z" fill="black"/>
+  <path d="M124 10H128V26H136V30H124V10Z" fill="black"/>
+  <path d="M138 30V10H142V17H148V10H152V30H148V21H142V30H138Z" fill="black"/>
+  <path d="M154 10H167V14H158V17H166V21H158V26H167V30H154V10Z" fill="black"/>
+</svg>
