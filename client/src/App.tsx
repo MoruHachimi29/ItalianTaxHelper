@@ -9,6 +9,8 @@ import FormPage from "@/pages/FormPage";
 import ModulesPage from "@/pages/ModulesPage";
 import TutorialsPage from "@/pages/TutorialsPage";
 import NewsPage from "@/pages/NewsPage";
+import BlogPage from "@/pages/BlogPage";
+import BlogPostPage from "@/pages/BlogPostPage";
 import ContactPage from "@/pages/ContactPage";
 import UtilitiesPage from "@/pages/UtilitiesPage";
 import CurrencyConverterPage from "@/pages/CurrencyConverterPage";
@@ -27,6 +29,8 @@ function Router() {
         <Route path="/moduli/:formType" component={FormPage} />
         <Route path="/tutorial" component={TutorialsPage} />
         <Route path="/notizie" component={NewsPage} />
+        <Route path="/blog" component={BlogPage} />
+        <Route path="/blog/:slug" component={BlogPostPage} />
         <Route path="/strumenti" component={UtilitiesPage} />
         <Route path="/strumenti/valuta" component={CurrencyConverterPage} />
         <Route path="/strumenti/dazi" component={DutyCalculatorPage} />
