@@ -31,10 +31,12 @@ export default function NewsList({
         
         {showRealTimeTab ? (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-            <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-8">
-              <TabsTrigger value="editorial">Editoriali</TabsTrigger>
-              <TabsTrigger value="realtime">Tempo Reale</TabsTrigger>
-            </TabsList>
+            <div className="max-w-md mx-auto mb-8">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="editorial">Editoriali</TabsTrigger>
+                <TabsTrigger value="realtime">Tempo Reale</TabsTrigger>
+              </TabsList>
+            </div>
             
             <TabsContent value="editorial">
               {isLoading ? (

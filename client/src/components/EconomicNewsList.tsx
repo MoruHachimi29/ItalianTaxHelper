@@ -172,14 +172,16 @@ export default function EconomicNewsList({
     <div className="space-y-6">
       {showCategories && (
         <Tabs value={activeCategory} onValueChange={handleCategoryChange} className="mb-6">
-          <TabsList className="grid grid-cols-2 md:grid-cols-6 mb-8">
-            <TabsTrigger value="all">Tutte</TabsTrigger>
-            <TabsTrigger value="economia">Economia</TabsTrigger>
-            <TabsTrigger value="fisco">Fisco</TabsTrigger>
-            <TabsTrigger value="finanza">Finanza</TabsTrigger>
-            <TabsTrigger value="lavoro">Lavoro</TabsTrigger>
-            <TabsTrigger value="tecnologia">Tecnologia</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto pb-2 -mx-4 px-4">
+            <TabsList className="inline-flex whitespace-nowrap md:grid md:grid-cols-6 mb-8 w-auto md:w-full">
+              <TabsTrigger value="all" className="px-4 flex-shrink-0">Tutte</TabsTrigger>
+              <TabsTrigger value="economia" className="px-4 flex-shrink-0">Economia</TabsTrigger>
+              <TabsTrigger value="fisco" className="px-4 flex-shrink-0">Fisco</TabsTrigger>
+              <TabsTrigger value="finanza" className="px-4 flex-shrink-0">Finanza</TabsTrigger>
+              <TabsTrigger value="lavoro" className="px-4 flex-shrink-0">Lavoro</TabsTrigger>
+              <TabsTrigger value="tecnologia" className="px-4 flex-shrink-0">Tecnologia</TabsTrigger>
+            </TabsList>
+          </div>
         </Tabs>
       )}
       
@@ -283,25 +285,35 @@ export default function EconomicNewsList({
           </div>
           
           {showPagination && data && data.totalPages > 1 && (
-            <Pagination className="mt-8">
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious 
-                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                    className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                  />
-                </PaginationItem>
-                
-                {renderPaginationItems()}
-                
-                <PaginationItem>
-                  <PaginationNext 
-                    onClick={() => handlePageChange(Math.min(data.totalPages, currentPage + 1))}
-                    className={currentPage === data.totalPages ? "pointer-events-none opacity-50" : ""}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            <div className="mt-8 overflow-x-auto pb-2">
+              <Pagination className="flex justify-center">
+                <PaginationContent className="flex flex-nowrap">
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      className={`${currentPage === 1 ? "pointer-events-none opacity-50" : ""} whitespace-nowrap`}
+                    />
+                  </PaginationItem>
+                  
+                  <div className="hidden sm:flex">
+                    {renderPaginationItems()}
+                  </div>
+                  
+                  <div className="flex sm:hidden items-center mx-2">
+                    <span className="text-sm">
+                      {currentPage} di {data.totalPages}
+                    </span>
+                  </div>
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => handlePageChange(Math.min(data.totalPages, currentPage + 1))}
+                      className={`${currentPage === data.totalPages ? "pointer-events-none opacity-50" : ""} whitespace-nowrap`}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
           )}
         </>
       )}
