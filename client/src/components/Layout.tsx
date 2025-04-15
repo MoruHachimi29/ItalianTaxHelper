@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import logoPath from "@/assets/f24-logo-final.svg";
+import logoPath from "@/assets/f24-logo-image.png";
 
 interface LayoutProps {
   children: ReactNode;
@@ -18,7 +18,7 @@ export default function Layout({ children }: LayoutProps) {
             <div className="flex items-center mb-4 md:mb-0">
               <Link href="/">
                 <a className="flex items-center">
-                  <img src={logoPath} alt="F24Editabile" className="h-12" />
+                  <img src={logoPath} alt="F24Editabile" className="h-14" />
                 </a>
               </Link>
               <span className="ml-2 text-sm bg-white text-black px-2 py-1 rounded">BETA</span>
