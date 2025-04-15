@@ -122,11 +122,9 @@ export default function BlogPostDetail({ slug }: BlogPostDetailProps) {
           <p>Si è verificato un errore nel caricamento dell'articolo richiesto.</p>
           <p className="text-sm mt-2">Dettagli: {error instanceof Error ? error.message : "Errore sconosciuto"}</p>
           <div className="mt-6">
-            <Link href="/blog">
-              <a className="inline-flex items-center text-black hover:underline">
-                <ArrowLeft size={18} className="mr-2" />
-                Torna alla lista degli articoli
-              </a>
+            <Link href="/blog" className="inline-flex items-center text-black hover:underline">
+              <ArrowLeft size={18} className="mr-2" />
+              Torna alla lista degli articoli
             </Link>
           </div>
         </div>
@@ -176,11 +174,9 @@ export default function BlogPostDetail({ slug }: BlogPostDetailProps) {
       <article className="max-w-4xl mx-auto px-4 py-8">
         {/* Back to blog */}
         <div className="mb-6">
-          <Link href="/blog">
-            <a className="inline-flex items-center text-black hover:underline mb-6">
-              <ArrowLeft size={18} className="mr-2" />
-              Torna al blog
-            </a>
+          <Link href="/blog" className="inline-flex items-center text-black hover:underline mb-6">
+            <ArrowLeft size={18} className="mr-2" />
+            Torna al blog
           </Link>
         </div>
 
@@ -265,11 +261,9 @@ export default function BlogPostDetail({ slug }: BlogPostDetailProps) {
 
         {/* Navigation */}
         <div className="mt-10 pt-6 border-t border-gray-200 flex justify-between">
-          <Link href="/blog">
-            <a className="inline-flex items-center text-black hover:underline">
-              <ArrowLeft size={18} className="mr-2" />
-              Torna al blog
-            </a>
+          <Link href="/blog" className="inline-flex items-center text-black hover:underline">
+            <ArrowLeft size={18} className="mr-2" />
+            Torna al blog
           </Link>
         </div>
       </article>
