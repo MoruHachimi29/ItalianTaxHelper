@@ -15,6 +15,9 @@ app.use(express.urlencoded({ extended: false }));
 // Serve i file SEO statici dalla cartella client/public
 app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
 
+// Serve i file dalla cartella attached_assets
+app.use('/assets', express.static(path.join(__dirname, '..', 'attached_assets')));
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
