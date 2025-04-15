@@ -73,9 +73,9 @@ export default function FormsList() {
                 <h3 className="text-xl font-bold mb-2">{form.title}</h3>
                 <p className="text-sm text-gray-600 mb-4">{form.description}</p>
                 <Link href={`/moduli/${form.type}`}>
-                  <a className="block w-full bg-black text-white text-center py-2 rounded hover:bg-gray-900 transition-colors">
+                  <div className="block w-full bg-black text-white text-center py-2 rounded hover:bg-gray-900 transition-colors cursor-pointer">
                     Compila
-                  </a>
+                  </div>
                 </Link>
               </div>
             </div>

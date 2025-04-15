@@ -1,6 +1,7 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Link, useLocation } from "wouter";
 import logoPath from "@/assets/f24-logo-latest.png";
+import { Menu, X } from "lucide-react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -8,6 +9,11 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
 
   return (
     <div className="bg-white font-sans text-gray-900 min-h-screen flex flex-col">
@@ -21,7 +27,9 @@ export default function Layout({ children }: LayoutProps) {
                 <span className="ml-2 text-xs bg-white text-black px-1.5 py-0.5 rounded">BETA</span>
               </div>
             </Link>
-            <nav className="flex-1 ml-10">
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:block flex-1 ml-10">
               <ul className="flex justify-around">
                 <li>
                   <Link href="/">
@@ -67,6 +75,78 @@ export default function Layout({ children }: LayoutProps) {
                 </li>
               </ul>
             </nav>
+
+            {/* Mobile Menu Button */}
+            <button 
+              className="md:hidden p-2 rounded-md text-gray-300 hover:text-white focus:outline-none"
+              onClick={toggleMobileMenu}
+            >
+              {mobileMenuOpen ? (
+                <X size={24} aria-hidden="true" />
+              ) : (
+                <Menu size={24} aria-hidden="true" />
+              )}
+            </button>
+          </div>
+
+          {/* Mobile Menu */}
+          <div className={`${mobileMenuOpen ? 'block' : 'hidden'} md:hidden py-2`}>
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              <Link href="/">
+                <div 
+                  className={`block px-3 py-2 rounded-md ${location === "/" ? 
+                    "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Home
+                </div>
+              </Link>
+              <Link href="/moduli">
+                <div 
+                  className={`block px-3 py-2 rounded-md ${location.startsWith("/moduli") ? 
+                    "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Moduli
+                </div>
+              </Link>
+              <Link href="/tutorial">
+                <div 
+                  className={`block px-3 py-2 rounded-md ${location === "/tutorial" ? 
+                    "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Tutorial
+                </div>
+              </Link>
+              <Link href="/notizie">
+                <div 
+                  className={`block px-3 py-2 rounded-md ${location === "/notizie" ? 
+                    "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Notizie
+                </div>
+              </Link>
+              <Link href="/strumenti">
+                <div 
+                  className={`block px-3 py-2 rounded-md ${location === "/strumenti" ? 
+                    "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Strumenti
+                </div>
+              </Link>
+              <Link href="/contatti">
+                <div 
+                  className={`block px-3 py-2 rounded-md ${location === "/contatti" ? 
+                    "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Contatti
+                </div>
+              </Link>
+            </div>
           </div>
         </div>
       </header>

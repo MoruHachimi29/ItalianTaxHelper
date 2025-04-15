@@ -90,7 +90,7 @@ export default function HowItWorks() {
               </div>
             </div>
             
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button 
                 className="flex-1 bg-black text-white py-2 px-4 rounded flex items-center justify-center"
                 onClick={() => handleAction("Scarica PDF")}
