@@ -50,10 +50,10 @@ export default function TutorialsList({ limit, showViewAllButton = true }: Tutor
                   <h3 className="text-lg font-bold mb-2">{tutorial.title}</h3>
                   <p className="text-sm text-gray-600 mb-4">{tutorial.content}</p>
                   <Link href={`/tutorial/${tutorial.id}`}>
-                    <a className="text-black font-medium hover:underline flex items-center">
+                    <div className="text-black font-medium hover:underline flex items-center cursor-pointer">
                       {tutorial.isVideo ? "Guarda il video" : "Leggi la guida"} 
                       <span className="material-icons text-sm ml-1">arrow_forward</span>
-                    </a>
+                    </div>
                   </Link>
                 </div>
               </div>
@@ -64,9 +64,9 @@ export default function TutorialsList({ limit, showViewAllButton = true }: Tutor
         {showViewAllButton && (
           <div className="text-center">
             <Link href="/tutorial">
-              <a className="inline-flex items-center bg-white border border-black px-6 py-3 rounded shadow hover:bg-gray-100 transition-colors">
+              <div className="inline-flex items-center bg-white border border-black px-6 py-3 rounded shadow hover:bg-gray-100 transition-colors cursor-pointer">
                 Vedi tutti i tutorial <span className="material-icons text-sm ml-1">arrow_forward</span>
-              </a>
+              </div>
             </Link>
           </div>
         )}
