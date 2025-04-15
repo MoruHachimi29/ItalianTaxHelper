@@ -1,4 +1,6 @@
 import { Link } from "wouter";
+import { useState } from "react";
+import ImageModal from "@/components/ImageModal";
 
 // Import form images
 import f24OrdinarioImage from "@/assets/forms/f24-ordinario.png";
@@ -54,6 +56,18 @@ const formsList: FormData[] = [
 ];
 
 export default function FormsList() {
+  const [selectedImage, setSelectedImage] = useState<{ src: string; alt: string } | null>(null);
+  
+  // Function to open the modal with the selected image
+  const openImageModal = (src: string, alt: string) => {
+    setSelectedImage({ src, alt });
+  };
+  
+  // Function to close the modal
+  const closeImageModal = () => {
+    setSelectedImage(null);
+  };
+  
   return (
     <section id="moduli" className="py-12 md:py-16">
       <div className="container mx-auto px-4">
@@ -62,7 +76,10 @@ export default function FormsList() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {formsList.map((form) => (
             <div key={form.id} className="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105">
-              <div className="h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
+              <div 
+                className="h-48 bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer"
+                onClick={() => openImageModal(form.image, `Modello ${form.title}`)}
+              >
                 <img 
                   src={form.image} 
                   alt={`Modello ${form.title}`} 
@@ -81,6 +98,16 @@ export default function FormsList() {
             </div>
           ))}
         </div>
+        
+        {/* Image Modal */}
+        {selectedImage && (
+          <ImageModal
+            isOpen={!!selectedImage}
+            onClose={closeImageModal}
+            imageSrc={selectedImage.src}
+            imageAlt={selectedImage.alt}
+          />
+        )}
       </div>
     </section>
   );

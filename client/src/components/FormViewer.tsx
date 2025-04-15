@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { createPDF } from "@/lib/pdfGenerator";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import ImageModal from "@/components/ImageModal";
 import {
   f24OrdinarySchema,
   f24SimplifiedSchema,
@@ -58,6 +59,7 @@ export default function FormViewer({ formType }: FormViewerProps) {
   const { toast } = useToast();
   const [total, setTotal] = useState("0,00");
   const formRef = useRef<HTMLDivElement>(null);
+  const [showImageModal, setShowImageModal] = useState(false);
   
   // Get the correct schema for the form type
   const formSchema = formSchemas[formType];
@@ -307,7 +309,7 @@ export default function FormViewer({ formType }: FormViewerProps) {
         </div>
       </div>
       
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 mb-4">
         <Button
           className="flex-1 bg-black text-white hover:bg-gray-900"
           onClick={downloadPDF}
@@ -333,6 +335,25 @@ export default function FormViewer({ formType }: FormViewerProps) {
           <span className="material-icons text-sm mr-1">save</span> Salva
         </Button>
       </div>
+      
+      <div className="text-center">
+        <Button
+          variant="link"
+          className="text-black hover:underline inline-flex items-center"
+          onClick={() => setShowImageModal(true)}
+        >
+          <span className="material-icons text-sm mr-1">zoom_in</span> 
+          Visualizza modello originale
+        </Button>
+      </div>
+      
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={showImageModal}
+        onClose={() => setShowImageModal(false)}
+        imageSrc={formImages[formType]}
+        imageAlt={`Modello ${formTitles[formType]}`}
+      />
     </div>
   );
 }
