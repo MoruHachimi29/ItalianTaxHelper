@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import fetch from "node-fetch";
@@ -6,6 +6,7 @@ import {
   insertFormSchema, 
   insertTutorialSchema, 
   insertNewsSchema,
+  insertBlogPostSchema,
   f24OrdinarySchema,
   f24SimplifiedSchema,
   f24ExciseSchema,
@@ -394,6 +395,186 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.send(Buffer.from(pdfBytes));
     } catch (error) {
       res.status(500).json({ message: "Errore nella generazione del PDF" });
+    }
+  });
+  
+  // Blog API endpoints
+  
+  // Get all blog posts with pagination
+  app.get("/api/blog", async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const result = await storage.getAllBlogPosts(page, limit);
+      
+      res.json({
+        posts: result.posts,
+        totalCount: result.totalCount,
+        currentPage: page,
+        pageSize: limit,
+        totalPages: Math.ceil(result.totalCount / limit)
+      });
+    } catch (error) {
+      console.error("Error in /api/blog route:", error);
+      res.status(500).json({ message: "Errore nel recupero degli articoli del blog" });
+    }
+  });
+  
+  // Get latest blog posts
+  app.get("/api/blog/latest", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 5;
+      const latestPosts = await storage.getLatestBlogPosts(limit);
+      res.json(latestPosts);
+    } catch (error) {
+      console.error("Error in /api/blog/latest route:", error);
+      res.status(500).json({ message: "Errore nel recupero degli ultimi articoli del blog" });
+    }
+  });
+  
+  // Get blog post by slug
+  app.get("/api/blog/post/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const post = await storage.getBlogPostBySlug(slug);
+      
+      if (!post) {
+        return res.status(404).json({ message: "Articolo non trovato" });
+      }
+      
+      res.json(post);
+    } catch (error) {
+      console.error(`Error in /api/blog/post/${req.params.slug} route:`, error);
+      res.status(500).json({ message: "Errore nel recupero dell'articolo del blog" });
+    }
+  });
+  
+  // Get blog posts by category
+  app.get("/api/blog/category/:category", async (req, res) => {
+    try {
+      const { category } = req.params;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      
+      const result = await storage.getBlogPostsByCategory(category, page, limit);
+      
+      res.json({
+        posts: result.posts,
+        totalCount: result.totalCount,
+        currentPage: page,
+        pageSize: limit,
+        totalPages: Math.ceil(result.totalCount / limit),
+        category
+      });
+    } catch (error) {
+      console.error(`Error in /api/blog/category/${req.params.category} route:`, error);
+      res.status(500).json({ message: "Errore nel recupero degli articoli per categoria" });
+    }
+  });
+  
+  // Search blog posts
+  app.get("/api/blog/search", async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      
+      if (!query || query.trim() === "") {
+        return res.status(400).json({ message: "È necessario specificare un termine di ricerca" });
+      }
+      
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      
+      const result = await storage.searchBlogPosts(query, page, limit);
+      
+      res.json({
+        posts: result.posts,
+        totalCount: result.totalCount,
+        currentPage: page,
+        pageSize: limit,
+        totalPages: Math.ceil(result.totalCount / limit),
+        searchQuery: query
+      });
+    } catch (error) {
+      console.error("Error in /api/blog/search route:", error);
+      res.status(500).json({ message: "Errore nella ricerca degli articoli" });
+    }
+  });
+  
+  // Get related posts
+  app.get("/api/blog/related/:postId", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.postId);
+      const limit = parseInt(req.query.limit as string) || 3;
+      
+      if (isNaN(postId)) {
+        return res.status(400).json({ message: "ID articolo non valido" });
+      }
+      
+      const relatedPosts = await storage.getRelatedBlogPosts(postId, limit);
+      res.json(relatedPosts);
+    } catch (error) {
+      console.error(`Error in /api/blog/related/${req.params.postId} route:`, error);
+      res.status(500).json({ message: "Errore nel recupero degli articoli correlati" });
+    }
+  });
+  
+  // Create a new blog post
+  app.post("/api/blog/post", async (req, res) => {
+    try {
+      const blogPostData = insertBlogPostSchema.parse(req.body);
+      const savedPost = await storage.createBlogPost(blogPostData);
+      res.status(201).json(savedPost);
+    } catch (error) {
+      console.error("Error in POST /api/blog/post route:", error);
+      res.status(400).json({ message: "Dati dell'articolo non validi", error });
+    }
+  });
+  
+  // Update a blog post
+  app.put("/api/blog/post/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "ID articolo non valido" });
+      }
+      
+      const post = await storage.getBlogPost(id);
+      
+      if (!post) {
+        return res.status(404).json({ message: "Articolo non trovato" });
+      }
+      
+      const updatedPostData = req.body;
+      const updatedPost = await storage.updateBlogPost(id, updatedPostData);
+      
+      res.json(updatedPost);
+    } catch (error) {
+      console.error(`Error in PUT /api/blog/post/${req.params.id} route:`, error);
+      res.status(400).json({ message: "Errore nell'aggiornamento dell'articolo", error });
+    }
+  });
+  
+  // Delete a blog post
+  app.delete("/api/blog/post/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "ID articolo non valido" });
+      }
+      
+      const post = await storage.getBlogPost(id);
+      
+      if (!post) {
+        return res.status(404).json({ message: "Articolo non trovato" });
+      }
+      
+      await storage.deleteBlogPost(id);
+      res.status(204).end();
+    } catch (error) {
+      console.error(`Error in DELETE /api/blog/post/${req.params.id} route:`, error);
+      res.status(500).json({ message: "Errore nell'eliminazione dell'articolo" });
     }
   });
 
