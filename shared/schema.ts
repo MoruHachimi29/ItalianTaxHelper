@@ -62,6 +62,39 @@ export const insertNewsSchema = createInsertSchema(news).pick({
   author: true
 });
 
+// Blog posts schema
+export const blogPosts = pgTable("blog_posts", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  summary: text("summary").notNull(),
+  content: text("content").notNull(),
+  imageUrl: text("image_url"),
+  author: text("author").notNull(),
+  category: text("category").notNull(), // economia, finanza, fisco, lavoro, tecnologia
+  tags: text("tags").array(),
+  publishDate: timestamp("publish_date").defaultNow().notNull(),
+  isPublished: boolean("is_published").default(true),
+  metaTitle: text("meta_title"), // SEO optimization
+  metaDescription: text("meta_description"), // SEO optimization
+  metaKeywords: text("meta_keywords"), // SEO optimization
+});
+
+export const insertBlogPostSchema = createInsertSchema(blogPosts).pick({
+  title: true,
+  slug: true,
+  summary: true,
+  content: true,
+  imageUrl: true,
+  author: true,
+  category: true,
+  tags: true,
+  isPublished: true,
+  metaTitle: true,
+  metaDescription: true,
+  metaKeywords: true
+});
+
 // Define form field schemas for validation
 export const f24OrdinarySchema = z.object({
   fiscalCode: z.string().nonempty("Il codice fiscale è obbligatorio"),
@@ -115,6 +148,9 @@ export type Tutorial = typeof tutorials.$inferSelect;
 
 export type InsertNews = z.infer<typeof insertNewsSchema>;
 export type News = typeof news.$inferSelect;
+
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+export type BlogPost = typeof blogPosts.$inferSelect;
 
 export type F24Ordinary = z.infer<typeof f24OrdinarySchema>;
 export type F24Simplified = z.infer<typeof f24SimplifiedSchema>;
