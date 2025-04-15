@@ -164,7 +164,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "economia": "economia OR pil OR inflazione",
         "fisco": "fisco OR tasse OR tributario OR imposte",
         "finanza": "finanza OR borsa OR investimenti OR mercati",
-        "lavoro": "lavoro OR occupazione OR contratti OR stipendi"
+        "lavoro": "lavoro OR occupazione OR contratti OR stipendi",
+        "tecnologia": "tecnologia OR digitale OR intelligenza artificiale OR ai OR smartphone OR computer"
       };
       
       const query = categoryQueries[category] || category;
