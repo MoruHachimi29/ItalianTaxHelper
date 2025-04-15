@@ -9,6 +9,11 @@ interface SEOProps {
   ogImage?: string;
   schemaType?: "WebPage" | "Article" | "Organization" | "Product" | "FAQPage";
   schemaData?: Record<string, any>;
+  noIndex?: boolean;
+  alternateLanguages?: {
+    hrefLang: string;
+    href: string;
+  }[];
 }
 
 const defaultDescription = "F24Editabile: compila online moduli F24 ordinario, semplificato, accise, elide e F23. Servizio gratuito per calcolare, scaricare e stampare moduli fiscali italiani.";
@@ -24,6 +29,8 @@ export default function SEO({
   ogImage = "/og-image.jpg",
   schemaType = "WebPage",
   schemaData = {},
+  noIndex = false,
+  alternateLanguages = [],
 }: SEOProps) {
   const fullTitle = title 
     ? `${title} | F24Editabile`
@@ -47,6 +54,23 @@ export default function SEO({
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
       <link rel="canonical" href={canonicalUrl} />
+      
+      {/* No Index if specified */}
+      {noIndex && <meta name="robots" content="noindex, nofollow" />}
+      
+      {/* Mobile Optimization */}
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+      <meta name="theme-color" content="#000000" />
+      
+      {/* Alternate Languages */}
+      {alternateLanguages.map((lang) => (
+        <link 
+          key={lang.hrefLang}
+          rel="alternate" 
+          hrefLang={lang.hrefLang} 
+          href={lang.href} 
+        />
+      ))}
       
       {/* Open Graph Tags */}
       <meta property="og:title" content={fullTitle} />
