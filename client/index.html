@@ -18,6 +18,12 @@
     <meta name="msapplication-config" content="/icons/browserconfig.xml" />
     <link rel="manifest" href="/manifest.json" />
     
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    
     <!-- Open Graph / Facebook -->
     <meta property="og:locale" content="it_IT" />
     <meta property="og:type" content="website" />
@@ -25,15 +31,15 @@
     <meta property="og:description" content="Compila, calcola e scarica gratis moduli fiscali F24 e F23. Servizio online semplice e intuitivo per la compilazione dei moduli dell'Agenzia delle Entrate." />
     <meta property="og:url" content="https://f24editabile.replit.app/" />
     <meta property="og:site_name" content="F24Editabile" />
-    <meta property="og:image" content="https://f24editabile.replit.app/og-image.jpg" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:image" content="https://f24editabile.replit.app/og-image.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
     
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="F24Editabile - Moduli Fiscali Italiani Compilabili Online" />
     <meta name="twitter:description" content="Compila, calcola e scarica gratis moduli fiscali F24 e F23. Servizio online semplice e intuitivo per la compilazione dei moduli dell'Agenzia delle Entrate." />
-    <meta name="twitter:image" content="https://f24editabile.replit.app/og-image.jpg" />
+    <meta name="twitter:image" content="https://f24editabile.replit.app/og-image.png" />
     
     <!-- DNS Prefetch e Preconnect per migliorare le prestazioni -->
     <link rel="dns-prefetch" href="//fonts.googleapis.com" />
@@ -56,5 +62,9 @@
     <script type="module" src="/src/main.tsx"></script>
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
     <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+    
+    <!-- JSON-LD structured data -->
+    <script type="application/ld+json" src="/structured-data.json"></script>
+    <script type="application/ld+json" src="/faq-data.json"></script>
   </body>
 </html>
