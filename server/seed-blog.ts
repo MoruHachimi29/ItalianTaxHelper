@@ -53,7 +53,7 @@ async function seedBlogPosts() {
         <h2>Conclusioni</h2>
         <p>Le novità fiscali introdotte dalla Legge di Bilancio 2025 rappresentano un passo verso la semplificazione del sistema tributario italiano. È consigliabile, tuttavia, consultare un commercialista o un esperto fiscale per valutare come queste modifiche impatteranno sulla propria situazione personale o aziendale.</p>
       `,
-      imageUrl: "https://images.pexels.com/photos/210574/pexels-photo-210574.jpeg",
+      // Utilizziamo l'immagine locale
       author: "Dott. Marco Rossi",
       category: "fisco",
       tags: ["fisco", "irpef", "legge di bilancio", "tasse", "2025"],
