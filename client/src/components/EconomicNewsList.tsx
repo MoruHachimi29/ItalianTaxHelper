@@ -54,7 +54,7 @@ export default function EconomicNewsList({
     }
     
     if (activeCategory !== "all") {
-      return ["/api/economic-news/category", activeCategory, { page: currentPage, pageSize: limit }];
+      return [`/api/economic-news/category/${activeCategory}`, { page: currentPage, pageSize: limit }];
     }
     
     return ["/api/economic-news", { page: currentPage, pageSize: limit }];
