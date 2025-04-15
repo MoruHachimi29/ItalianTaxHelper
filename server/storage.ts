@@ -1,6 +1,12 @@
-import { users, type User, type InsertUser, forms, type Form, type InsertForm, tutorials, type Tutorial, type InsertTutorial, news, type News, type InsertNews } from "@shared/schema";
+import { 
+  users, type User, type InsertUser, 
+  forms, type Form, type InsertForm, 
+  tutorials, type Tutorial, type InsertTutorial, 
+  news, type News, type InsertNews,
+  blogPosts, type BlogPost, type InsertBlogPost 
+} from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, count } from "drizzle-orm";
+import { eq, desc, count, and, like, sql } from "drizzle-orm";
 
 // Expanded interface with CRUD methods for all entities
 export interface IStorage {
@@ -27,6 +33,18 @@ export interface IStorage {
   getAllNews(): Promise<News[]>;
   getLatestNews(limit: number): Promise<News[]>;
   createNews(newsItem: InsertNews): Promise<News>;
+  
+  // Blog methods
+  getBlogPost(id: number): Promise<BlogPost | undefined>;
+  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
+  getAllBlogPosts(page?: number, limit?: number): Promise<{ posts: BlogPost[], totalCount: number }>;
+  getBlogPostsByCategory(category: string, page?: number, limit?: number): Promise<{ posts: BlogPost[], totalCount: number }>;
+  searchBlogPosts(query: string, page?: number, limit?: number): Promise<{ posts: BlogPost[], totalCount: number }>;
+  getLatestBlogPosts(limit: number): Promise<BlogPost[]>;
+  getRelatedBlogPosts(postId: number, limit?: number): Promise<BlogPost[]>;
+  createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  updateBlogPost(id: number, data: Partial<BlogPost>): Promise<BlogPost | undefined>;
+  deleteBlogPost(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -157,6 +175,166 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return newsItem;
+  }
+  
+  // Blog methods
+  async getBlogPost(id: number): Promise<BlogPost | undefined> {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
+    return post || undefined;
+  }
+  
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug));
+    return post || undefined;
+  }
+  
+  async getAllBlogPosts(page: number = 1, limit: number = 10): Promise<{ posts: BlogPost[], totalCount: number }> {
+    const offset = (page - 1) * limit;
+    
+    // Get total count
+    const [result] = await db.select({ count: count() }).from(blogPosts).where(eq(blogPosts.isPublished, true));
+    const totalCount = Number(result.count);
+    
+    // Get paginated posts
+    const posts = await db
+      .select()
+      .from(blogPosts)
+      .where(eq(blogPosts.isPublished, true))
+      .orderBy(desc(blogPosts.publishDate))
+      .limit(limit)
+      .offset(offset);
+    
+    return { posts, totalCount };
+  }
+  
+  async getBlogPostsByCategory(category: string, page: number = 1, limit: number = 10): Promise<{ posts: BlogPost[], totalCount: number }> {
+    const offset = (page - 1) * limit;
+    
+    // Get total count for category
+    const [result] = await db
+      .select({ count: count() })
+      .from(blogPosts)
+      .where(and(
+        eq(blogPosts.category, category),
+        eq(blogPosts.isPublished, true)
+      ));
+    const totalCount = Number(result.count);
+    
+    // Get paginated posts by category
+    const posts = await db
+      .select()
+      .from(blogPosts)
+      .where(and(
+        eq(blogPosts.category, category),
+        eq(blogPosts.isPublished, true)
+      ))
+      .orderBy(desc(blogPosts.publishDate))
+      .limit(limit)
+      .offset(offset);
+    
+    return { posts, totalCount };
+  }
+  
+  async searchBlogPosts(query: string, page: number = 1, limit: number = 10): Promise<{ posts: BlogPost[], totalCount: number }> {
+    const offset = (page - 1) * limit;
+    const searchPattern = `%${query}%`;
+    
+    // Get total count for search
+    const [result] = await db
+      .select({ count: count() })
+      .from(blogPosts)
+      .where(and(
+        or(
+          like(blogPosts.title, searchPattern),
+          like(blogPosts.content, searchPattern),
+          like(blogPosts.summary, searchPattern),
+          sql`${blogPosts.tags}::text LIKE ${searchPattern}`
+        ),
+        eq(blogPosts.isPublished, true)
+      ));
+    const totalCount = Number(result.count);
+    
+    // Get paginated search results
+    const posts = await db
+      .select()
+      .from(blogPosts)
+      .where(and(
+        or(
+          like(blogPosts.title, searchPattern),
+          like(blogPosts.content, searchPattern),
+          like(blogPosts.summary, searchPattern),
+          sql`${blogPosts.tags}::text LIKE ${searchPattern}`
+        ),
+        eq(blogPosts.isPublished, true)
+      ))
+      .orderBy(desc(blogPosts.publishDate))
+      .limit(limit)
+      .offset(offset);
+    
+    return { posts, totalCount };
+  }
+  
+  async getLatestBlogPosts(limit: number): Promise<BlogPost[]> {
+    return await db
+      .select()
+      .from(blogPosts)
+      .where(eq(blogPosts.isPublished, true))
+      .orderBy(desc(blogPosts.publishDate))
+      .limit(limit);
+  }
+  
+  async getRelatedBlogPosts(postId: number, limit: number = 3): Promise<BlogPost[]> {
+    // First get the category of the specified post
+    const [post] = await db
+      .select()
+      .from(blogPosts)
+      .where(eq(blogPosts.id, postId));
+    
+    if (!post) return [];
+    
+    // Then get other posts from the same category, excluding the original post
+    return await db
+      .select()
+      .from(blogPosts)
+      .where(and(
+        eq(blogPosts.category, post.category),
+        eq(blogPosts.isPublished, true),
+        sql`${blogPosts.id} != ${postId}`
+      ))
+      .orderBy(desc(blogPosts.publishDate))
+      .limit(limit);
+  }
+  
+  async createBlogPost(insertBlogPost: InsertBlogPost): Promise<BlogPost> {
+    const postWithTimestamp = {
+      ...insertBlogPost,
+      publishDate: new Date()
+    };
+    
+    const [post] = await db
+      .insert(blogPosts)
+      .values(postWithTimestamp)
+      .returning();
+    
+    return post;
+  }
+  
+  async updateBlogPost(id: number, data: Partial<BlogPost>): Promise<BlogPost | undefined> {
+    const [updatedPost] = await db
+      .update(blogPosts)
+      .set(data)
+      .where(eq(blogPosts.id, id))
+      .returning();
+    
+    return updatedPost || undefined;
+  }
+  
+  async deleteBlogPost(id: number): Promise<boolean> {
+    await db
+      .delete(blogPosts)
+      .where(eq(blogPosts.id, id));
+    
+    return true;
   }
 }
 
