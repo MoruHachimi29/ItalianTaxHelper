@@ -1,0 +1,24 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#FFFFFF"/>
+  
+  <!-- Header -->
+  <rect width="1200" height="100" fill="#000000"/>
+  
+  <!-- Title -->
+  <text x="600" y="180" font-family="Playfair Display, serif" font-size="64" font-weight="700" text-anchor="middle" fill="#000000">F24Editabile</text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="250" font-family="Roboto, sans-serif" font-size="32" font-weight="400" text-anchor="middle" fill="#222222">Moduli Fiscali Italiani Compilabili Online</text>
+  
+  <!-- Form Icon -->
+  <rect x="450" y="300" width="300" height="250" rx="10" stroke="#000000" stroke-width="3" fill="none"/>
+  <line x1="480" y1="340" x2="720" y2="340" stroke="#000000" stroke-width="2"/>
+  <line x1="480" y1="380" x2="720" y2="380" stroke="#000000" stroke-width="2"/>
+  <line x1="480" y1="420" x2="720" y2="420" stroke="#000000" stroke-width="2"/>
+  <line x1="480" y1="460" x2="720" y2="460" stroke="#000000" stroke-width="2"/>
+  <line x1="480" y1="500" x2="720" y2="500" stroke="#000000" stroke-width="2"/>
+  
+  <!-- URL at bottom -->
+  <text x="600" y="600" font-family="Roboto, sans-serif" font-size="24" font-weight="500" text-anchor="middle" fill="#000000">f24editabile.replit.app</text>
+</svg>
