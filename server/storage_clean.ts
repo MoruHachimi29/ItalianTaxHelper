@@ -7,7 +7,6 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, count, and, like, sql, or } from "drizzle-orm";
-import seedBlogPosts from "./seed-blog";
 
 // Expanded interface with CRUD methods for all entities
 export interface IStorage {
@@ -441,29 +440,10 @@ async function initializeDatabase() {
     ]);
   }
   
-  // Verifica se ci sono già dei post nel blog
-  const existingBlogPosts = await db.select({ count: count() }).from(blogPosts);
-  if (existingBlogPosts[0].count === 0) {
-    console.log("Nessun post del blog trovato, verranno creati esempi dal seed-blog.ts");
-  }
+  // TODO: Implementare l'inizializzazione dei post del blog
+  // Quando il seed-blog.ts sarà completato, decommentare questo blocco
+  // import seedBlogPosts from "./seed-blog";
+  // await seedBlogPosts();
 }
 
 export const storage = new DatabaseStorage();
-
-// Inizializza il database con i dati di esempio
-initializeDatabase().then(async () => {
-  try {
-    // Importa e chiama seedBlogPosts se ci sono 0 post blog nel database
-    const existingBlogPosts = await db.select({ count: count() }).from(blogPosts);
-    if (existingBlogPosts[0].count === 0) {
-      // Richiamo il modulo seedBlogPosts
-      const seedBlogPostsModule = require('./seed-blog');
-      await seedBlogPostsModule.default();
-      console.log("Seeding dei post blog completato con successo");
-    }
-  } catch (error) {
-    console.error("Errore durante il seeding dei post blog:", error);
-  }
-}).catch(error => {
-  console.error("Errore durante l'inizializzazione del database:", error);
-});
