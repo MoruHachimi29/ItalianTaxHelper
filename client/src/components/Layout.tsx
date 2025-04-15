@@ -60,6 +60,13 @@ export default function Layout({ children }: LayoutProps) {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/blog">
+                    <div className={`text-gray-300 hover:text-white hover:underline ${location === "/blog" || location.startsWith("/blog/") ? "font-bold text-white" : ""}`}>
+                      Blog
+                    </div>
+                  </Link>
+                </li>
+                <li>
                   <Link href="/strumenti">
                     <div className={`text-gray-300 hover:text-white hover:underline ${location === "/strumenti" ? "font-bold text-white" : ""}`}>
                       Strumenti
@@ -129,6 +136,15 @@ export default function Layout({ children }: LayoutProps) {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Notizie
+                </div>
+              </Link>
+              <Link href="/blog">
+                <div 
+                  className={`block px-3 py-2 rounded-md ${location === "/blog" || location.startsWith("/blog/") ? 
+                    "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Blog
                 </div>
               </Link>
               <Link href="/strumenti">

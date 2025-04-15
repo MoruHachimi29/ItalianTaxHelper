@@ -20,8 +20,8 @@ export default function RelatedPosts({ postId, limit = 3 }: RelatedPostsProps) {
   });
 
   // Format date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatDate = (dateString: Date | string) => {
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
     return format(date, "d MMMM yyyy", { locale: it });
   };
 
@@ -90,7 +90,7 @@ export default function RelatedPosts({ postId, limit = 3 }: RelatedPostsProps) {
             <CardHeader className="pb-2">
               <div className="flex justify-between items-center mb-2">
                 <Badge variant={getCategoryColor(post.category)}>{getCategoryLabel(post.category)}</Badge>
-                <span className="text-xs text-gray-500">{formatDate(post.publishDate)}</span>
+                <span className="text-xs text-gray-500">{formatDate(post.publishDate.toString())}</span>
               </div>
               <CardTitle className="text-base">
                 <Link href={`/blog/${post.slug}`}>
