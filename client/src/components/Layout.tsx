@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
+import logoPath from "@/assets/f24-logo-path.svg";
 
 interface LayoutProps {
   children: ReactNode;
@@ -16,7 +17,9 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center mb-4 md:mb-0">
               <Link href="/">
-                <a className="text-2xl md:text-3xl font-serif font-bold text-white">ModuliTax</a>
+                <a className="flex items-center">
+                  <img src={logoPath} alt="F24Editabile" className="h-10" />
+                </a>
               </Link>
               <span className="ml-2 text-sm bg-white text-black px-2 py-1 rounded">BETA</span>
             </div>
@@ -80,7 +83,7 @@ export default function Layout({ children }: LayoutProps) {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold mb-4">ModuliTax</h3>
+              <h3 className="text-xl font-bold mb-4">F24Editabile</h3>
               <p className="text-sm text-gray-400">Il modo più semplice per compilare moduli fiscali italiani online.</p>
             </div>
             
@@ -169,7 +172,7 @@ export default function Layout({ children }: LayoutProps) {
           </div>
           
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-            <p>&copy; {new Date().getFullYear()} ModuliTax. Tutti i diritti riservati. Questo sito non è affiliato all'Agenzia delle Entrate.</p>
+            <p>&copy; {new Date().getFullYear()} F24Editabile. Tutti i diritti riservati. Questo sito non è affiliato all'Agenzia delle Entrate.</p>
           </div>
         </div>
       </footer>
