@@ -310,7 +310,7 @@ export default function BlogPostsList({
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-center mb-2">
                       <Badge variant={getCategoryColor(post.category)}>{getCategoryLabel(post.category)}</Badge>
-                      <span className="text-xs text-gray-500">{formatDate(post.publishDate)}</span>
+                      <span className="text-xs text-gray-500">{formatDate(post.publishDate.toString())}</span>
                     </div>
                     <CardTitle className="text-lg">
                       <Link href={`/blog/${post.slug}`}>
