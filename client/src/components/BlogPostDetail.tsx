@@ -53,8 +53,8 @@ export default function BlogPostDetail({ slug }: BlogPostDetailProps) {
   };
 
   // Format date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatDate = (dateString: Date | string) => {
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
     return format(date, "d MMMM yyyy", { locale: it });
   };
 
@@ -192,7 +192,7 @@ export default function BlogPostDetail({ slug }: BlogPostDetailProps) {
             </Badge>
             <div className="flex items-center text-gray-600 text-sm">
               <Calendar size={14} className="mr-1" />
-              {formatDate(post.publishDate)}
+              {formatDate(post.publishDate.toString())}
             </div>
             <button
               onClick={handleShare}

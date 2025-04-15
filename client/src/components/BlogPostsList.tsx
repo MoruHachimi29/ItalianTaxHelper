@@ -179,8 +179,8 @@ export default function BlogPostsList({
   };
 
   // Format date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatDate = (dateString: Date | string) => {
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
     return format(date, "d MMMM yyyy", { locale: it });
   };
 
