@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import logoPath from "@/assets/f24-logo-path.svg";
+import logoPath from "@/assets/f24-logo-distintivo.svg";
 
 interface LayoutProps {
   children: ReactNode;
