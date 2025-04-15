@@ -231,6 +231,11 @@ export default function Layout({ children }: LayoutProps) {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/blog">
+                    <div className="text-gray-400 hover:text-white">Blog</div>
+                  </Link>
+                </li>
+                <li>
                   <Link href="/strumenti">
                     <div className="text-gray-400 hover:text-white">Strumenti</div>
                   </Link>
