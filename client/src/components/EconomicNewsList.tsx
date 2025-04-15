@@ -172,12 +172,13 @@ export default function EconomicNewsList({
     <div className="space-y-6">
       {showCategories && (
         <Tabs value={activeCategory} onValueChange={handleCategoryChange} className="mb-6">
-          <TabsList className="grid grid-cols-2 md:grid-cols-5 mb-8">
+          <TabsList className="grid grid-cols-2 md:grid-cols-6 mb-8">
             <TabsTrigger value="all">Tutte</TabsTrigger>
             <TabsTrigger value="economia">Economia</TabsTrigger>
             <TabsTrigger value="fisco">Fisco</TabsTrigger>
             <TabsTrigger value="finanza">Finanza</TabsTrigger>
             <TabsTrigger value="lavoro">Lavoro</TabsTrigger>
+            <TabsTrigger value="tecnologia">Tecnologia</TabsTrigger>
           </TabsList>
         </Tabs>
       )}

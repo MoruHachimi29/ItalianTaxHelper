@@ -17,8 +17,8 @@ export default function NewsPage() {
   return (
     <>
       <Helmet>
-        <title>Notizie Economiche e Fiscali | ModuliTax</title>
-        <meta name="description" content="Ultime notizie su economia, fisco e normative fiscali italiane. Aggiornamenti in tempo reale su economia, finanza, tasse e fiscalità." />
+        <title>Notizie Economiche e Fiscali | F24Editabile</title>
+        <meta name="description" content="Ultime notizie su economia, fisco, tecnologia e normative fiscali italiane. Aggiornamenti in tempo reale su economia, finanza, tasse e fiscalità." />
       </Helmet>
       
       <div className="container mx-auto px-4 py-12">
@@ -34,7 +34,7 @@ export default function NewsPage() {
             <div className="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-100">
               <h2 className="text-2xl font-bold mb-6">Notizie Economiche in Tempo Reale</h2>
               <p className="text-gray-600 mb-6">
-                Le ultime notizie su economia, finanza, fisco e lavoro da fonti italiane e internazionali, aggiornate in tempo reale.
+                Le ultime notizie su economia, finanza, fisco, tecnologia e lavoro da fonti italiane e internazionali, aggiornate in tempo reale.
               </p>
               
               <EconomicNewsList 
@@ -50,7 +50,7 @@ export default function NewsPage() {
             <div className="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-100">
               <h2 className="text-2xl font-bold mb-6">Editoriali e Approfondimenti</h2>
               <p className="text-gray-600 mb-6">
-                I nostri articoli, analisi e commenti sui temi più importanti dell'economia e della fiscalità italiana.
+                I nostri articoli, analisi e commenti sui temi più importanti dell'economia, della tecnologia e della fiscalità italiana.
               </p>
               
               {isLoading ? (
