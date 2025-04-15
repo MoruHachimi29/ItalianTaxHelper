@@ -18,7 +18,7 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="bg-white font-sans text-gray-900 min-h-screen flex flex-col">
       {/* Header */}
-      <header className="bg-black text-white border-b border-gray-700">
+      <header className="bg-black bg-opacity-95 backdrop-blur-sm text-white border-b border-gray-700 sticky top-0 z-50 shadow-md">
         <div className="container mx-auto px-4 py-2">
           <div className="flex flex-row justify-between items-center">
             <Link href="/">
@@ -78,8 +78,9 @@ export default function Layout({ children }: LayoutProps) {
 
             {/* Mobile Menu Button */}
             <button 
-              className="md:hidden p-2 rounded-md text-gray-300 hover:text-white focus:outline-none"
+              className="md:hidden p-2 rounded-md text-gray-300 hover:text-white focus:outline-none transition-colors duration-200"
               onClick={toggleMobileMenu}
+              aria-label={mobileMenuOpen ? "Chiudi menu" : "Apri menu"}
             >
               {mobileMenuOpen ? (
                 <X size={24} aria-hidden="true" />
@@ -90,7 +91,9 @@ export default function Layout({ children }: LayoutProps) {
           </div>
 
           {/* Mobile Menu */}
-          <div className={`${mobileMenuOpen ? 'block' : 'hidden'} md:hidden py-2`}>
+          <div 
+            className={`${mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'} md:hidden py-2 overflow-hidden transition-all duration-300 ease-in-out`}
+          >
             <div className="px-2 pt-2 pb-3 space-y-1">
               <Link href="/">
                 <div 
