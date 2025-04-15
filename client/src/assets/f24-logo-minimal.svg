@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="200" height="40" viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- F24 part with distinctive style -->
+  <path d="M10 8H22V12H14V18H20V22H14V32H10V8Z" fill="black"/>
+  <path d="M24 32V8H28L32 20H33L37 8H41V32H37V18H36L32 32H29L25 18H24V32Z" fill="black"/>
+  <path d="M46 8H58V12H50V18H56V22H50V28H58V32H46V8Z" fill="black"/>
+  
+  <!-- Thin horizontal line connecting the parts -->
+  <line x1="44" y1="20" x2="46" y2="20" stroke="black" stroke-width="2"/>
+  
+  <!-- Editabile part with clean typography -->
+  <path d="M60 20C60 13 64 7 72 7C80 7 84 13 84 20C84 27 80 33 72 33C64 33 60 27 60 20ZM64 20C64 25 67 29 72 29C77 29 80 25 80 20C80 15 77 11 72 11C67 11 64 15 64 20Z" fill="black"/>
+  <path d="M86 8H90V32H86V8Z" fill="black"/>
+  <path d="M92 8H96V28H106V32H92V8Z" fill="black"/>
+  <path d="M108 8H122V12H112V18H120V22H112V28H122V32H108V8Z" fill="black"/>
+  <path d="M124 8H138V12H128V18H136V22H128V28H138V32H124V8Z" fill="black"/>
+  <path d="M140 8H152V12H144V18H150V22H144V28H152V32H140V8Z" fill="black"/>
+  <path d="M154 32V8H158V18H166V8H170V32H166V22H158V32H154Z" fill="black"/>
+  <path d="M172 8H184V12H176V18H182V22H176V28H184V32H172V8Z" fill="black"/>
+</svg>
