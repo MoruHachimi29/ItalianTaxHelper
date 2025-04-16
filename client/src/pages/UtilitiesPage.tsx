@@ -10,6 +10,13 @@ const toolsList = [
     path: "/strumenti/stipendio-netto"
   },
   {
+    id: "public-debt-tracker",
+    title: "Debito Pubblico",
+    description: "Monitora il debito pubblico delle maggiori economie globali. Visualizza andamento storico, confronta paesi e analizza dati aggiornati quotidianamente.",
+    icon: "📊",
+    path: "/strumenti/debito-pubblico"
+  },
+  {
     id: "currency-converter",
     title: "Convertitore di Valuta",
     description: "Converti facilmente tra diverse valute utilizzando tassi di cambio aggiornati. Strumento utile per chi effettua pagamenti o riceve denaro dall'estero.",
