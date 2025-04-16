@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
-import { db } from "../db";
-import { z } from "zod";
 
-// Tipi di dati per i bonus
+// Modelli di dati per i bonus
 export interface BonusCategory {
   id: string;
   name: string;
@@ -25,17 +23,17 @@ export interface BonusItem {
   updatedAt: string;
 }
 
-// Elenco delle categorie disponibili
+// Dati statici per le categorie di bonus
 export const bonusCategories: BonusCategory[] = [
-  { id: "famiglia", name: "Famiglia", icon: "BabyIcon" },
-  { id: "casa", name: "Casa", icon: "HomeIcon" },
-  { id: "istruzione", name: "Istruzione", icon: "GraduationCapIcon" },
-  { id: "trasporti", name: "Trasporti", icon: "CarIcon" },
-  { id: "salute", name: "Salute", icon: "HeartPulseIcon" },
-  { id: "economici", name: "Economici", icon: "EuroIcon" },
+  { id: "famiglia", name: "Famiglia", icon: "baby" },
+  { id: "casa", name: "Casa", icon: "home" },
+  { id: "istruzione", name: "Istruzione", icon: "graduation-cap" },
+  { id: "trasporti", name: "Trasporti", icon: "car" },
+  { id: "salute", name: "Salute", icon: "heart-pulse" },
+  { id: "economici", name: "Economici", icon: "euro" },
 ];
 
-// Dati iniziali per i bonus
+// Lista predefinita di bonus (aggiornata al 2025)
 export const bonusList: BonusItem[] = [
   {
     id: "1",
@@ -55,7 +53,7 @@ export const bonusList: BonusItem[] = [
     link: "https://www.inps.it/",
     isNew: false,
     isExpiring: false,
-    updatedAt: "2025-04-01"
+    updatedAt: "2025-01-15T10:00:00Z"
   },
   {
     id: "2",
@@ -74,7 +72,7 @@ export const bonusList: BonusItem[] = [
     link: "https://www.inps.it/",
     isNew: true,
     isExpiring: false,
-    updatedAt: "2025-04-10"
+    updatedAt: "2025-01-10T15:30:00Z"
   },
   {
     id: "3",
@@ -93,7 +91,7 @@ export const bonusList: BonusItem[] = [
     link: "https://www.agenziaentrate.gov.it/",
     isNew: false,
     isExpiring: true,
-    updatedAt: "2025-03-15"
+    updatedAt: "2024-12-01T09:15:00Z"
   },
   {
     id: "4",
@@ -112,7 +110,7 @@ export const bonusList: BonusItem[] = [
     link: "https://www.agenziaentrate.gov.it/",
     isNew: false,
     isExpiring: false,
-    updatedAt: "2025-02-20"
+    updatedAt: "2024-12-05T11:45:00Z"
   },
   {
     id: "5",
@@ -131,7 +129,7 @@ export const bonusList: BonusItem[] = [
     link: "https://www.agenziaentrate.gov.it/",
     isNew: false,
     isExpiring: false,
-    updatedAt: "2025-03-05"
+    updatedAt: "2024-11-30T14:20:00Z"
   },
   {
     id: "6",
@@ -150,7 +148,7 @@ export const bonusList: BonusItem[] = [
     link: "https://www.lavoro.gov.it/",
     isNew: true,
     isExpiring: false,
-    updatedAt: "2025-04-16"
+    updatedAt: "2025-01-20T08:30:00Z"
   },
   {
     id: "7",
@@ -168,7 +166,7 @@ export const bonusList: BonusItem[] = [
     link: "https://www.inps.it/",
     isNew: true,
     isExpiring: false,
-    updatedAt: "2025-04-14"
+    updatedAt: "2025-01-15T16:45:00Z"
   },
   {
     id: "8",
@@ -186,7 +184,7 @@ export const bonusList: BonusItem[] = [
     link: "https://www.bonustrasporti.lavoro.gov.it/",
     isNew: false,
     isExpiring: false,
-    updatedAt: "2025-02-28"
+    updatedAt: "2025-01-05T12:20:00Z"
   },
   {
     id: "9",
@@ -204,7 +202,7 @@ export const bonusList: BonusItem[] = [
     link: "https://www.cartadelmerito.gov.it/",
     isNew: false,
     isExpiring: false,
-    updatedAt: "2025-01-15"
+    updatedAt: "2025-01-02T10:10:00Z"
   },
   {
     id: "10",
@@ -223,7 +221,7 @@ export const bonusList: BonusItem[] = [
     link: "https://www.mur.gov.it/",
     isNew: false,
     isExpiring: false,
-    updatedAt: "2025-02-05"
+    updatedAt: "2024-12-15T09:30:00Z"
   },
   {
     id: "11",
@@ -243,7 +241,7 @@ export const bonusList: BonusItem[] = [
     link: "https://www.inps.it/",
     isNew: false,
     isExpiring: false,
-    updatedAt: "2025-01-30"
+    updatedAt: "2024-12-20T15:45:00Z"
   },
   {
     id: "12",
@@ -261,126 +259,110 @@ export const bonusList: BonusItem[] = [
     link: "https://www.agenziaentrate.gov.it/",
     isNew: false,
     isExpiring: true,
-    updatedAt: "2025-03-20"
+    updatedAt: "2024-11-25T13:15:00Z"
   }
 ];
 
-// Valori ISEE predefiniti per il simulatore
-const iseeRanges = [
-  { min: 0, max: 9360, label: "Molto basso (0-9.360€)" },
-  { min: 9361, max: 15000, label: "Basso (9.361-15.000€)" },
-  { min: 15001, max: 20000, label: "Medio-basso (15.001-20.000€)" },
-  { min: 20001, max: 30000, label: "Medio (20.001-30.000€)" },
-  { min: 30001, max: 40000, label: "Medio-alto (30.001-40.000€)" },
-  { min: 40001, max: 50000, label: "Alto (40.001-50.000€)" },
-  { min: 50001, max: null, label: "Superiore a 50.000€" }
-];
-
-// Schema di validazione per il filtro bonus
-const bonusFilterSchema = z.object({
-  iseeValue: z.string().optional(),
-  category: z.string().optional(),
-  searchQuery: z.string().optional()
-});
-
-// Ottieni tutte le categorie
+// API per recuperare le categorie dei bonus
 export const getBonusCategories = async (req: Request, res: Response) => {
   try {
     res.json({ categories: bonusCategories });
   } catch (error) {
-    console.error("Errore nel recupero delle categorie:", error);
-    res.status(500).json({ error: "Errore nel recupero delle categorie dei bonus" });
+    res.status(500).json({ error: "Errore nel recupero delle categorie" });
   }
 };
 
-// Ottieni tutti i bonus
+// API per recuperare tutti i bonus con filtri opzionali
 export const getAllBonus = async (req: Request, res: Response) => {
   try {
-    const { 
-      iseeValue,  
-      category, 
-      searchQuery 
-    } = bonusFilterSchema.parse(req.query);
+    const { iseeValue, category, searchQuery } = req.query;
     
     let filteredBonus = [...bonusList];
     
-    // Filtra per ISEE se specificato
-    if (iseeValue && iseeValue !== "") {
-      const iseeNum = parseFloat(iseeValue);
-      filteredBonus = filteredBonus.filter(bonus => 
-        !bonus.iseeMax || iseeNum <= bonus.iseeMax
-      );
+    // Applica i filtri se specificati
+    if (category && category !== 'all') {
+      filteredBonus = filteredBonus.filter(bonus => bonus.category === category);
     }
     
-    // Filtra per categoria se specificata e non è "all"
-    if (category && category !== "all") {
-      filteredBonus = filteredBonus.filter(bonus => 
-        bonus.category === category
-      );
+    if (iseeValue) {
+      const iseeNumber = parseFloat(iseeValue as string);
+      filteredBonus = filteredBonus.filter(bonus => !bonus.iseeMax || iseeNumber <= bonus.iseeMax);
     }
     
-    // Filtra per testo di ricerca se specificato
-    if (searchQuery && searchQuery !== "") {
-      const query = searchQuery.toLowerCase();
+    if (searchQuery) {
+      const query = (searchQuery as string).toLowerCase();
       filteredBonus = filteredBonus.filter(bonus => 
         bonus.title.toLowerCase().includes(query) || 
         bonus.description.toLowerCase().includes(query)
       );
     }
     
-    res.json({ 
+    // Trova l'aggiornamento più recente
+    const lastUpdate = filteredBonus.length > 0 
+      ? new Date(Math.max(...filteredBonus.map(b => new Date(b.updatedAt).getTime()))).toISOString()
+      : new Date().toISOString();
+    
+    res.json({
       bonus: filteredBonus,
       totalCount: filteredBonus.length,
-      lastUpdate: new Date().toISOString()
+      lastUpdate
     });
   } catch (error) {
-    console.error("Errore nel recupero dei bonus:", error);
-    res.status(500).json({ error: "Errore nel recupero dei bonus disponibili" });
+    res.status(500).json({ error: "Errore nel recupero dei bonus" });
   }
 };
 
-// Ottieni i ranges ISEE predefiniti
+// API per recuperare i range ISEE predefiniti
 export const getIseeRanges = async (req: Request, res: Response) => {
   try {
-    res.json({ ranges: iseeRanges });
+    const ranges = [
+      { min: 0, max: 10000, label: "Fino a 10.000€" },
+      { min: 10001, max: 20000, label: "10.001€ - 20.000€" },
+      { min: 20001, max: 30000, label: "20.001€ - 30.000€" },
+      { min: 30001, max: 40000, label: "30.001€ - 40.000€" },
+      { min: 40001, max: 50000, label: "40.001€ - 50.000€" },
+      { min: 50001, max: null, label: "Oltre 50.000€" }
+    ];
+    
+    res.json({ ranges });
   } catch (error) {
-    console.error("Errore nel recupero dei range ISEE:", error);
     res.status(500).json({ error: "Errore nel recupero dei range ISEE" });
   }
 };
 
-// Ottieni i bonus nuovi
+// API per recuperare i nuovi bonus
 export const getNewBonus = async (req: Request, res: Response) => {
   try {
     const newBonus = bonusList.filter(bonus => bonus.isNew);
-    res.json({ 
+    
+    res.json({
       bonus: newBonus,
-      count: newBonus.length 
+      count: newBonus.length
     });
   } catch (error) {
-    console.error("Errore nel recupero dei nuovi bonus:", error);
     res.status(500).json({ error: "Errore nel recupero dei nuovi bonus" });
   }
 };
 
-// Ottieni i bonus in scadenza
+// API per recuperare i bonus in scadenza
 export const getExpiringBonus = async (req: Request, res: Response) => {
   try {
     const expiringBonus = bonusList.filter(bonus => bonus.isExpiring);
-    res.json({ 
+    
+    res.json({
       bonus: expiringBonus,
-      count: expiringBonus.length 
+      count: expiringBonus.length
     });
   } catch (error) {
-    console.error("Errore nel recupero dei bonus in scadenza:", error);
     res.status(500).json({ error: "Errore nel recupero dei bonus in scadenza" });
   }
 };
 
-// Dettagli di un bonus specifico
+// API per recuperare un singolo bonus per ID
 export const getBonusById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    
     const bonus = bonusList.find(b => b.id === id);
     
     if (!bonus) {
@@ -389,7 +371,6 @@ export const getBonusById = async (req: Request, res: Response) => {
     
     res.json({ bonus });
   } catch (error) {
-    console.error("Errore nel recupero del bonus:", error);
     res.status(500).json({ error: "Errore nel recupero del bonus" });
   }
 };

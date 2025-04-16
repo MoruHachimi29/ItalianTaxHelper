@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Card,
   CardContent,
@@ -29,6 +30,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "@/hooks/use-toast";
 import { 
   EuroIcon, 
   HomeIcon, 
@@ -39,11 +41,12 @@ import {
   FilterIcon,
   SearchIcon,
   CheckCircle2Icon,
-  XCircleIcon
+  XCircleIcon,
+  RefreshCwIcon
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-// Interfacce per i tipi di dati
+// Interfaccia per le categorie del client
 interface BonusCategory {
   id: string;
   name: string;
@@ -63,9 +66,17 @@ interface BonusItem {
   link: string;
   isNew: boolean;
   isExpiring: boolean;
+  updatedAt: string;
 }
 
 export default function BonusIseeTracker() {
+  // Stato per la selezione della categoria e il valore ISEE
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [iseeValue, setIseeValue] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [lastUpdate, setLastUpdate] = useState<string | null>(null);
+  const [bonusItems, setBonusItems] = useState<BonusItem[]>([]);
+  
   // Lista categorie
   const categories: BonusCategory[] = [
     { id: "all", name: "Tutti i bonus", icon: <FilterIcon className="h-4 w-4" /> },
@@ -76,232 +87,78 @@ export default function BonusIseeTracker() {
     { id: "salute", name: "Salute", icon: <HeartPulseIcon className="h-4 w-4" /> },
     { id: "economici", name: "Economici", icon: <EuroIcon className="h-4 w-4" /> },
   ];
-
-  // Stato per la selezione della categoria e il valore ISEE
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [iseeValue, setIseeValue] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
   
-  // Lista dei Bonus disponibili nel 2025 (dati di esempio)
-  const bonusList: BonusItem[] = [
-    {
-      id: "1",
-      title: "Assegno Unico Universale 2025",
-      description: "Contributo economico per le famiglie con figli a carico fino a 21 anni di età. L'importo varia in base all'ISEE.",
-      category: "famiglia",
-      iseeMax: 40000,
-      amount: "Da 54€ a 189,20€ mensili per figlio",
-      deadline: "30/06/2025",
-      requirements: [
-        "Figli a carico fino a 21 anni",
-        "Residenza in Italia",
-        "Cittadinanza italiana, UE o permesso di soggiorno",
-        "ISEE in corso di validità"
-      ],
-      howToApply: "Domanda tramite sito INPS, patronati o app IO",
-      link: "https://www.inps.it/",
-      isNew: false,
-      isExpiring: false
-    },
-    {
-      id: "2",
-      title: "Bonus Asilo Nido 2025",
-      description: "Contributo per il pagamento delle rette degli asili nido pubblici e privati o per forme di supporto presso la propria abitazione.",
-      category: "famiglia",
-      iseeMax: 40000,
-      amount: "Fino a 3.000€ annui",
-      deadline: "31/12/2025",
-      requirements: [
-        "Figli nati dal 1° gennaio 2022",
-        "Iscrizione all'asilo nido",
-        "ISEE minorenni in corso di validità"
-      ],
-      howToApply: "Domanda online sul sito INPS",
-      link: "https://www.inps.it/",
-      isNew: true,
-      isExpiring: false
-    },
-    {
-      id: "3",
-      title: "Bonus Ristrutturazioni 2025",
-      description: "Detrazione fiscale per interventi di ristrutturazione edilizia",
-      category: "casa",
-      iseeMax: null,
-      amount: "50% delle spese fino a un massimo di 96.000€",
-      deadline: "31/12/2025",
-      requirements: [
-        "Proprietà dell'immobile o titolo che attesti la disponibilità",
-        "Comunicazione all'Agenzia delle Entrate",
-        "Pagamento con bonifico parlante"
-      ],
-      howToApply: "Dichiarazione dei redditi - Modello 730 o Modello Redditi",
-      link: "https://www.agenziaentrate.gov.it/",
-      isNew: false,
-      isExpiring: true
-    },
-    {
-      id: "4",
-      title: "Ecobonus 2025",
-      description: "Detrazione fiscale per interventi di efficientamento energetico",
-      category: "casa",
-      iseeMax: null,
-      amount: "Dal 50% al 65% delle spese",
-      deadline: "31/12/2025",
-      requirements: [
-        "Proprietà dell'immobile o titolo che attesti la disponibilità",
-        "Certificazione energetica pre e post intervento",
-        "Invio documentazione all'ENEA entro 90 giorni dalla fine dei lavori"
-      ],
-      howToApply: "Dichiarazione dei redditi - Modello 730 o Modello Redditi",
-      link: "https://www.agenziaentrate.gov.it/",
-      isNew: false,
-      isExpiring: false
-    },
-    {
-      id: "5",
-      title: "Bonus Mobili 2025",
-      description: "Detrazione fiscale per l'acquisto di mobili e grandi elettrodomestici",
-      category: "casa",
-      iseeMax: null,
-      amount: "50% delle spese fino a un massimo di 5.000€",
-      deadline: "31/12/2025",
-      requirements: [
-        "Ristrutturazione dell'immobile iniziata dal 1° gennaio 2024",
-        "Elettrodomestici di classe energetica non inferiore alla A (A+ per forni)",
-        "Pagamento con bonifico, carta di credito o debito"
-      ],
-      howToApply: "Dichiarazione dei redditi - Modello 730 o Modello Redditi",
-      link: "https://www.agenziaentrate.gov.it/",
-      isNew: false,
-      isExpiring: false
-    },
-    {
-      id: "6",
-      title: "Carta Dedicata a Te 2025",
-      description: "Carta prepagata per l'acquisto di beni alimentari di prima necessità, carburanti o abbonamenti al trasporto pubblico",
-      category: "economici",
-      iseeMax: 15000,
-      amount: "500€ una tantum",
-      deadline: "31/07/2025",
-      requirements: [
-        "ISEE inferiore a 15.000€",
-        "Non percepire altri sussidi pubblici",
-        "Essere iscritti all'anagrafe comunale"
-      ],
-      howToApply: "Assegnazione automatica in base a graduatorie comunali",
-      link: "https://www.lavoro.gov.it/",
-      isNew: true,
-      isExpiring: false
-    },
-    {
-      id: "7",
-      title: "Bonus Psicologo 2025",
-      description: "Contributo per sostenere le spese di assistenza psicologica",
-      category: "salute",
-      iseeMax: 50000,
-      amount: "Fino a 1.500€ per persona",
-      deadline: "31/10/2025",
-      requirements: [
-        "ISEE inferiore a 50.000€",
-        "Residenza in Italia"
-      ],
-      howToApply: "Domanda online sul sito INPS",
-      link: "https://www.inps.it/",
-      isNew: true,
-      isExpiring: false
-    },
-    {
-      id: "8",
-      title: "Bonus Trasporti 2025",
-      description: "Contributo per l'acquisto di abbonamenti al trasporto pubblico locale, regionale e interregionale",
-      category: "trasporti",
-      iseeMax: 20000,
-      amount: "Fino a 60€ per abbonamento",
-      deadline: "31/12/2025 (fino ad esaurimento fondi)",
-      requirements: [
-        "ISEE inferiore a 20.000€",
-        "Acquisto di abbonamenti ai servizi di trasporto pubblico"
-      ],
-      howToApply: "Domanda online sulla piattaforma dedicata",
-      link: "https://www.bonustrasporti.lavoro.gov.it/",
-      isNew: false,
-      isExpiring: false
-    },
-    {
-      id: "9",
-      title: "Carta del Merito 2025",
-      description: "Bonus cultura destinato ai giovani che conseguono il diploma con 100/100",
-      category: "istruzione",
-      iseeMax: null,
-      amount: "500€ spendibili in cultura",
-      deadline: "31/12/2025",
-      requirements: [
-        "Conseguimento del diploma con votazione 100/100",
-        "Età non superiore a 19 anni"
-      ],
-      howToApply: "Registrazione alla piattaforma online dedicata",
-      link: "https://www.cartadelmerito.gov.it/",
-      isNew: false,
-      isExpiring: false
-    },
-    {
-      id: "10",
-      title: "Bonus Università 2025",
-      description: "Esonero totale o parziale dal pagamento delle tasse universitarie",
-      category: "istruzione",
-      iseeMax: 30000,
-      amount: "Esonero totale o parziale in base all'ISEE",
-      deadline: "Variabile in base all'ateneo",
-      requirements: [
-        "ISEE fino a 30.000€ per esonero totale o parziale",
-        "Iscrizione a università statali",
-        "Requisiti di merito definiti dagli atenei"
-      ],
-      howToApply: "Domanda alla segreteria del proprio ateneo",
-      link: "https://www.mur.gov.it/",
-      isNew: false,
-      isExpiring: false
-    },
-    {
-      id: "11",
-      title: "Assegno di Inclusione 2025",
-      description: "Misura di sostegno economico e inclusione sociale rivolta ai nuclei familiari con componenti in condizioni di svantaggio",
-      category: "economici",
-      iseeMax: 9360,
-      amount: "Fino a 6.000€ annui (7.560€ per over 67)",
-      deadline: "Rinnovo annuale",
-      requirements: [
-        "ISEE inferiore a 9.360€",
-        "Presenza nel nucleo di minori, over 60, disabili o in condizioni di svantaggio",
-        "Residenza in Italia da almeno 5 anni",
-        "Iscrizione al Centro per l'Impiego"
-      ],
-      howToApply: "Domanda presso INPS, patronati o CAF",
-      link: "https://www.inps.it/",
-      isNew: false,
-      isExpiring: false
-    },
-    {
-      id: "12",
-      title: "Bonus Barriere Architettoniche 75% 2025",
-      description: "Detrazione fiscale per interventi di eliminazione delle barriere architettoniche",
-      category: "casa",
-      iseeMax: null,
-      amount: "75% delle spese sostenute",
-      deadline: "31/12/2025",
-      requirements: [
-        "Interventi finalizzati all'eliminazione delle barriere architettoniche",
-        "Conformità ai requisiti tecnici previsti dal DM 236/1989"
-      ],
-      howToApply: "Dichiarazione dei redditi - Modello 730 o Modello Redditi",
-      link: "https://www.agenziaentrate.gov.it/",
-      isNew: false,
-      isExpiring: true
+  // Effetto per caricare i bonus automaticamente all'avvio della pagina
+  useEffect(() => {
+    // Funzione asincrona per caricare i bonus dal server
+    const fetchBonusItems = async () => {
+      try {
+        const response = await fetch('/api/bonus');
+        if (!response.ok) {
+          throw new Error('Errore nel caricamento dei bonus');
+        }
+        
+        const data = await response.json();
+        setBonusItems(data.bonus || []);
+        
+        if (data.lastUpdate) {
+          setLastUpdate(data.lastUpdate);
+        }
+      } catch (error) {
+        console.error('Errore nel caricamento dei bonus:', error);
+        toast({
+          title: "Errore",
+          description: "Impossibile caricare i bonus. Riprova più tardi.",
+          variant: "destructive"
+        });
+      }
+    };
+    
+    fetchBonusItems();
+    
+    // Imposta un intervallo per aggiornare i bonus automaticamente ogni ora
+    const intervalId = setInterval(fetchBonusItems, 3600000); // 1 ora
+    
+    // Pulizia dell'intervallo quando il componente viene smontato
+    return () => clearInterval(intervalId);
+  }, []);
+  
+  // Funzione per aggiornare manualmente i dati
+  const handleRefresh = async () => {
+    try {
+      toast({
+        title: "Aggiornamento in corso",
+        description: "Stiamo verificando se ci sono nuovi bonus disponibili."
+      });
+      
+      const response = await fetch('/api/bonus');
+      if (!response.ok) {
+        throw new Error('Errore nell\'aggiornamento dei bonus');
+      }
+      
+      const data = await response.json();
+      setBonusItems(data.bonus || []);
+      
+      if (data.lastUpdate) {
+        setLastUpdate(data.lastUpdate);
+      }
+      
+      toast({
+        title: "Aggiornamento completato",
+        description: "I dati dei bonus sono stati aggiornati con successo.",
+      });
+    } catch (error) {
+      console.error('Errore nell\'aggiornamento dei bonus:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile aggiornare i bonus. Riprova più tardi.",
+        variant: "destructive"
+      });
     }
-  ];
-
+  };
+  
   // Filtraggio bonus in base alla categoria, al valore ISEE e alla ricerca
-  const filteredBonus = bonusList.filter(bonus => {
+  const filteredBonus = bonusItems.filter(bonus => {
     // Filtro per categoria
     const categoryMatch = selectedCategory === "all" || bonus.category === selectedCategory;
     
@@ -316,7 +173,7 @@ export default function BonusIseeTracker() {
     
     return categoryMatch && iseeMatch && searchMatch;
   });
-
+  
   // Controlla se un bonus è accessibile con l'ISEE specificato
   const isEligibleByIsee = (bonus: BonusItem) => {
     if (iseeValue === "" || !bonus.iseeMax) return true;
@@ -325,6 +182,25 @@ export default function BonusIseeTracker() {
 
   return (
     <div className="space-y-3">
+      <div className="flex justify-between items-center">
+        <div>
+          {lastUpdate && (
+            <div className="text-sm text-gray-500">
+              Ultimo aggiornamento: {new Date(lastUpdate).toLocaleString('it-IT')}
+            </div>
+          )}
+        </div>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleRefresh}
+          className="flex items-center gap-1"
+        >
+          <RefreshCwIcon className="h-3 w-3" />
+          <span>Aggiorna</span>
+        </Button>
+      </div>
+      
       <Tabs defaultValue="explorer" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="explorer">Esplora Bonus</TabsTrigger>
@@ -620,8 +496,6 @@ export default function BonusIseeTracker() {
                 <Button 
                   className="w-full" 
                   onClick={() => {
-                    // Questo recupera i bonus filtrati in base all'ISEE inserito
-                    // Il risultato è già visibile nella sezione sottostante
                     document.getElementById('bonus-results')?.scrollIntoView({ behavior: 'smooth' });
                   }}
                 >
@@ -635,61 +509,61 @@ export default function BonusIseeTracker() {
             <div id="bonus-results" className="space-y-4">
               <h3 className="text-xl font-semibold">Bonus potenzialmente disponibili</h3>
               
-              {filteredBonus
-                .filter(bonus => isEligibleByIsee(bonus))
-                .map((bonus) => (
-                  <Card key={bonus.id}>
-                    <CardHeader className="pb-2">
-                      <div className="flex justify-between items-start">
-                        <CardTitle className="text-lg">{bonus.title}</CardTitle>
-                        <div className="flex gap-1">
-                          {bonus.isNew && (
-                            <Badge className="bg-blue-500 hover:bg-blue-600">Nuovo</Badge>
-                          )}
-                          {bonus.isExpiring && (
-                            <Badge className="bg-amber-500 hover:bg-amber-600">In scadenza</Badge>
-                          )}
-                        </div>
-                      </div>
-                      <CardDescription>
-                        {bonus.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="font-medium block">Importo:</span>
-                            <span>{bonus.amount}</span>
-                          </div>
-                          <div>
-                            <span className="font-medium block">Scadenza:</span>
-                            <span>{bonus.deadline}</span>
-                          </div>
-                          <div>
-                            <span className="font-medium block">Categoria:</span>
-                            <span>{categories.find(c => c.id === bonus.category)?.name}</span>
-                          </div>
-                          <div>
-                            <span className="font-medium block">ISEE massimo:</span>
-                            <span>{bonus.iseeMax ? `${bonus.iseeMax.toLocaleString()}€` : "Nessun limite"}</span>
+              {bonusItems.filter(bonus => isEligibleByIsee(bonus)).length > 0 ? (
+                bonusItems
+                  .filter(bonus => isEligibleByIsee(bonus))
+                  .map((bonus) => (
+                    <Card key={bonus.id}>
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start">
+                          <CardTitle className="text-lg">{bonus.title}</CardTitle>
+                          <div className="flex gap-1">
+                            {bonus.isNew && (
+                              <Badge className="bg-blue-500 hover:bg-blue-600">Nuovo</Badge>
+                            )}
+                            {bonus.isExpiring && (
+                              <Badge className="bg-amber-500 hover:bg-amber-600">In scadenza</Badge>
+                            )}
                           </div>
                         </div>
-                        
-                        <a 
-                          href={bonus.link} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center px-3 py-1.5 text-sm border border-gray-200 rounded hover:bg-gray-50"
-                        >
-                          Vai al sito ufficiale
-                        </a>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              
-              {filteredBonus.filter(bonus => isEligibleByIsee(bonus)).length === 0 && (
+                        <CardDescription>
+                          {bonus.description}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="font-medium block">Importo:</span>
+                              <span>{bonus.amount}</span>
+                            </div>
+                            <div>
+                              <span className="font-medium block">Scadenza:</span>
+                              <span>{bonus.deadline}</span>
+                            </div>
+                            <div>
+                              <span className="font-medium block">Categoria:</span>
+                              <span>{categories.find(c => c.id === bonus.category)?.name}</span>
+                            </div>
+                            <div>
+                              <span className="font-medium block">ISEE massimo:</span>
+                              <span>{bonus.iseeMax ? `${bonus.iseeMax.toLocaleString()}€` : "Nessun limite"}</span>
+                            </div>
+                          </div>
+                          
+                          <a 
+                            href={bonus.link} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center px-3 py-1.5 text-sm border border-gray-200 rounded hover:bg-gray-50"
+                          >
+                            Vai al sito ufficiale
+                          </a>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+              ) : (
                 <div className="text-center py-8">
                   <div className="text-gray-500 mb-2">
                     Nessun bonus disponibile con il valore ISEE inserito
