@@ -457,9 +457,13 @@ initializeDatabase().then(async () => {
     const existingBlogPosts = await db.select({ count: count() }).from(blogPosts);
     if (existingBlogPosts[0].count === 0) {
       // Richiamo il modulo seedBlogPosts
-      const seedBlogPostsModule = require('./seed-blog');
-      await seedBlogPostsModule.default();
-      console.log("Seeding dei post blog completato con successo");
+      try {
+        const { default: seedBlogPosts } = await import('./seed-blog.js');
+        await seedBlogPosts();
+        console.log("Seeding dei post blog completato con successo");
+      } catch (error) {
+        console.error("Errore durante l'importazione del modulo seed-blog:", error);
+      }
     }
   } catch (error) {
     console.error("Errore durante il seeding dei post blog:", error);
