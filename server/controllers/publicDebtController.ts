@@ -104,6 +104,7 @@ export const getHistoricalPublicDebt = async (req: Request, res: Response) => {
     return res.status(400).json({ error: "È necessario specificare un paese valido." });
   }
 
+  // Convertiamo esplicitamente years in un numero e utilizziamo il valore richiesto
   const numYears = parseInt(years as string) || 5;
   
   // Se useTestData è true, restituisci i dati di esempio
