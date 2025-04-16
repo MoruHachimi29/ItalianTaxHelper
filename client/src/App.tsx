@@ -15,6 +15,7 @@ import ContactPage from "@/pages/ContactPage";
 import UtilitiesPage from "@/pages/UtilitiesPage";
 import CurrencyConverterPage from "@/pages/CurrencyConverterPage";
 import DutyCalculatorPage from "@/pages/DutyCalculatorPage";
+import NetSalaryCalculatorPage from "./pages/NetSalaryCalculatorPage";
 import P7mConverterPage from "@/pages/P7mConverterPage";
 import XmlToPngConverterPage from "@/pages/XmlToPngConverterPage";
 import PdfEditorPage from "@/pages/PdfEditorPage";
@@ -32,6 +33,7 @@ function Router() {
         <Route path="/blog" component={BlogPage} />
         <Route path="/blog/:slug" component={BlogPostPage} />
         <Route path="/strumenti" component={UtilitiesPage} />
+        <Route path="/strumenti/stipendio-netto" component={NetSalaryCalculatorPage} />
         <Route path="/strumenti/valuta" component={CurrencyConverterPage} />
         <Route path="/strumenti/dazi" component={DutyCalculatorPage} />
         <Route path="/strumenti/p7m" component={P7mConverterPage} />

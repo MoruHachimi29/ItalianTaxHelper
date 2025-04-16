@@ -3,6 +3,13 @@ import { Link } from "wouter";
 // Tool data with descriptions and links
 const toolsList = [
   {
+    id: "net-salary-calculator",
+    title: "Calcolo Stipendio Netto",
+    description: "Calcola il tuo stipendio netto mensile a partire dal lordo annuale (RAL). Aggiornato con le aliquote fiscali 2025 e le ultime normative.",
+    icon: "💰",
+    path: "/strumenti/stipendio-netto"
+  },
+  {
     id: "currency-converter",
     title: "Convertitore di Valuta",
     description: "Converti facilmente tra diverse valute utilizzando tassi di cambio aggiornati. Strumento utile per chi effettua pagamenti o riceve denaro dall'estero.",
