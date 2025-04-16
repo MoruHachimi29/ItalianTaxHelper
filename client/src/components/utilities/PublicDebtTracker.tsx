@@ -563,6 +563,46 @@ export default function PublicDebtTracker() {
                 
                 <Separator />
                 
+                {/* Tabella di confronto */}
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse mb-6">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="py-2 px-4 border text-left">Indicatore</th>
+                        {comparisonData.data.map(item => (
+                          <th key={item.country} className="py-2 px-4 border text-left">{item.country}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="hover:bg-gray-50">
+                        <td className="py-2 px-4 border font-medium">Debito Totale</td>
+                        {comparisonData.data.map(item => (
+                          <td key={`${item.country}-debt`} className="py-2 px-4 border text-red-600 font-medium">
+                            {item.debtValue.toLocaleString()} miliardi {item.currency}
+                          </td>
+                        ))}
+                      </tr>
+                      <tr className="hover:bg-gray-50">
+                        <td className="py-2 px-4 border font-medium">Debito/PIL</td>
+                        {comparisonData.data.map(item => (
+                          <td key={`${item.country}-gdp`} className="py-2 px-4 border text-green-600 font-medium">
+                            {item.debtToGDP.toLocaleString()}%
+                          </td>
+                        ))}
+                      </tr>
+                      <tr className="hover:bg-gray-50">
+                        <td className="py-2 px-4 border font-medium">Debito Pro Capite</td>
+                        {comparisonData.data.map(item => (
+                          <td key={`${item.country}-capita`} className="py-2 px-4 border text-orange-500 font-medium">
+                            {item.perCapita.toLocaleString()} {item.currency}
+                          </td>
+                        ))}
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <Card>
                     <CardHeader className="pb-2">
