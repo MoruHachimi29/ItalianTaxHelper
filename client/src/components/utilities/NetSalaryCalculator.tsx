@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import {
   Tabs,
   TabsContent,
@@ -8,6 +8,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -37,28 +38,128 @@ const IRPEF_RATES_2025 = [
   { limit: Infinity, rate: 0.43 }
 ];
 
-// Percentuali INPS per dipendenti
-const INPS_RATE = 0.0919; // 9.19% per la maggior parte dei lavoratori dipendenti
+// Percentuali INPS per dipendenti (variano in base al CCNL)
+const INPS_RATES = {
+  "commercio": 0.0919, // 9.19% per commercio
+  "industria": 0.0919, // 9.19% per industria
+  "artigianato": 0.0919, // 9.19% per artigianato
+  "turismo": 0.0919, // 9.19% per turismo
+  "agricoltura": 0.0889, // 8.89% per agricoltura
+  "edilizia": 0.0919, // 9.19% per edilizia
+  "trasporti": 0.0919, // 9.19% per trasporti
+  "credito": 0.0919, // 9.19% per credito e assicurazioni
+  "pubblico": 0.0819, // 8.19% per pubblico impiego
+  "sanita": 0.0919, // 9.19% per sanità privata
+  "scuola": 0.0819, // 8.19% per scuola e istruzione privata
+  "altro": 0.0919, // 9.19% valore standard
+};
+
+// Giorni lavorativi standard per tipo di contratto
+const WORKING_DAYS = {
+  "full-time": 260, // 5 giorni a settimana per circa 52 settimane
+  "part-time-5": 260, // part-time 5 giorni a settimana
+  "part-time-4": 208, // part-time 4 giorni a settimana
+  "part-time-3": 156, // part-time 3 giorni a settimana
+  "turni": 240, // lavoro a turni in media
+  "stagionale": 180, // contratto stagionale
+  "flessibile": 240, // orario flessibile
+  "custom": 365, // personalizzato (calendario completo)
+};
 
 // Detrazioni
 const BASE_DEDUCTION = 3000; // Detrazione di base per lavoro dipendente
 const MAX_DEDUCTION_INCOME = 15000; // Reddito massimo per detrazione completa
 
-// Per le addizionali regionali e comunali (valori medi)
-const AVG_REGIONAL_TAX_RATE = 0.0139; // 1.39% media nazionale
-const AVG_MUNICIPAL_TAX_RATE = 0.00701; // 0.701% media nazionale
+// Aliquote addizionali regionali 2025 (percentuali)
+const REGIONAL_TAX_RATES = {
+  "abruzzo": 0.0173,
+  "basilicata": 0.0173,
+  "calabria": 0.0196,
+  "campania": 0.0203,
+  "emilia-romagna": 0.0193,
+  "friuli-venezia-giulia": 0.0123,
+  "lazio": 0.0173,
+  "liguria": 0.0148,
+  "lombardia": 0.0133,
+  "marche": 0.0173,
+  "molise": 0.0183,
+  "piemonte": 0.0162,
+  "puglia": 0.0133,
+  "sardegna": 0.0123,
+  "sicilia": 0.0173,
+  "toscana": 0.0148,
+  "trentino-alto-adige": 0.0123,
+  "umbria": 0.0153,
+  "valle-aosta": 0.0123,
+  "veneto": 0.0123,
+  "media": 0.0139, // 1.39% media nazionale
+};
+
+// Aliquote addizionali comunali 2025 (percentuali - valori approssimativi)
+const MUNICIPAL_TAX_RATES = {
+  "roma": 0.009,
+  "milano": 0.008,
+  "napoli": 0.01,
+  "torino": 0.008,
+  "palermo": 0.008,
+  "genova": 0.008,
+  "bologna": 0.008,
+  "firenze": 0.007,
+  "bari": 0.008,
+  "catania": 0.008,
+  "venezia": 0.008,
+  "verona": 0.007,
+  "messina": 0.008,
+  "padova": 0.007,
+  "trieste": 0.006,
+  "brescia": 0.006,
+  "parma": 0.008,
+  "modena": 0.007,
+  "reggio-calabria": 0.008,
+  "reggio-emilia": 0.008,
+  "perugia": 0.007,
+  "livorno": 0.007,
+  "cagliari": 0.007,
+  "foggia": 0.008,
+  "rimini": 0.007,
+  "salerno": 0.008,
+  "ferrara": 0.008,
+  "sassari": 0.007,
+  "siracusa": 0.008,
+  "pescara": 0.008,
+  "monza": 0.007,
+  "bergamo": 0.006,
+  "forlì": 0.007,
+  "trento": 0.006,
+  "vicenza": 0.007,
+  "bolzano": 0.006,
+  "novara": 0.008,
+  "piacenza": 0.008,
+  "ancona": 0.008,
+  "media": 0.00701, // 0.701% media nazionale
+};
 
 export default function NetSalaryCalculator() {
   // Stati per i valori del form
   const [grossAnnualSalary, setGrossAnnualSalary] = useState("");
   const [monthlyPayments, setMonthlyPayments] = useState("13");
-  const [workingDays, setWorkingDays] = useState("365"); // Giorni lavorati in un anno
+  const [contractType, setContractType] = useState("commercio"); // Tipo di contratto (CCNL)
+  const [workSchedule, setWorkSchedule] = useState("full-time"); // Tipo di orario lavorativo
+  const [workingDays, setWorkingDays] = useState("260"); // Giorni lavorati in un anno (default 260 per full-time)
   const [dependents, setDependents] = useState("0"); // Familiari a carico
   const [region, setRegion] = useState("media"); // Regione per calcolo addizionale regionale
   const [city, setCity] = useState("media"); // Comune per calcolo addizionale comunale
+  const [customDays, setCustomDays] = useState(false); // Se true, l'utente specifica manualmente i giorni
   
   // Stato per i risultati
   const [calculationResults, setCalculationResults] = useState<any>(null);
+  
+  // Aggiorna i giorni lavorativi quando cambia il tipo di orario
+  useEffect(() => {
+    if (!customDays && workSchedule !== "custom") {
+      setWorkingDays(WORKING_DAYS[workSchedule].toString());
+    }
+  }, [workSchedule, customDays]);
 
   // Calcola lo stipendio netto
   const calculateNetSalary = () => {
@@ -72,8 +173,9 @@ export default function NetSalaryCalculator() {
       return;
     }
     
-    // 1. Calcolo dei contributi INPS
-    const inpsContribution = grossAnnual * INPS_RATE;
+    // 1. Calcolo dei contributi INPS in base al tipo di contratto
+    const inpsRate = INPS_RATES[contractType as keyof typeof INPS_RATES];
+    const inpsContribution = grossAnnual * inpsRate;
     const taxableIncome = grossAnnual - inpsContribution;
     
     // 2. Calcolo IRPEF progressiva
@@ -111,9 +213,11 @@ export default function NetSalaryCalculator() {
     // IRPEF finale dopo detrazioni (non può essere negativa)
     const finalIrpef = Math.max(0, irpef - totalDeductions);
     
-    // 4. Addizionali regionali e comunali
-    const regionalTax = taxableIncome * AVG_REGIONAL_TAX_RATE;
-    const municipalTax = taxableIncome * AVG_MUNICIPAL_TAX_RATE;
+    // 4. Addizionali regionali e comunali in base alla regione e comune selezionati
+    const regionalRate = REGIONAL_TAX_RATES[region as keyof typeof REGIONAL_TAX_RATES];
+    const municipalRate = MUNICIPAL_TAX_RATES[city as keyof typeof MUNICIPAL_TAX_RATES];
+    const regionalTax = taxableIncome * regionalRate;
+    const municipalTax = taxableIncome * municipalRate;
     
     // 5. Calcolo stipendio netto annuale
     const netAnnualSalary = grossAnnual - inpsContribution - finalIrpef - regionalTax - municipalTax;
@@ -145,7 +249,10 @@ export default function NetSalaryCalculator() {
   const resetForm = () => {
     setGrossAnnualSalary("");
     setMonthlyPayments("13");
-    setWorkingDays("365");
+    setContractType("commercio");
+    setWorkSchedule("full-time");
+    setWorkingDays("260");
+    setCustomDays(false);
     setDependents("0");
     setRegion("media");
     setCity("media");
@@ -193,13 +300,91 @@ export default function NetSalaryCalculator() {
           
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <Label htmlFor="workingDays">Giorni lavorati all'anno</Label>
+              <Label htmlFor="contractType">Tipo di contratto (CCNL)</Label>
+              <Select value={contractType} onValueChange={setContractType}>
+                <SelectTrigger id="contractType" className="mt-1">
+                  <SelectValue placeholder="Seleziona contratto" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="commercio">Commercio</SelectItem>
+                  <SelectItem value="industria">Industria</SelectItem>
+                  <SelectItem value="artigianato">Artigianato</SelectItem>
+                  <SelectItem value="turismo">Turismo</SelectItem>
+                  <SelectItem value="agricoltura">Agricoltura</SelectItem>
+                  <SelectItem value="edilizia">Edilizia</SelectItem>
+                  <SelectItem value="trasporti">Trasporti</SelectItem>
+                  <SelectItem value="credito">Credito e Assicurazioni</SelectItem>
+                  <SelectItem value="pubblico">Pubblico Impiego</SelectItem>
+                  <SelectItem value="sanita">Sanità Privata</SelectItem>
+                  <SelectItem value="scuola">Scuola e Istruzione</SelectItem>
+                  <SelectItem value="altro">Altro</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="workSchedule">Tipo di orario di lavoro</Label>
+              <Select 
+                value={workSchedule} 
+                onValueChange={(val) => {
+                  setWorkSchedule(val);
+                  if (val === "custom") {
+                    setCustomDays(true);
+                  }
+                }}
+              >
+                <SelectTrigger id="workSchedule" className="mt-1">
+                  <SelectValue placeholder="Seleziona orario" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="full-time">Full-time (5 giorni/settimana)</SelectItem>
+                  <SelectItem value="part-time-5">Part-time (5 giorni/settimana)</SelectItem>
+                  <SelectItem value="part-time-4">Part-time (4 giorni/settimana)</SelectItem>
+                  <SelectItem value="part-time-3">Part-time (3 giorni/settimana)</SelectItem>
+                  <SelectItem value="turni">Lavoro a turni</SelectItem>
+                  <SelectItem value="stagionale">Lavoro stagionale</SelectItem>
+                  <SelectItem value="flessibile">Orario flessibile</SelectItem>
+                  <SelectItem value="custom">Personalizzato</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <div className="flex justify-between items-center">
+                <Label htmlFor="workingDays">Giorni lavorati all'anno</Label>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="customDays"
+                    checked={customDays}
+                    onCheckedChange={(checked) => {
+                      setCustomDays(checked === true);
+                      if (checked === false && workSchedule !== "custom") {
+                        setWorkingDays(WORKING_DAYS[workSchedule].toString());
+                      }
+                    }}
+                  />
+                  <label
+                    htmlFor="customDays"
+                    className="text-xs leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Personalizza
+                  </label>
+                </div>
+              </div>
               <Input
                 id="workingDays"
                 type="number"
-                placeholder="es. 365"
+                placeholder="es. 260"
                 value={workingDays}
-                onChange={(e) => setWorkingDays(e.target.value)}
+                onChange={(e) => {
+                  setWorkingDays(e.target.value);
+                  // Se l'utente modifica manualmente, impostiamo customDays a true
+                  if (!customDays) {
+                    setCustomDays(true);
+                  }
+                }}
                 className="mt-1"
               />
             </div>
@@ -231,15 +416,26 @@ export default function NetSalaryCalculator() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="media">Media nazionale</SelectItem>
-                  <SelectItem value="lombardia">Lombardia</SelectItem>
-                  <SelectItem value="lazio">Lazio</SelectItem>
+                  <SelectItem value="abruzzo">Abruzzo</SelectItem>
+                  <SelectItem value="basilicata">Basilicata</SelectItem>
+                  <SelectItem value="calabria">Calabria</SelectItem>
                   <SelectItem value="campania">Campania</SelectItem>
-                  <SelectItem value="sicilia">Sicilia</SelectItem>
-                  <SelectItem value="veneto">Veneto</SelectItem>
-                  <SelectItem value="emilia">Emilia-Romagna</SelectItem>
+                  <SelectItem value="emilia-romagna">Emilia-Romagna</SelectItem>
+                  <SelectItem value="friuli-venezia-giulia">Friuli-Venezia Giulia</SelectItem>
+                  <SelectItem value="lazio">Lazio</SelectItem>
+                  <SelectItem value="liguria">Liguria</SelectItem>
+                  <SelectItem value="lombardia">Lombardia</SelectItem>
+                  <SelectItem value="marche">Marche</SelectItem>
+                  <SelectItem value="molise">Molise</SelectItem>
                   <SelectItem value="piemonte">Piemonte</SelectItem>
                   <SelectItem value="puglia">Puglia</SelectItem>
+                  <SelectItem value="sardegna">Sardegna</SelectItem>
+                  <SelectItem value="sicilia">Sicilia</SelectItem>
                   <SelectItem value="toscana">Toscana</SelectItem>
+                  <SelectItem value="trentino-alto-adige">Trentino-Alto Adige</SelectItem>
+                  <SelectItem value="umbria">Umbria</SelectItem>
+                  <SelectItem value="valle-aosta">Valle d'Aosta</SelectItem>
+                  <SelectItem value="veneto">Veneto</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -252,8 +448,8 @@ export default function NetSalaryCalculator() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="media">Media nazionale</SelectItem>
-                  <SelectItem value="milano">Milano</SelectItem>
                   <SelectItem value="roma">Roma</SelectItem>
+                  <SelectItem value="milano">Milano</SelectItem>
                   <SelectItem value="napoli">Napoli</SelectItem>
                   <SelectItem value="torino">Torino</SelectItem>
                   <SelectItem value="palermo">Palermo</SelectItem>
@@ -261,6 +457,36 @@ export default function NetSalaryCalculator() {
                   <SelectItem value="bologna">Bologna</SelectItem>
                   <SelectItem value="firenze">Firenze</SelectItem>
                   <SelectItem value="bari">Bari</SelectItem>
+                  <SelectItem value="catania">Catania</SelectItem>
+                  <SelectItem value="venezia">Venezia</SelectItem>
+                  <SelectItem value="verona">Verona</SelectItem>
+                  <SelectItem value="messina">Messina</SelectItem>
+                  <SelectItem value="padova">Padova</SelectItem>
+                  <SelectItem value="trieste">Trieste</SelectItem>
+                  <SelectItem value="brescia">Brescia</SelectItem>
+                  <SelectItem value="parma">Parma</SelectItem>
+                  <SelectItem value="modena">Modena</SelectItem>
+                  <SelectItem value="reggio-calabria">Reggio Calabria</SelectItem>
+                  <SelectItem value="reggio-emilia">Reggio Emilia</SelectItem>
+                  <SelectItem value="perugia">Perugia</SelectItem>
+                  <SelectItem value="livorno">Livorno</SelectItem>
+                  <SelectItem value="cagliari">Cagliari</SelectItem>
+                  <SelectItem value="foggia">Foggia</SelectItem>
+                  <SelectItem value="rimini">Rimini</SelectItem>
+                  <SelectItem value="salerno">Salerno</SelectItem>
+                  <SelectItem value="ferrara">Ferrara</SelectItem>
+                  <SelectItem value="sassari">Sassari</SelectItem>
+                  <SelectItem value="siracusa">Siracusa</SelectItem>
+                  <SelectItem value="pescara">Pescara</SelectItem>
+                  <SelectItem value="monza">Monza</SelectItem>
+                  <SelectItem value="bergamo">Bergamo</SelectItem>
+                  <SelectItem value="forlì">Forlì</SelectItem>
+                  <SelectItem value="trento">Trento</SelectItem>
+                  <SelectItem value="vicenza">Vicenza</SelectItem>
+                  <SelectItem value="bolzano">Bolzano</SelectItem>
+                  <SelectItem value="novara">Novara</SelectItem>
+                  <SelectItem value="piacenza">Piacenza</SelectItem>
+                  <SelectItem value="ancona">Ancona</SelectItem>
                 </SelectContent>
               </Select>
             </div>
