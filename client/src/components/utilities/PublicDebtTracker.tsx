@@ -401,7 +401,7 @@ export default function PublicDebtTracker() {
                         type="monotone" 
                         dataKey="debtValue" 
                         name="Debito pubblico" 
-                        stroke="#8884d8" 
+                        stroke="#ef4444" 
                         activeDot={{ r: 8 }} 
                         strokeWidth={2} 
                       />
@@ -410,7 +410,7 @@ export default function PublicDebtTracker() {
                         type="monotone" 
                         dataKey="debtToGDP" 
                         name="Debito/PIL" 
-                        stroke="#82ca9d" 
+                        stroke="#10b981" 
                         strokeWidth={2}
                       />
                     </LineChart>
@@ -419,9 +419,36 @@ export default function PublicDebtTracker() {
                 
                 <Separator />
                 
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="py-2 px-4 border text-left">Anno</th>
+                        <th className="py-2 px-4 border text-left">
+                          <span className="text-red-600">Debito (miliardi {historicalDebt.currency})</span>
+                        </th>
+                        <th className="py-2 px-4 border text-left">
+                          <span className="text-green-600">Debito/PIL (%)</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...historicalDebt.data]
+                        .sort((a, b) => b.year - a.year) // Ordina per anno decrescente
+                        .map((item) => (
+                          <tr key={item.year} className="hover:bg-gray-50">
+                            <td className="py-2 px-4 border">{item.year}</td>
+                            <td className="py-2 px-4 border text-red-600 font-medium">{item.debtValue.toLocaleString()}</td>
+                            <td className="py-2 px-4 border text-green-600 font-medium">{item.debtToGDP.toLocaleString()}%</td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+                
                 <div className="pt-2 text-sm text-gray-500">
                   <p className="text-xs text-center">
-                    Il grafico mostra l'andamento del debito pubblico in miliardi di {historicalDebt.currency} 
+                    I dati mostrano l'andamento del debito pubblico in miliardi di {historicalDebt.currency} 
                     e il rapporto debito/PIL in percentuale nel corso degli anni.
                   </p>
                 </div>
@@ -518,17 +545,17 @@ export default function PublicDebtTracker() {
                       <Bar 
                         dataKey="debtValue" 
                         name="Debito totale (miliardi)" 
-                        fill="#8884d8" 
+                        fill="#ef4444" 
                       />
                       <Bar 
                         dataKey="debtToGDP" 
                         name="Debito/PIL (%)" 
-                        fill="#82ca9d" 
+                        fill="#10b981" 
                       />
                       <Bar 
                         dataKey="perCapita" 
                         name="Debito pro capite" 
-                        fill="#ffc658" 
+                        fill="#f97316" 
                       />
                     </BarChart>
                   </ResponsiveContainer>
