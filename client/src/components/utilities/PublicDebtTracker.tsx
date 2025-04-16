@@ -423,11 +423,11 @@ export default function PublicDebtTracker() {
                   <table className="w-full border-collapse">
                     <thead>
                       <tr className="bg-gray-100">
-                        <th className="py-2 px-4 border text-left">Anno</th>
-                        <th className="py-2 px-4 border text-left">
+                        <th className="py-2 px-4 border text-left" style={{ minWidth: "80px" }}>Anno</th>
+                        <th className="py-2 px-4 border text-left" style={{ minWidth: "200px" }}>
                           <span className="text-red-600">Debito (miliardi {historicalDebt.currency})</span>
                         </th>
-                        <th className="py-2 px-4 border text-left">
+                        <th className="py-2 px-4 border text-left" style={{ minWidth: "150px" }}>
                           <span className="text-green-600">Debito/PIL (%)</span>
                         </th>
                       </tr>
@@ -569,9 +569,9 @@ export default function PublicDebtTracker() {
                   <table className="w-full border-collapse mb-6">
                     <thead>
                       <tr className="bg-gray-100">
-                        <th className="py-2 px-4 border text-left">Indicatore</th>
+                        <th className="py-2 px-4 border text-left" style={{ minWidth: "150px" }}>Indicatore</th>
                         {comparisonData.data.map(item => (
-                          <th key={item.country} className="py-2 px-4 border text-left">{item.country}</th>
+                          <th key={item.country} className="py-2 px-4 border text-left" style={{ minWidth: "180px" }}>{item.country}</th>
                         ))}
                       </tr>
                     </thead>
