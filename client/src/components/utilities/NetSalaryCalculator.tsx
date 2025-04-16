@@ -56,7 +56,7 @@ const INPS_RATES = {
 
 // Giorni lavorativi standard per tipo di contratto
 const WORKING_DAYS: Record<string, number> = {
-  "full-time": 260, // 5 giorni a settimana per circa 52 settimane
+  "full-time": 365, // 365 giorni nell'anno (calendario completo)
   "part-time-5": 260, // part-time 5 giorni a settimana
   "part-time-4": 208, // part-time 4 giorni a settimana
   "part-time-3": 156, // part-time 3 giorni a settimana
