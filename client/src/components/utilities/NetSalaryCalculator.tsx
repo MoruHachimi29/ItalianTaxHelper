@@ -55,7 +55,7 @@ const INPS_RATES = {
 };
 
 // Giorni lavorativi standard per tipo di contratto
-const WORKING_DAYS = {
+const WORKING_DAYS: Record<string, number> = {
   "full-time": 260, // 5 giorni a settimana per circa 52 settimane
   "part-time-5": 260, // part-time 5 giorni a settimana
   "part-time-4": 208, // part-time 4 giorni a settimana
@@ -157,7 +157,7 @@ export default function NetSalaryCalculator() {
   // Aggiorna i giorni lavorativi quando cambia il tipo di orario
   useEffect(() => {
     if (!customDays && workSchedule !== "custom") {
-      setWorkingDays(WORKING_DAYS[workSchedule].toString());
+      setWorkingDays(WORKING_DAYS[workSchedule as keyof typeof WORKING_DAYS].toString());
     }
   }, [workSchedule, customDays]);
 
@@ -361,7 +361,7 @@ export default function NetSalaryCalculator() {
                     onCheckedChange={(checked) => {
                       setCustomDays(checked === true);
                       if (checked === false && workSchedule !== "custom") {
-                        setWorkingDays(WORKING_DAYS[workSchedule].toString());
+                        setWorkingDays(WORKING_DAYS[workSchedule as keyof typeof WORKING_DAYS].toString());
                       }
                     }}
                   />
