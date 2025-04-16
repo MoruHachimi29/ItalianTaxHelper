@@ -1,12 +1,11 @@
 import { Helmet } from "react-helmet";
-import Layout from "@/components/Layout";
 import BonusIseeTracker from "@/components/utilities/BonusIseeTracker";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { InfoIcon } from "lucide-react";
 
 export default function BonusIseePage() {
   return (
-    <Layout>
+    <>
       <Helmet>
         <title>Bonus ISEE 2025 | F24Editabile</title>
         <meta name="description" content="Esplora i Bonus ISEE 2025 disponibili per i cittadini italiani. Scopri a quali contributi potresti avere diritto in base al tuo ISEE e alla tua situazione familiare." />
@@ -29,6 +28,6 @@ export default function BonusIseePage() {
 
         <BonusIseeTracker />
       </div>
-    </Layout>
+    </>
   );
 }
