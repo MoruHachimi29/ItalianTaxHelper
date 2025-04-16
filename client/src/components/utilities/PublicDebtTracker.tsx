@@ -371,14 +371,14 @@ export default function PublicDebtTracker() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="h-[400px] w-full">
+                <div className="h-[450px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                       data={historicalDebt.data.slice(-parseInt(yearsToShow))}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
+                      margin={{ top: 20, right: 30, left: 30, bottom: 120 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="year" label={{ value: 'Anno', position: 'bottom', offset: 10 }} />
+                      <XAxis dataKey="year" label={{ value: 'Anno', position: 'insideBottom', offset: -15 }} />
                       <YAxis 
                         yAxisId="left" 
                         orientation="left" 
@@ -395,7 +395,7 @@ export default function PublicDebtTracker() {
                         if (name === 'debtToGDP') return [`${value}%`, 'Debito/PIL'];
                         return [value, name];
                       }} />
-                      <Legend verticalAlign="bottom" height={60} />
+                      <Legend verticalAlign="bottom" height={80} wrapperStyle={{ paddingTop: "20px" }} />
                       <Line 
                         yAxisId="left" 
                         type="monotone" 
@@ -519,11 +519,11 @@ export default function PublicDebtTracker() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="h-[400px] w-full">
+                <div className="h-[450px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={comparisonData.data}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
+                      margin={{ top: 20, right: 30, left: 30, bottom: 120 }}
                       layout="vertical"
                     >
                       <CartesianGrid strokeDasharray="3 3" />
@@ -542,7 +542,7 @@ export default function PublicDebtTracker() {
                           return [value, name];
                         }}
                       />
-                      <Legend verticalAlign="bottom" height={60} />
+                      <Legend verticalAlign="bottom" height={80} wrapperStyle={{ paddingTop: "20px" }} />
                       <Bar 
                         dataKey="debtValue" 
                         name="Debito totale (miliardi)" 
