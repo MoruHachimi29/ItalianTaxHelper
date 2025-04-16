@@ -382,13 +382,13 @@ export default function PublicDebtTracker() {
                       <YAxis 
                         yAxisId="left" 
                         orientation="left" 
-                        label={{ value: `Debito (miliardi ${historicalDebt.currency})`, angle: -90, position: 'outside' }} 
+                        label={{ value: `Debito (miliardi ${historicalDebt.currency})`, angle: -90, position: 'outside', dx: -45 }} 
                       />
                       <YAxis 
                         yAxisId="right" 
                         orientation="right" 
                         domain={[0, 200]} 
-                        label={{ value: 'Debito/PIL (%)', angle: 90, position: 'outside' }} 
+                        label={{ value: 'Debito/PIL (%)', angle: 90, position: 'outside', dx: 45 }} 
                       />
                       <Tooltip formatter={(value: number, name: string) => {
                         if (name === 'debtValue') return [`${value} miliardi ${historicalDebt.currency}`, 'Debito pubblico'];
