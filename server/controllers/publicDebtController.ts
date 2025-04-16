@@ -60,7 +60,8 @@ export const getCurrentPublicDebt = async (req: Request, res: Response) => {
     });
 
     // Parsifica il risultato
-    const data = JSON.parse(completion.choices[0].message.content);
+    const content = completion.choices[0].message.content || "";
+    const data = JSON.parse(content);
     return res.json(data);
   } catch (error) {
     console.error("Errore nel recupero del debito pubblico:", error);
@@ -114,7 +115,8 @@ export const getHistoricalPublicDebt = async (req: Request, res: Response) => {
     });
 
     // Parsifica il risultato
-    const data = JSON.parse(completion.choices[0].message.content);
+    const content = completion.choices[0].message.content || "";
+    const data = JSON.parse(content);
     return res.json(data);
   } catch (error) {
     console.error("Errore nel recupero dei dati storici:", error);
@@ -178,7 +180,8 @@ export const comparePublicDebt = async (req: Request, res: Response) => {
     });
 
     // Parsifica il risultato
-    const data = JSON.parse(completion.choices[0].message.content);
+    const content = completion.choices[0].message.content || "";
+    const data = JSON.parse(content);
     return res.json(data);
   } catch (error) {
     console.error("Errore nel confronto dei dati:", error);

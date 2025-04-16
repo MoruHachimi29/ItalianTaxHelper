@@ -16,6 +16,7 @@ import UtilitiesPage from "@/pages/UtilitiesPage";
 import CurrencyConverterPage from "@/pages/CurrencyConverterPage";
 import DutyCalculatorPage from "@/pages/DutyCalculatorPage";
 import NetSalaryCalculatorPage from "./pages/NetSalaryCalculatorPage";
+import PublicDebtTrackerPage from "./pages/PublicDebtTrackerPage";
 import P7mConverterPage from "@/pages/P7mConverterPage";
 import XmlToPngConverterPage from "@/pages/XmlToPngConverterPage";
 import PdfEditorPage from "@/pages/PdfEditorPage";
