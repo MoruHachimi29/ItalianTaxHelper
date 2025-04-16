@@ -39,8 +39,8 @@ export const getCurrentPublicDebt = async (req: Request, res: Response) => {
   // Se useTestData è true, restituisci i dati di esempio
   if (useTestData) {
     // Controlliamo se il paese è tra quelli disponibili nei dati di esempio
-    if (currentDebtData[country]) {
-      return res.json(currentDebtData[country]);
+    if (country in currentDebtData) {
+      return res.json(currentDebtData[country as keyof typeof currentDebtData]);
     } else {
       // Se il paese non è disponibile, usiamo l'Italia come fallback
       return res.json(currentDebtData["Italia"]);
@@ -82,9 +82,9 @@ export const getCurrentPublicDebt = async (req: Request, res: Response) => {
     console.error("Errore nel recupero del debito pubblico:", error);
     
     // In caso di errore, se abbiamo dati di esempio disponibili, li utilizziamo
-    if (currentDebtData[country as string]) {
+    if (country in currentDebtData) {
       console.log("Utilizzo dati di esempio dopo errore API per", country);
-      return res.json(currentDebtData[country as string]);
+      return res.json(currentDebtData[country as keyof typeof currentDebtData]);
     }
     
     return res.status(500).json({ 
@@ -108,8 +108,8 @@ export const getHistoricalPublicDebt = async (req: Request, res: Response) => {
   
   // Se useTestData è true, restituisci i dati di esempio
   if (useTestData) {
-    if (historicalDebtData[country]) {
-      return res.json(historicalDebtData[country]);
+    if (country in historicalDebtData) {
+      return res.json(historicalDebtData[country as keyof typeof historicalDebtData]);
     } else {
       // Se il paese non è disponibile nei dati di esempio, usiamo l'Italia
       return res.json(historicalDebtData["Italia"]);
@@ -154,9 +154,9 @@ export const getHistoricalPublicDebt = async (req: Request, res: Response) => {
     console.error("Errore nel recupero dei dati storici:", error);
     
     // In caso di errore, se abbiamo dati di esempio disponibili, li utilizziamo
-    if (historicalDebtData[country as string]) {
+    if (country in historicalDebtData) {
       console.log("Utilizzo dati storici di esempio dopo errore API per", country);
-      return res.json(historicalDebtData[country as string]);
+      return res.json(historicalDebtData[country as keyof typeof historicalDebtData]);
     }
     
     return res.status(500).json({ 
