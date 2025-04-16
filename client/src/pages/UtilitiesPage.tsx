@@ -10,6 +10,13 @@ const toolsList = [
     path: "/strumenti/stipendio-netto"
   },
   {
+    id: "bonus-isee",
+    title: "Bonus ISEE 2025",
+    description: "Esplora tutti i bonus e le agevolazioni disponibili in base al tuo ISEE. Verifica la tua idoneità e scopri come fare domanda per ottenere i contributi.",
+    icon: "🎁",
+    path: "/strumenti/bonus-isee"
+  },
+  {
     id: "public-debt-tracker",
     title: "Debito Pubblico",
     description: "Monitora il debito pubblico delle maggiori economie globali. Visualizza andamento storico, confronta paesi e analizza dati aggiornati quotidianamente.",
