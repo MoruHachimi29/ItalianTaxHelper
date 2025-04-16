@@ -375,20 +375,20 @@ export default function PublicDebtTracker() {
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                       data={historicalDebt.data.slice(-parseInt(yearsToShow))}
-                      margin={{ top: 20, right: 30, left: 30, bottom: 120 }}
+                      margin={{ top: 20, right: 50, left: 50, bottom: 120 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="year" label={{ value: 'Anno', position: 'insideBottom', offset: -15 }} />
                       <YAxis 
                         yAxisId="left" 
                         orientation="left" 
-                        label={{ value: `Debito (miliardi ${historicalDebt.currency})`, angle: -90, position: 'insideLeft', dy: -85 }} 
+                        label={{ value: `Debito (miliardi ${historicalDebt.currency})`, angle: -90, position: 'center' }} 
                       />
                       <YAxis 
                         yAxisId="right" 
                         orientation="right" 
                         domain={[0, 200]} 
-                        label={{ value: 'Debito/PIL (%)', angle: 90, position: 'insideRight', dy: -85 }} 
+                        label={{ value: 'Debito/PIL (%)', angle: 90, position: 'center' }} 
                       />
                       <Tooltip formatter={(value: number, name: string) => {
                         if (name === 'debtValue') return [`${value} miliardi ${historicalDebt.currency}`, 'Debito pubblico'];
@@ -523,7 +523,7 @@ export default function PublicDebtTracker() {
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={comparisonData.data}
-                      margin={{ top: 20, right: 30, left: 30, bottom: 120 }}
+                      margin={{ top: 20, right: 50, left: 50, bottom: 120 }}
                       layout="vertical"
                     >
                       <CartesianGrid strokeDasharray="3 3" />
