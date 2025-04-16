@@ -603,6 +603,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Confronta il debito pubblico tra due paesi
   app.get("/api/public-debt/compare", comparePublicDebt);
 
+  // API per i Bonus ISEE
+  
+  // Ottieni tutte le categorie dei bonus
+  app.get("/api/bonus/categories", getBonusCategories);
+  
+  // Ottieni tutti i bonus con filtri opzionali
+  app.get("/api/bonus", getAllBonus);
+  
+  // Ottieni i range ISEE predefiniti
+  app.get("/api/bonus/isee-ranges", getIseeRanges);
+  
+  // Ottieni i bonus nuovi
+  app.get("/api/bonus/new", getNewBonus);
+  
+  // Ottieni i bonus in scadenza
+  app.get("/api/bonus/expiring", getExpiringBonus);
+  
+  // Ottieni un bonus specifico per ID
+  app.get("/api/bonus/:id", getBonusById);
+
   const httpServer = createServer(app);
   return httpServer;
 }
