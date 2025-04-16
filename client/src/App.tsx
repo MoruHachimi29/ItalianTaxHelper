@@ -17,6 +17,7 @@ import CurrencyConverterPage from "@/pages/CurrencyConverterPage";
 import DutyCalculatorPage from "@/pages/DutyCalculatorPage";
 import NetSalaryCalculatorPage from "./pages/NetSalaryCalculatorPage";
 import PublicDebtTrackerPage from "./pages/PublicDebtTrackerPage";
+import BonusIseePage from "./pages/BonusIseePage";
 import P7mConverterPage from "@/pages/P7mConverterPage";
 import XmlToPngConverterPage from "@/pages/XmlToPngConverterPage";
 import PdfEditorPage from "@/pages/PdfEditorPage";
@@ -36,6 +37,7 @@ function Router() {
         <Route path="/strumenti" component={UtilitiesPage} />
         <Route path="/strumenti/stipendio-netto" component={NetSalaryCalculatorPage} />
         <Route path="/strumenti/debito-pubblico" component={PublicDebtTrackerPage} />
+        <Route path="/strumenti/bonus-isee" component={BonusIseePage} />
         <Route path="/strumenti/valuta" component={CurrencyConverterPage} />
         <Route path="/strumenti/dazi" component={DutyCalculatorPage} />
         <Route path="/strumenti/p7m" component={P7mConverterPage} />
