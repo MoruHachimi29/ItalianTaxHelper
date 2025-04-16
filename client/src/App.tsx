@@ -35,6 +35,7 @@ function Router() {
         <Route path="/blog/:slug" component={BlogPostPage} />
         <Route path="/strumenti" component={UtilitiesPage} />
         <Route path="/strumenti/stipendio-netto" component={NetSalaryCalculatorPage} />
+        <Route path="/strumenti/debito-pubblico" component={PublicDebtTrackerPage} />
         <Route path="/strumenti/valuta" component={CurrencyConverterPage} />
         <Route path="/strumenti/dazi" component={DutyCalculatorPage} />
         <Route path="/strumenti/p7m" component={P7mConverterPage} />
