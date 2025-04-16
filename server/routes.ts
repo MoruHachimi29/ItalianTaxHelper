@@ -597,13 +597,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Ottieni i dati correnti del debito pubblico per un paese
   app.get("/api/public-debt/current", getCurrentPublicDebt);
   
-  // Ottieni i dati storici del debito pubblico
   app.get("/api/public-debt/historical", getHistoricalPublicDebt);
   
   // Confronta il debito pubblico tra due paesi
   app.get("/api/public-debt/compare", comparePublicDebt);
 
-  // API per i Bonus ISEE
+  // API per i Bonus ISEE 2025
   
   // Ottieni tutte le categorie dei bonus
   app.get("/api/bonus/categories", getBonusCategories);
