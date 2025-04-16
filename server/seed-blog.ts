@@ -1,7 +1,7 @@
 import { db } from "./db";
 import { blogPosts } from "@shared/schema";
 
-async function seedBlogPosts() {
+export default async function seedBlogPosts() {
   console.log("Seeding blog posts...");
 
   // Check if we already have blog posts in the database
@@ -323,4 +323,4 @@ async function seedBlogPosts() {
   }
 }
 
-export default seedBlogPosts;
+// La funzione è già stata esportata come default all'inizio del file
