@@ -63,7 +63,7 @@ const WORKING_DAYS: Record<string, number> = {
   "turni": 240, // lavoro a turni in media
   "stagionale": 180, // contratto stagionale
   "flessibile": 240, // orario flessibile
-  "custom": 365, // personalizzato (calendario completo)
+  "custom": 365, // personalizzato (calendario completo - 365 giorni)
 };
 
 // Detrazioni
@@ -145,7 +145,7 @@ export default function NetSalaryCalculator() {
   const [monthlyPayments, setMonthlyPayments] = useState("13");
   const [contractType, setContractType] = useState("commercio"); // Tipo di contratto (CCNL)
   const [workSchedule, setWorkSchedule] = useState("full-time"); // Tipo di orario lavorativo
-  const [workingDays, setWorkingDays] = useState("260"); // Giorni lavorati in un anno (default 260 per full-time)
+  const [workingDays, setWorkingDays] = useState("365"); // Giorni lavorati in un anno (default 365 per calendario completo)
   const [dependents, setDependents] = useState("0"); // Familiari a carico
   const [region, setRegion] = useState("media"); // Regione per calcolo addizionale regionale
   const [city, setCity] = useState("media"); // Comune per calcolo addizionale comunale
@@ -251,7 +251,7 @@ export default function NetSalaryCalculator() {
     setMonthlyPayments("13");
     setContractType("commercio");
     setWorkSchedule("full-time");
-    setWorkingDays("260");
+    setWorkingDays("365");
     setCustomDays(false);
     setDependents("0");
     setRegion("media");
@@ -376,7 +376,7 @@ export default function NetSalaryCalculator() {
               <Input
                 id="workingDays"
                 type="number"
-                placeholder="es. 260"
+                placeholder="es. 365"
                 value={workingDays}
                 onChange={(e) => {
                   setWorkingDays(e.target.value);
