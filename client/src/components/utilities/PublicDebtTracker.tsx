@@ -199,7 +199,7 @@ export default function PublicDebtTracker() {
         </TabsList>
         
         {/* Sezione Situazione Attuale */}
-        <TabsContent value="current" className="space-y-6">
+        <TabsContent value="current" className="space-y-3">
           <div className="grid grid-cols-1 gap-4 mb-4">
             <div>
               <Label htmlFor="country">Seleziona un paese</Label>
@@ -234,7 +234,7 @@ export default function PublicDebtTracker() {
                   Dati aggiornati al {currentDebt.lastUpdate}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-3">
                 <div className="p-6 bg-gray-50 rounded-lg">
                   <div className="text-center">
                     <h4 className="text-lg font-semibold mb-1">Debito Totale</h4>
@@ -314,7 +314,7 @@ export default function PublicDebtTracker() {
         </TabsContent>
         
         {/* Sezione Storico */}
-        <TabsContent value="historical" className="space-y-6">
+        <TabsContent value="historical" className="space-y-3">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div>
               <Label htmlFor="historical-country">Seleziona un paese</Label>
@@ -370,7 +370,7 @@ export default function PublicDebtTracker() {
                   Evoluzione negli ultimi {yearsToShow} anni
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-3">
                 <div className="h-[450px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
@@ -518,7 +518,7 @@ export default function PublicDebtTracker() {
                   {comparisonData.countries[0]} vs {comparisonData.countries[1]}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-3">
                 <div className="h-[450px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
