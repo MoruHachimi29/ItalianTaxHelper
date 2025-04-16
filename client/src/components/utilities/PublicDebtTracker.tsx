@@ -395,7 +395,7 @@ export default function PublicDebtTracker() {
                         if (name === 'debtToGDP') return [`${value}%`, 'Debito/PIL'];
                         return [value, name];
                       }} />
-                      <Legend verticalAlign="bottom" height={80} wrapperStyle={{ paddingTop: "20px" }} />
+                      <Legend verticalAlign="bottom" height={50} wrapperStyle={{ paddingTop: "10px" }} />
                       <Line 
                         yAxisId="left" 
                         type="monotone" 
@@ -417,7 +417,7 @@ export default function PublicDebtTracker() {
                   </ResponsiveContainer>
                 </div>
                 
-                <Separator />
+                <Separator className="my-2" />
                 
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
@@ -542,7 +542,7 @@ export default function PublicDebtTracker() {
                           return [value, name];
                         }}
                       />
-                      <Legend verticalAlign="bottom" height={80} wrapperStyle={{ paddingTop: "20px" }} />
+                      <Legend verticalAlign="bottom" height={50} wrapperStyle={{ paddingTop: "10px" }} />
                       <Bar 
                         dataKey="debtValue" 
                         name="Debito totale (miliardi)" 
@@ -562,7 +562,7 @@ export default function PublicDebtTracker() {
                   </ResponsiveContainer>
                 </div>
                 
-                <Separator />
+                <Separator className="my-2" />
                 
                 {/* Tabella di confronto */}
                 <div className="overflow-x-auto">
