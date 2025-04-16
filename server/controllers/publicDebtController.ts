@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
 import OpenAI from "openai";
+import { currentDebtData, historicalDebtData, comparisonData } from "./mockPublicDebtData";
 
 // Inizializzazione del client OpenAI
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// Flag per indicare se usare dati di esempio invece di OpenAI
+const useTestData = true; // Imposta a false quando l'API OpenAI funziona
 
 // Lista dei paesi principali supportati
 export const supportedCountries = [
@@ -30,6 +34,17 @@ export const getCurrentPublicDebt = async (req: Request, res: Response) => {
   
   if (!country || typeof country !== "string") {
     return res.status(400).json({ error: "È necessario specificare un paese valido." });
+  }
+
+  // Se useTestData è true, restituisci i dati di esempio
+  if (useTestData) {
+    // Controlliamo se il paese è tra quelli disponibili nei dati di esempio
+    if (currentDebtData[country]) {
+      return res.json(currentDebtData[country]);
+    } else {
+      // Se il paese non è disponibile, usiamo l'Italia come fallback
+      return res.json(currentDebtData["Italia"]);
+    }
   }
 
   try {
@@ -65,6 +80,13 @@ export const getCurrentPublicDebt = async (req: Request, res: Response) => {
     return res.json(data);
   } catch (error) {
     console.error("Errore nel recupero del debito pubblico:", error);
+    
+    // In caso di errore, se abbiamo dati di esempio disponibili, li utilizziamo
+    if (currentDebtData[country as string]) {
+      console.log("Utilizzo dati di esempio dopo errore API per", country);
+      return res.json(currentDebtData[country as string]);
+    }
+    
     return res.status(500).json({ 
       error: "Si è verificato un errore durante il recupero dei dati sul debito pubblico.",
       details: error instanceof Error ? error.message : String(error)
@@ -83,6 +105,16 @@ export const getHistoricalPublicDebt = async (req: Request, res: Response) => {
   }
 
   const numYears = parseInt(years as string) || 5;
+  
+  // Se useTestData è true, restituisci i dati di esempio
+  if (useTestData) {
+    if (historicalDebtData[country]) {
+      return res.json(historicalDebtData[country]);
+    } else {
+      // Se il paese non è disponibile nei dati di esempio, usiamo l'Italia
+      return res.json(historicalDebtData["Italia"]);
+    }
+  }
 
   try {
     // Richiesta a GPT per ottenere dati storici
@@ -120,6 +152,13 @@ export const getHistoricalPublicDebt = async (req: Request, res: Response) => {
     return res.json(data);
   } catch (error) {
     console.error("Errore nel recupero dei dati storici:", error);
+    
+    // In caso di errore, se abbiamo dati di esempio disponibili, li utilizziamo
+    if (historicalDebtData[country as string]) {
+      console.log("Utilizzo dati storici di esempio dopo errore API per", country);
+      return res.json(historicalDebtData[country as string]);
+    }
+    
     return res.status(500).json({ 
       error: "Si è verificato un errore durante il recupero dei dati storici.",
       details: error instanceof Error ? error.message : String(error)
@@ -135,6 +174,22 @@ export const comparePublicDebt = async (req: Request, res: Response) => {
   
   if (!country1 || !country2 || typeof country1 !== "string" || typeof country2 !== "string") {
     return res.status(400).json({ error: "È necessario specificare due paesi validi per il confronto." });
+  }
+  
+  // Se useTestData è true, restituisci i dati di esempio
+  if (useTestData) {
+    // Prepariamo una chiave per comparisonData basata sui due paesi
+    const key1 = `${country1}-${country2}`;
+    const key2 = `${country2}-${country1}`;
+    
+    if (key1 in comparisonData) {
+      return res.json(comparisonData[key1 as keyof typeof comparisonData]);
+    } else if (key2 in comparisonData) {
+      return res.json(comparisonData[key2 as keyof typeof comparisonData]);
+    } else {
+      // Se la combinazione specifica non è disponibile, usiamo Italia-Germania come fallback
+      return res.json(comparisonData["Italia-Germania"]);
+    }
   }
 
   try {
@@ -185,6 +240,19 @@ export const comparePublicDebt = async (req: Request, res: Response) => {
     return res.json(data);
   } catch (error) {
     console.error("Errore nel confronto dei dati:", error);
+    
+    // In caso di errore, proviamo a utilizzare i dati di esempio
+    const key1 = `${country1}-${country2}`;
+    const key2 = `${country2}-${country1}`;
+    
+    if (key1 in comparisonData) {
+      console.log("Utilizzo dati di confronto di esempio dopo errore API per", key1);
+      return res.json(comparisonData[key1 as keyof typeof comparisonData]);
+    } else if (key2 in comparisonData) {
+      console.log("Utilizzo dati di confronto di esempio dopo errore API per", key2);
+      return res.json(comparisonData[key2 as keyof typeof comparisonData]);
+    }
+    
     return res.status(500).json({ 
       error: "Si è verificato un errore durante il confronto dei dati sul debito pubblico.",
       details: error instanceof Error ? error.message : String(error)
