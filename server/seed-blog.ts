@@ -53,7 +53,7 @@ export default async function seedBlogPosts() {
         <h2>Conclusioni</h2>
         <p>Le novità fiscali introdotte dalla Legge di Bilancio 2025 rappresentano un passo verso la semplificazione del sistema tributario italiano. È consigliabile, tuttavia, consultare un commercialista o un esperto fiscale per valutare come queste modifiche impatteranno sulla propria situazione personale o aziendale.</p>
       `,
-      imageUrl: "/assets/F.png",
+      imageUrl: "https://img.freepik.com/free-photo/close-up-accountant-hands-counting-calculator_1262-3169.jpg",
       author: "Dott. Marco Rossi",
       category: "fisco",
       tags: ["fisco", "irpef", "legge di bilancio", "tasse", "2025"],
@@ -115,7 +115,7 @@ export default async function seedBlogPosts() {
         <h2>Conclusioni</h2>
         <p>La corretta compilazione del modello F24 è fondamentale per evitare sanzioni e problemi con il fisco. In caso di dubbi, è sempre consigliabile consultare un commercialista o un esperto fiscale. Ricordate inoltre che F24Editabile.it offre strumenti online per compilare facilmente e correttamente questi moduli.</p>
       `,
-      imageUrl: "/assets/Modello_F24.png",
+      imageUrl: "https://img.freepik.com/free-photo/finance-business-concept-hands-closeup-using-calculator-working-modern-office_1423-120.jpg",
       author: "Dott.ssa Laura Bianchi",
       category: "fisco",
       tags: ["f24", "modello", "compilazione", "tasse", "pagamenti"],
@@ -177,7 +177,7 @@ export default async function seedBlogPosts() {
         <h2>Conclusioni</h2>
         <p>Il 2025 si configura come un anno di transizione per i mercati finanziari, con opportunità interessanti ma anche rischi da monitorare attentamente. La diversificazione e un approccio disciplinato agli investimenti rimangono le strategie più prudenti in un contesto di mercato che, seppur complessivamente positivo, non è privo di incognite.</p>
       `,
-      imageUrl: "/assets/1000109272.jpg",
+      imageUrl: "https://img.freepik.com/free-photo/business-concept-with-graphic-holography_23-2149160932.jpg",
       author: "Dott. Paolo Verdi",
       category: "finanza",
       tags: ["investimenti", "mercati", "finanza", "borse", "2025"],
@@ -233,7 +233,7 @@ export default async function seedBlogPosts() {
         <h2>Conclusioni</h2>
         <p>Il 2025 segna un punto di svolta per la regolamentazione dello smart working in Italia, con un approccio più strutturato e attento agli aspetti fiscali, contributivi e di benessere dei lavoratori. Le nuove normative mirano a trovare un equilibrio tra le esigenze di flessibilità delle aziende e la tutela dei diritti dei lavoratori, in un contesto lavorativo che continua a evolversi rapidamente.</p>
       `,
-      imageUrl: "/assets/ef7985b0-789e-49da-a51e-6c2b4ba1cc31 (1).png",
+      imageUrl: "https://img.freepik.com/free-photo/remote-work-concept-with-laptop_23-2149171141.jpg",
       author: "Avv. Giulia Neri",
       category: "lavoro",
       tags: ["smart working", "lavoro agile", "normative", "fisco", "2025"],
@@ -301,7 +301,7 @@ export default async function seedBlogPosts() {
         <h2>Conclusioni</h2>
         <p>La normativa fiscale italiana sulle criptovalute ha fatto significativi passi avanti in termini di chiarezza e definizione degli obblighi. È fondamentale mantenere una documentazione accurata di tutte le transazioni effettuate e, in caso di dubbi, rivolgersi a un consulente fiscale specializzato in asset digitali per evitare sanzioni o complicazioni in sede di accertamento.</p>
       `,
-      imageUrl: "/assets/Modello_F24_Elementi_identificativi.png",
+      imageUrl: "https://img.freepik.com/free-photo/cryptocurrency-bitcoin-gold-coins-circuit-board_1150-6321.jpg",
       author: "Dott. Alessandro Ferrara",
       category: "tecnologia",
       tags: ["criptovalute", "bitcoin", "fisco", "tasse", "dichiarazione redditi", "2025"],
