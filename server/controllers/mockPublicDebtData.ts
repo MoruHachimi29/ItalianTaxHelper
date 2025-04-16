@@ -1,8 +1,45 @@
 // Dati di esempio per il debito pubblico
 // Questi dati verranno utilizzati solo per il testing dell'interfaccia quando OpenAI API non è disponibile
 
+// Definizione dei tipi
+export interface CurrentDebtItem {
+  country: string;
+  debtValue: number;
+  currency: string;
+  debtToGDP: number;
+  lastUpdate: string;
+  trend: 'up' | 'down';
+  changePercentage: number;
+}
+
+export interface HistoricalDebtItem {
+  country: string;
+  currency: string;
+  data: Array<{
+    year: number;
+    debtValue: number;
+    debtToGDP: number;
+  }>;
+}
+
+export interface ComparisonDebtItem {
+  countries: string[];
+  data: Array<{
+    country: string;
+    debtValue: number;
+    currency: string;
+    debtToGDP: number;
+    perCapita: number;
+  }>;
+  comparison: {
+    relativeSize: number;
+    gdpComparison: number;
+    perCapitaRatio: number;
+  };
+}
+
 // Dati attuali del debito pubblico per paese
-export const currentDebtData = {
+export const currentDebtData: Record<string, CurrentDebtItem> = {
   "Italia": {
     "country": "Italia",
     "debtValue": 2843.2,
@@ -132,7 +169,7 @@ export const currentDebtData = {
 };
 
 // Dati storici per paese
-export const historicalDebtData = {
+export const historicalDebtData: Record<string, HistoricalDebtItem> = {
   "Italia": {
     "country": "Italia",
     "currency": "EUR",
@@ -172,7 +209,7 @@ export const historicalDebtData = {
 };
 
 // Dati di confronto tra paesi
-export const comparisonData = {
+export const comparisonData: Record<string, ComparisonDebtItem> = {
   "Italia-Germania": {
     "countries": ["Italia", "Germania"],
     "data": [
