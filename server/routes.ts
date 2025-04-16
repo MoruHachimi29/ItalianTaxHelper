@@ -15,6 +15,14 @@ import {
 } from "@shared/schema";
 import { PDFDocument } from "pdf-lib";
 import { getCurrentPublicDebt, getHistoricalPublicDebt, comparePublicDebt, supportedCountries } from "./controllers/publicDebtController";
+import { 
+  getBonusCategories,
+  getAllBonus,
+  getIseeRanges,
+  getNewBonus,
+  getExpiringBonus,
+  getBonusById
+} from "./controllers/bonusController";
 
 const NEWS_API_KEY = process.env.NEWS_API_KEY;
 const NEWS_API_URL = "https://newsapi.org/v2";
