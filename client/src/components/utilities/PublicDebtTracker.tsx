@@ -375,7 +375,7 @@ export default function PublicDebtTracker() {
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                       data={historicalDebt.data.slice(-parseInt(yearsToShow))}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 70 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="year" label={{ value: 'Anno', position: 'bottom', offset: 10 }} />
@@ -395,7 +395,7 @@ export default function PublicDebtTracker() {
                         if (name === 'debtToGDP') return [`${value}%`, 'Debito/PIL'];
                         return [value, name];
                       }} />
-                      <Legend />
+                      <Legend verticalAlign="bottom" height={36} />
                       <Line 
                         yAxisId="left" 
                         type="monotone" 
@@ -542,7 +542,7 @@ export default function PublicDebtTracker() {
                           return [value, name];
                         }}
                       />
-                      <Legend />
+                      <Legend verticalAlign="bottom" height={36} />
                       <Bar 
                         dataKey="debtValue" 
                         name="Debito totale (miliardi)" 
