@@ -10,6 +10,13 @@ const toolsList = [
     path: "/strumenti/stipendio-netto"
   },
   {
+    id: "tax-deadlines",
+    title: "Scadenze Fiscali 2025",
+    description: "Monitora tutte le scadenze fiscali per persone fisiche e giuridiche. Aggiornamento automatico su dichiarazioni, versamenti e adempimenti fiscali.",
+    icon: "📅",
+    path: "/strumenti/scadenze-fiscali"
+  },
+  {
     id: "bonus-isee",
     title: "Bonus ISEE 2025",
     description: "Esplora tutti i bonus e le agevolazioni disponibili in base al tuo ISEE. Verifica la tua idoneità e scopri come fare domanda per ottenere i contributi.",

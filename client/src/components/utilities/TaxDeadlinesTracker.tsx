@@ -69,7 +69,7 @@ interface DeadlineCategory {
 export default function TaxDeadlinesTracker() {
   // Stati
   const [activeTab, setActiveTab] = useState<"individuals" | "companies">("individuals");
-  const [categoryFilter, setCategoryFilter] = useState<string>("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [refreshInterval, setRefreshInterval] = useState<number>(300000); // 5 minuti
 
@@ -78,7 +78,7 @@ export default function TaxDeadlinesTracker() {
     queryKey: ["tax-deadlines", activeTab, categoryFilter],
     queryFn: async () => {
       let url = `/api/tax-deadlines?type=${activeTab}`;
-      if (categoryFilter) {
+      if (categoryFilter && categoryFilter !== "all") {
         url += `&category=${categoryFilter}`;
       }
       const response = await fetch(url);
@@ -210,13 +210,13 @@ export default function TaxDeadlinesTracker() {
               <SelectValue placeholder="Tutte le categorie" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Tutte le categorie</SelectItem>
+              <SelectItem value="all">Tutte le categorie</SelectItem>
               {!isLoadingCategories && categoriesData?.categories.map((category: DeadlineCategory) => (
                 <SelectItem key={category.id} value={category.id}>
-                  <div className="flex items-center space-x-2">
+                  <span className="flex items-center space-x-2">
                     {getCategoryIcon(category.id)}
-                    <span>{category.name}</span>
-                  </div>
+                    <span className="ml-2">{category.name}</span>
+                  </span>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -320,7 +320,7 @@ export default function TaxDeadlinesTracker() {
                               <Badge variant="destructive" className="mt-1">Scaduta</Badge>
                             )}
                             {isDeadlineImminent(deadline.date) && !isDeadlineExpired(deadline.date) && (
-                              <Badge variant="warning" className="mt-1 bg-orange-500">Imminente</Badge>
+                              <Badge variant="outline" className="mt-1 bg-orange-500 text-white">Imminente</Badge>
                             )}
                           </div>
                         </div>
