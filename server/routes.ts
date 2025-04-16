@@ -23,6 +23,13 @@ import {
   getExpiringBonus,
   getBonusById
 } from "./controllers/bonusController";
+import {
+  getAllTaxDeadlines,
+  getTaxDeadlineCategories,
+  getCurrentMonthDeadlines,
+  getUpcomingDeadlines,
+  getTaxDeadlineById
+} from "./controllers/taxDeadlinesController";
 
 const NEWS_API_KEY = process.env.NEWS_API_KEY;
 const NEWS_API_URL = "https://newsapi.org/v2";
@@ -621,6 +628,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Ottieni un bonus specifico per ID
   app.get("/api/bonus/:id", getBonusById);
+
+  // API per le Scadenze Fiscali
+  
+  // Ottieni tutte le scadenze fiscali con filtri opzionali
+  app.get("/api/tax-deadlines", getAllTaxDeadlines);
+  
+  // Ottieni le categorie delle scadenze fiscali
+  app.get("/api/tax-deadlines/categories", getTaxDeadlineCategories);
+  
+  // Ottieni le scadenze del mese corrente
+  app.get("/api/tax-deadlines/current-month", getCurrentMonthDeadlines);
+  
+  // Ottieni le scadenze imminenti
+  app.get("/api/tax-deadlines/upcoming", getUpcomingDeadlines);
+  
+  // Ottieni una scadenza specifica per ID
+  app.get("/api/tax-deadlines/:id", getTaxDeadlineById);
 
   const httpServer = createServer(app);
   return httpServer;
