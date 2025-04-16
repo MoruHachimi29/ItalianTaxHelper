@@ -1,10 +1,9 @@
-import Layout from "@/components/Layout";
 import PublicDebtTracker from "@/components/utilities/PublicDebtTracker";
 import { Helmet } from "react-helmet";
 
 export default function PublicDebtTrackerPage() {
   return (
-    <Layout>
+    <>
       <Helmet>
         <title>Tracker Debito Pubblico | F24Editabile</title>
         <meta name="description" content="Monitora il debito pubblico delle principali economie mondiali, visualizza dati storici e confronta paesi con dati aggiornati quotidianamente." />
@@ -40,6 +39,6 @@ export default function PublicDebtTrackerPage() {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 }

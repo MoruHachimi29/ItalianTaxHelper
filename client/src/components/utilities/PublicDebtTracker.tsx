@@ -374,11 +374,11 @@ export default function PublicDebtTracker() {
                 <div className="h-[400px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
-                      data={historicalDebt.data}
+                      data={historicalDebt.data.slice(-parseInt(yearsToShow))}
                       margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="year" label={{ value: 'Anno', position: 'bottom', offset: 0 }} />
+                      <XAxis dataKey="year" label={{ value: 'Anno', position: 'bottom', offset: 10 }} />
                       <YAxis 
                         yAxisId="left" 
                         orientation="left" 
@@ -434,6 +434,7 @@ export default function PublicDebtTracker() {
                     </thead>
                     <tbody>
                       {[...historicalDebt.data]
+                        .slice(-parseInt(yearsToShow)) // Prendi solo gli ultimi N anni
                         .sort((a, b) => b.year - a.year) // Ordina per anno decrescente
                         .map((item) => (
                           <tr key={item.year} className="hover:bg-gray-50">
