@@ -579,6 +579,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // API per il debito pubblico
+  
+  // Ottieni i paesi supportati
+  app.get("/api/public-debt/countries", (req, res) => {
+    res.json({ countries: supportedCountries });
+  });
+  
+  // Ottieni i dati correnti del debito pubblico per un paese
+  app.get("/api/public-debt/current", getCurrentPublicDebt);
+  
+  // Ottieni i dati storici del debito pubblico
+  app.get("/api/public-debt/historical", getHistoricalPublicDebt);
+  
+  // Confronta il debito pubblico tra due paesi
+  app.get("/api/public-debt/compare", comparePublicDebt);
+
   const httpServer = createServer(app);
   return httpServer;
 }
