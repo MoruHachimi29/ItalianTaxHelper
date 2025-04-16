@@ -502,11 +502,14 @@ export default function BonusIseeTracker() {
                           <h4 className="font-medium">Come fare domanda</h4>
                           <p className="text-gray-700 mt-1">{bonus.howToApply}</p>
                           <div className="mt-2">
-                            <Button asChild variant="outline" size="sm" className="inline-flex items-center">
-                              <a href={bonus.link} target="_blank" rel="noopener noreferrer">
-                                Vai al sito ufficiale
-                              </a>
-                            </Button>
+                            <a 
+                              href={bonus.link} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="inline-flex items-center px-2.5 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+                            >
+                              Vai al sito ufficiale
+                            </a>
                           </div>
                         </div>
                       </div>
@@ -614,13 +617,22 @@ export default function BonusIseeTracker() {
                   </div>
                 </div>
                 
-                <Button className="w-full">Verifica Bonus Disponibili</Button>
+                <Button 
+                  className="w-full" 
+                  onClick={() => {
+                    // Questo recupera i bonus filtrati in base all'ISEE inserito
+                    // Il risultato è già visibile nella sezione sottostante
+                    document.getElementById('bonus-results')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  Verifica Bonus Disponibili
+                </Button>
               </div>
             </CardContent>
           </Card>
           
           {iseeValue && (
-            <div className="space-y-4">
+            <div id="bonus-results" className="space-y-4">
               <h3 className="text-xl font-semibold">Bonus potenzialmente disponibili</h3>
               
               {filteredBonus
@@ -664,11 +676,14 @@ export default function BonusIseeTracker() {
                           </div>
                         </div>
                         
-                        <Button asChild variant="outline" size="sm">
-                          <a href={bonus.link} target="_blank" rel="noopener noreferrer">
-                            Vai al sito ufficiale
-                          </a>
-                        </Button>
+                        <a 
+                          href={bonus.link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-3 py-1.5 text-sm border border-gray-200 rounded hover:bg-gray-50"
+                        >
+                          Vai al sito ufficiale
+                        </a>
                       </div>
                     </CardContent>
                   </Card>
