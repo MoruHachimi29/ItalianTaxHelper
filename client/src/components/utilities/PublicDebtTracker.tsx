@@ -190,7 +190,7 @@ export default function PublicDebtTracker() {
   };
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <Tabs defaultValue="current" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="current">Situazione Attuale</TabsTrigger>
@@ -459,7 +459,7 @@ export default function PublicDebtTracker() {
         </TabsContent>
         
         {/* Sezione Confronto */}
-        <TabsContent value="comparison" className="space-y-6">
+        <TabsContent value="comparison" className="space-y-3">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div>
               <Label htmlFor="country1">Primo paese</Label>
