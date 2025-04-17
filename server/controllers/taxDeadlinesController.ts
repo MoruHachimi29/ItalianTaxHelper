@@ -13,6 +13,13 @@ export interface TaxDeadline {
   recurringInfo?: string;
   link: string;
   updatedAt: string;
+  // Informazioni aggiuntive
+  targetAudience?: string;  // A chi è rivolta questa scadenza
+  amount?: string;          // Importo o percentuale se applicabile
+  paymentMethods?: string[];  // Metodi di pagamento accettati
+  regulations?: string;     // Normativa di riferimento
+  consequences?: string;    // Conseguenze per mancato pagamento/adempimento
+  notes?: string;           // Note aggiuntive
 }
 
 // Categorie di scadenze
@@ -130,7 +137,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Semestrale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2024-12-20T16:45:00Z"
+    updatedAt: "2024-12-20T16:45:00Z",
+    targetAudience: "Contribuenti residenti in Italia possessori di apparecchi TV non addebitati in bolletta elettrica",
+    amount: "45,00 € (metà del canone annuale di 90,00 €)",
+    paymentMethods: ["F24", "Bollettino postale"],
+    regulations: "Legge 28 dicembre 2015, n. 208 (Legge di Stabilità 2016)",
+    consequences: "In caso di mancato pagamento sono previste sanzioni amministrative, interessi di mora e possibile recupero forzoso",
+    notes: "Il pagamento può essere effettuato in un'unica soluzione entro il 31 gennaio (90,00 €) oppure in due rate semestrali (45,00 € ciascuna) con scadenza 31 gennaio e 31 luglio"
   },
   {
     id: "pf-9",
@@ -210,7 +223,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Mensile",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-10T09:00:00Z"
+    updatedAt: "2025-01-10T09:00:00Z",
+    targetAudience: "Imprese e professionisti in regime IVA mensile",
+    amount: "Variabile in base all'eccedenza tra IVA a debito e IVA a credito",
+    paymentMethods: ["F24", "Home banking", "Servizi telematici dell'Agenzia delle Entrate"],
+    regulations: "D.P.R. 26 ottobre 1972, n. 633 (Testo Unico IVA), art. 27",
+    consequences: "In caso di omesso, insufficiente o tardivo versamento: sanzione del 30% dell'importo non versato, ridotta in caso di ravvedimento operoso",
+    notes: "Il termine di versamento è fissato al giorno 16 del mese successivo a quello di riferimento. Se il giorno 16 cade di sabato o in un giorno festivo, il termine è posticipato al primo giorno lavorativo successivo."
   },
   {
     id: "pg-3",
