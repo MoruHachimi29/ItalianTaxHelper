@@ -158,25 +158,6 @@ export default function TaxDeadlinesTracker() {
     }
   };
   
-  // Funzione per verificare se una scadenza è imminente (entro 30 giorni)
-  const isDeadlineImminent = (dateStr: string) => {
-    try {
-      const deadlineDate = parseISO(dateStr);
-      
-      // Per scopi di test, usiamo una data artificiale di riferimento
-      const testDate = new Date('2025-01-15');
-      const nextMonth = addDays(testDate, 30);
-      
-      // In produzione useremmo:
-      // const today = new Date();
-      // const nextMonth = addDays(today, 30);
-      
-      return isAfter(deadlineDate, testDate) && isBefore(deadlineDate, nextMonth);
-    } catch (error) {
-      return false;
-    }
-  };
-  
   // Funzione per verificare se una scadenza è scaduta
   const isDeadlineExpired = (dateStr: string) => {
     try {
@@ -189,6 +170,30 @@ export default function TaxDeadlinesTracker() {
       // const today = new Date();
       
       return isBefore(deadlineDate, testDate);
+    } catch (error) {
+      return false;
+    }
+  };
+  
+  // Funzione per verificare se una scadenza è imminente (entro 30 giorni)
+  const isDeadlineImminent = (dateStr: string) => {
+    try {
+      // Verifico prima se è scaduta, in tal caso non può essere imminente
+      if (isDeadlineExpired(dateStr)) {
+        return false;
+      }
+      
+      const deadlineDate = parseISO(dateStr);
+      
+      // Per scopi di test, usiamo una data artificiale di riferimento
+      const testDate = new Date('2025-01-15');
+      const nextMonth = addDays(testDate, 30);
+      
+      // In produzione useremmo:
+      // const today = new Date();
+      // const nextMonth = addDays(today, 30);
+      
+      return isAfter(deadlineDate, testDate) && isBefore(deadlineDate, nextMonth);
     } catch (error) {
       return false;
     }
@@ -410,7 +415,11 @@ export default function TaxDeadlinesTracker() {
                   {upcomingData.deadlines.map((deadline: TaxDeadline) => (
                     <div key={deadline.id} className="flex items-start space-x-3">
                       <div className={`flex-shrink-0 rounded-full p-2 ${
-                        isDeadlineImminent(deadline.date) ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'
+                        isDeadlineExpired(deadline.date) 
+                          ? 'bg-red-100 text-red-700' 
+                          : isDeadlineImminent(deadline.date) 
+                            ? 'bg-orange-100 text-orange-700' 
+                            : 'bg-blue-100 text-blue-700'
                       }`}>
                         <Calendar className="h-4 w-4" />
                       </div>
