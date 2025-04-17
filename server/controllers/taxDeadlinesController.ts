@@ -529,7 +529,7 @@ export const taxDeadlines: TaxDeadline[] = [
     paymentMethods: ["F24", "Home banking", "Servizi telematici dell'INPS"],
     regulations: "Decreto Legislativo 9 luglio 1997, n. 241 (art. 18); Legge 8 agosto 1995, n. 335",
     consequences: "Sanzione civile dal 5,5% al 40% dell'importo dei contributi non versati, a seconda della gravità e della durata del ritardo. Sono previste anche sanzioni amministrative e penali in casi gravi",
-    notes: "Il termine di versamento è fissato al giorno 16 del mese successivo a quello di riferimento. Se il giorno 16 cade di sabato o in un giorno festivo, il termine è posticipato al primo giorno lavorativo successivo"
+    notes: "Il termine di versamento è fissato al giorno 16 del mese successivo a quello di riferimento. Se il giorno 16 cade di sabato o in un giorno festivo, il termine è posticipato al primo giorno lavorativo successivo. Il versamento riguarda sia i contributi a carico del datore di lavoro che quelli a carico dei lavoratori trattenuti in busta paga"
   },
   {
     id: "pg-15",
