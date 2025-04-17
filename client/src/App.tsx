@@ -24,6 +24,7 @@ import P7mConverterPage from "@/pages/P7mConverterPage";
 import XmlToPngConverterPage from "@/pages/XmlToPngConverterPage";
 import PdfEditorPage from "@/pages/PdfEditorPage";
 import PdfToWordConverterPage from "@/pages/PdfToWordConverterPage";
+import CodiceFiscalePage from "@/pages/CodiceFiscalePage";
 
 function Router() {
   return (
@@ -42,6 +43,7 @@ function Router() {
         <Route path="/strumenti/bonus-isee" component={BonusIseePage} />
         <Route path="/strumenti/scadenze-fiscali" component={TaxDeadlinesPage} />
         <Route path="/strumenti/scadenze-fiscali/:id" component={TaxDeadlineDetailPage} />
+        <Route path="/strumenti/codice-fiscale" component={CodiceFiscalePage} />
         <Route path="/strumenti/valuta" component={CurrencyConverterPage} />
         <Route path="/strumenti/dazi" component={DutyCalculatorPage} />
         <Route path="/strumenti/p7m" component={P7mConverterPage} />

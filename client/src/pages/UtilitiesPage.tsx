@@ -10,6 +10,13 @@ const toolsList = [
     path: "/strumenti/stipendio-netto"
   },
   {
+    id: "codice-fiscale",
+    title: "Calcolatore Codice Fiscale",
+    description: "Calcola il tuo codice fiscale in modo preciso e affidabile. Inserisci i dati anagrafici e ottieni immediatamente il risultato completo di carattere di controllo.",
+    icon: "🆔",
+    path: "/strumenti/codice-fiscale"
+  },
+  {
     id: "tax-deadlines",
     title: "Scadenze Fiscali 2025",
     description: "Monitora tutte le scadenze fiscali per persone fisiche e giuridiche. Aggiornamento automatico su dichiarazioni, versamenti e adempimenti fiscali.",
