@@ -152,21 +152,40 @@ export default function TaxDeadlinesTracker() {
   
   // Funzione per verificare se una scadenza è scaduta
   const isDeadlineExpired = (deadline: TaxDeadline): boolean => {
-    // Per test, classifichiamo manualmente alcune scadenze come scadute
-    const expiredIds = ["pf-8", "pg-2"];
-    return expiredIds.includes(deadline.id);
+    try {
+      const today = new Date();
+      const deadlineDate = parseISO(deadline.date);
+      
+      // Considera scadute le date passate rispetto a oggi
+      return deadlineDate < today;
+    } catch (error) {
+      console.error("Errore nel controllo se la scadenza è scaduta:", error);
+      return false;
+    }
   };
   
   // Funzione per verificare se una scadenza è imminente (entro 30 giorni)
   const isDeadlineImminent = (deadline: TaxDeadline): boolean => {
-    // Verifica prima che non sia scaduta, in tal caso non può essere imminente
-    if (isDeadlineExpired(deadline)) {
+    try {
+      // Verifica prima che non sia scaduta, in tal caso non può essere imminente
+      if (isDeadlineExpired(deadline)) {
+        return false;
+      }
+      
+      const today = new Date();
+      const deadlineDate = parseISO(deadline.date);
+      
+      // Calcola la differenza in millisecondi
+      const diffTime = deadlineDate.getTime() - today.getTime();
+      // Converti millisecondi in giorni
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      // Considera imminenti le scadenze entro i prossimi 30 giorni
+      return diffDays >= 0 && diffDays <= 30;
+    } catch (error) {
+      console.error("Errore nel controllo se la scadenza è imminente:", error);
       return false;
     }
-    
-    // Per test, classifichiamo manualmente alcune scadenze come imminenti
-    const imminentIds = ["pf-1", "pg-1"];
-    return imminentIds.includes(deadline.id);
   };
 
   // Ottieni la data dell'ultimo aggiornamento
