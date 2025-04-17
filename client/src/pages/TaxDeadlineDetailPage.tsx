@@ -210,7 +210,7 @@ export default function TaxDeadlineDetailPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/tax-deadlines">Scadenze Fiscali</BreadcrumbLink>
+              <BreadcrumbLink href="/strumenti/scadenze-fiscali">Scadenze Fiscali</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -229,7 +229,7 @@ export default function TaxDeadlineDetailPage() {
         </Alert>
         
         <div className="flex justify-center mt-6">
-          <Link href="/tax-deadlines">
+          <Link href="/strumenti/scadenze-fiscali">
             <Button variant="outline" className="flex items-center">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Torna all'elenco delle scadenze
@@ -256,7 +256,7 @@ export default function TaxDeadlineDetailPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/tax-deadlines">Scadenze Fiscali</BreadcrumbLink>
+            <BreadcrumbLink href="/strumenti/scadenze-fiscali">Scadenze Fiscali</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -401,7 +401,7 @@ export default function TaxDeadlineDetailPage() {
           </div>
           
           <div className="flex gap-2">
-            <Link href="/tax-deadlines">
+            <Link href="/strumenti/scadenze-fiscali">
               <Button variant="outline" className="flex items-center">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Torna all'elenco
