@@ -91,7 +91,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Semestrale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-10T14:30:00Z"
+    updatedAt: "2025-01-10T14:30:00Z",
+    targetAudience: "Proprietari di immobili, titolari di diritti reali di usufrutto, uso, abitazione, enfiteusi, superficie su immobili",
+    amount: "Saldo a conguaglio dell'importo annuale calcolato in base alle aliquote comunali vigenti",
+    paymentMethods: ["F24", "PagoPA", "Home banking"],
+    regulations: "Legge 160/2019 (Legge di Bilancio 2020), articoli 738-783",
+    consequences: "Sanzione del 30% dell'importo non versato. Per versamenti tardivi con ravvedimento operoso entro 14 giorni: sanzione ridotta dello 0,1% giornaliero, fino al 1,4%",
+    notes: "Il saldo IMU rappresenta il conguaglio rispetto all'acconto versato a giugno e deve tenere conto di eventuali variazioni delle aliquote stabilite dai Comuni. In caso di possesso degli immobili per periodi inferiori all'anno, l'imposta è calcolata proporzionalmente ai mesi di possesso"
   },
   {
     id: "pf-5",
@@ -168,7 +174,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Semestrale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2024-12-20T16:45:00Z"
+    updatedAt: "2024-12-20T16:45:00Z",
+    targetAudience: "Contribuenti residenti in Italia possessori di apparecchi TV non addebitati in bolletta elettrica",
+    amount: "45,00 € (seconda metà del canone annuale di 90,00 €)",
+    paymentMethods: ["F24", "Bollettino postale"],
+    regulations: "Legge 28 dicembre 2015, n. 208 (Legge di Stabilità 2016)",
+    consequences: "In caso di mancato pagamento sono previste sanzioni amministrative, interessi di mora e possibile recupero forzoso",
+    notes: "Il pagamento della seconda rata deve essere effettuato entro il 31 luglio. Per i nuovi abbonati nel secondo semestre, l'importo è proporzionale ai mesi di possesso dell'apparecchio televisivo"
   },
   {
     id: "pf-10",
@@ -181,7 +193,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Annuale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-25T10:30:00Z"
+    updatedAt: "2025-01-25T10:30:00Z",
+    targetAudience: "Cittadini ultrasettantacinquenni con reddito non superiore a soglie specifiche; diplomatici e militari stranieri; persone non in possesso di apparecchi TV",
+    amount: "Non applicabile, trattandosi di una richiesta di esenzione",
+    paymentMethods: ["Non applicabile"],
+    regulations: "Legge 28 dicembre 2015, n. 208, art. 1, comma 153; Circolare n. 46/E del 20 settembre 2010",
+    consequences: "Se l'esenzione viene richiesta oltre il termine, sarà applicata solo per i periodi successivi, con obbligo di versamento del canone per i periodi precedenti",
+    notes: "La dichiarazione sostitutiva ha validità annuale e può essere presentata tramite il sito dell'Agenzia delle Entrate, tramite intermediari abilitati o mediante raccomandata. Per l'esenzione relativa all'intero anno successivo, la dichiarazione deve essere presentata entro il 31 gennaio. Se presentata entro il 30 giugno, l'esenzione si applica al secondo semestre dell'anno"
   },
   {
     id: "pf-11",
