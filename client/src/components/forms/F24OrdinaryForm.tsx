@@ -67,23 +67,32 @@ const F24OrdinaryForm = () => {
   });
 
   // Stato per le varie sezioni
-  const [erarioRows, setErarioRows] = useState<SectionRow[]>([
+  const [erarioRows, setErarioRows] = useState<ErarioRow[]>([
     { id: '1', codiceTributo: '', importoDebito: '', importoCredito: '' }
   ]);
   
-  const [inpsRows, setInpsRows] = useState<SectionRow[]>([
-    { id: '1', codiceSede: '', causaleContributo: '', matricolaInps: '', importoDebito: '', importoCredito: '' }
+  const [inpsRows, setInpsRows] = useState<InpsRow[]>([
+    { 
+      id: '1', 
+      codiceSede: '', 
+      causaleContributo: '', 
+      matricolaInps: '', 
+      riferimentoMese1: '', 
+      riferimentoMese2: '', 
+      importoDebito: '', 
+      importoCredito: '' 
+    }
   ]);
   
-  const [regioniRows, setRegioniRows] = useState<SectionRow[]>([
+  const [regioniRows, setRegioniRows] = useState<RegioniRow[]>([
     { id: '1', codiceRegione: '', codiceTributo: '', importoDebito: '', importoCredito: '' }
   ]);
   
-  const [imuRows, setImuRows] = useState<SectionRow[]>([
+  const [imuRows, setImuRows] = useState<ImuRow[]>([
     { id: '1', codiceEnte: '', tipologiaImmobile: '', importoDebito: '', importoCredito: '' }
   ]);
   
-  const [inailRows, setInailRows] = useState<SectionRow[]>([
+  const [inailRows, setInailRows] = useState<InailRow[]>([
     { id: '1', codiceSede: '', codiceTributo: '', codicePosizione: '', importoDebito: '', importoCredito: '' }
   ]);
 
@@ -137,6 +146,8 @@ const F24OrdinaryForm = () => {
           codiceSede: '', 
           causaleContributo: '', 
           matricolaInps: '', 
+          riferimentoMese1: '',
+          riferimentoMese2: '',
           importoDebito: '', 
           importoCredito: '' 
         }]);
@@ -163,7 +174,7 @@ const F24OrdinaryForm = () => {
         setInailRows([...inailRows, { 
           id: (inailRows.length + 1).toString(), 
           codiceSede: '', 
-          codiceContributo: '', 
+          codiceTributo: '', 
           codicePosizione: '', 
           importoDebito: '', 
           importoCredito: '' 
@@ -249,7 +260,8 @@ const F24OrdinaryForm = () => {
   // Calcolo dei totali
   useEffect(() => {
     // Funzione helper per sommare gli importi
-    const sumImporti = (rows: SectionRow[], field: 'importoDebito' | 'importoCredito'): number => {
+    // Funzione helper generica per sommare gli importi
+  const sumImporti = <T extends BaseRow>(rows: T[], field: 'importoDebito' | 'importoCredito'): number => {
       return rows.reduce((acc, row) => {
         const importo = row[field].replace(',', '.');
         return acc + (parseFloat(importo) || 0);
@@ -337,10 +349,19 @@ const F24OrdinaryForm = () => {
     
     // Reset sezioni
     setErarioRows([{ id: '1', codiceTributo: '', importoDebito: '', importoCredito: '' }]);
-    setInpsRows([{ id: '1', codiceSede: '', causaleContributo: '', matricolaInps: '', importoDebito: '', importoCredito: '' }]);
+    setInpsRows([{ 
+      id: '1', 
+      codiceSede: '', 
+      causaleContributo: '', 
+      matricolaInps: '', 
+      riferimentoMese1: '',
+      riferimentoMese2: '',
+      importoDebito: '', 
+      importoCredito: '' 
+    }]);
     setRegioniRows([{ id: '1', codiceRegione: '', codiceTributo: '', importoDebito: '', importoCredito: '' }]);
     setImuRows([{ id: '1', codiceEnte: '', tipologiaImmobile: '', importoDebito: '', importoCredito: '' }]);
-    setInailRows([{ id: '1', codiceSede: '', codiceContributo: '', codicePosizione: '', importoDebito: '', importoCredito: '' }]);
+    setInailRows([{ id: '1', codiceSede: '', codiceTributo: '', codicePosizione: '', importoDebito: '', importoCredito: '' }]);
     
     // Reset dati di pagamento
     setPaymentData({
@@ -452,12 +473,12 @@ const F24OrdinaryForm = () => {
     }
     
     // Sezione INAIL
-    if (inailRows.some(row => row.codiceSede || row.codiceContributo || row.codicePosizione || row.importoDebito || row.importoCredito)) {
+    if (inailRows.some(row => row.codiceSede || row.codiceTributo || row.codicePosizione || row.importoDebito || row.importoCredito)) {
       doc.text("Sezione INAIL", 20, y);
       y += 7;
       inailRows.forEach(row => {
-        if (row.codiceSede || row.codiceContributo || row.codicePosizione || row.importoDebito || row.importoCredito) {
-          doc.text(`Cod. Sede: ${row.codiceSede}, Cod. Contributo: ${row.codiceContributo}, Pos.: ${row.codicePosizione}`, 20, y);
+        if (row.codiceSede || row.codiceTributo || row.codicePosizione || row.importoDebito || row.importoCredito) {
+          doc.text(`Cod. Sede: ${row.codiceSede}, Cod. Contributo: ${row.codiceTributo}, Pos.: ${row.codicePosizione}`, 20, y);
           y += 7;
           doc.text(`Importo a debito: ${row.importoDebito}, Importo a credito: ${row.importoCredito}`, 20, y);
           y += 7;
@@ -1091,8 +1112,8 @@ const F24OrdinaryForm = () => {
                 <input 
                   type="text" 
                   className="text-input" 
-                  value={row.codiceContributo || ''}
-                  onChange={(e) => handleRowChange('inail', row.id, 'codiceContributo', e.target.value)}
+                  value={row.codiceTributo || ''}
+                  onChange={(e) => handleRowChange('inail', row.id, 'codiceTributo', e.target.value)}
                 />
               </div>
               <div className="table-cell">
