@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet";
-import TaxDeadlinesTracker from "@/components/utilities/TaxDeadlinesTracker";
+import TaxDeadlinesTracker from "@/components/utilities/TaxDeadlinesTrackerNew";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { InfoIcon } from "lucide-react";
 
