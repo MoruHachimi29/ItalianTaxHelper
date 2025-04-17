@@ -19,6 +19,7 @@ import NetSalaryCalculatorPage from "./pages/NetSalaryCalculatorPage";
 import PublicDebtTrackerPage from "./pages/PublicDebtTrackerPage";
 import BonusIseePage from "./pages/BonusIseePage";
 import TaxDeadlinesPage from "./pages/TaxDeadlinesPage";
+import TaxDeadlineDetailPage from "./pages/TaxDeadlineDetailPage";
 import P7mConverterPage from "@/pages/P7mConverterPage";
 import XmlToPngConverterPage from "@/pages/XmlToPngConverterPage";
 import PdfEditorPage from "@/pages/PdfEditorPage";
@@ -40,6 +41,7 @@ function Router() {
         <Route path="/strumenti/debito-pubblico" component={PublicDebtTrackerPage} />
         <Route path="/strumenti/bonus-isee" component={BonusIseePage} />
         <Route path="/strumenti/scadenze-fiscali" component={TaxDeadlinesPage} />
+        <Route path="/strumenti/scadenze-fiscali/:id" component={TaxDeadlineDetailPage} />
         <Route path="/strumenti/valuta" component={CurrencyConverterPage} />
         <Route path="/strumenti/dazi" component={DutyCalculatorPage} />
         <Route path="/strumenti/p7m" component={P7mConverterPage} />
