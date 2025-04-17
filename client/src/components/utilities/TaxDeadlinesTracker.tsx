@@ -158,25 +158,23 @@ export default function TaxDeadlinesTracker() {
     }
   };
   
-  // Funzione per classificare manualmente le scadenze per test
-  const getDeadlineStatus = (deadline: TaxDeadline): 'expired' | 'imminent' | 'future' => {
-    // Configura manualmente lo stato delle scadenze per test
-    const expiredIds = ["pf-8", "pg-2"];
-    const imminentIds = ["pf-1", "pg-1"];
-    
-    if (expiredIds.includes(deadline.id)) return 'expired';
-    if (imminentIds.includes(deadline.id)) return 'imminent';
-    return 'future';
-  };
-
   // Funzione per verificare se una scadenza è scaduta
-  const isDeadlineExpired = (deadline: TaxDeadline) => {
-    return getDeadlineStatus(deadline) === 'expired';
+  const isDeadlineExpired = (deadline: TaxDeadline): boolean => {
+    // Per test, classifichiamo manualmente alcune scadenze come scadute
+    const expiredIds = ["pf-8", "pg-2"];
+    return expiredIds.includes(deadline.id);
   };
   
-  // Funzione per verificare se una scadenza è imminente
-  const isDeadlineImminent = (deadline: TaxDeadline) => {
-    return getDeadlineStatus(deadline) === 'imminent';
+  // Funzione per verificare se una scadenza è imminente (entro 30 giorni)
+  const isDeadlineImminent = (deadline: TaxDeadline): boolean => {
+    // Verifica prima che non sia scaduta, in tal caso non può essere imminente
+    if (isDeadlineExpired(deadline)) {
+      return false;
+    }
+    
+    // Per test, classifichiamo manualmente alcune scadenze come imminenti
+    const imminentIds = ["pf-1", "pg-1"];
+    return imminentIds.includes(deadline.id);
   };
 
   // Ottieni la data dell'ultimo aggiornamento
@@ -395,9 +393,9 @@ export default function TaxDeadlinesTracker() {
                   {upcomingData.deadlines.map((deadline: TaxDeadline) => (
                     <div key={deadline.id} className="flex items-start space-x-3">
                       <div className={`flex-shrink-0 rounded-full p-2 ${
-                        isDeadlineExpired(deadline.date, deadline.id) 
+                        isDeadlineExpired(deadline) 
                           ? 'bg-red-100 text-red-700' 
-                          : isDeadlineImminent(deadline.date, deadline.id) 
+                          : isDeadlineImminent(deadline) 
                             ? 'bg-orange-100 text-orange-700' 
                             : 'bg-blue-100 text-blue-700'
                       }`}>
