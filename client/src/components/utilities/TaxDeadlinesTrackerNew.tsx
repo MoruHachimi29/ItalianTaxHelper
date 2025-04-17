@@ -338,14 +338,24 @@ export default function TaxDeadlinesTracker() {
                           <Clock className="h-3 w-3 mr-1" />
                           Aggiornato: {format(parseISO(deadline.updatedAt), "d MMM yyyy", { locale: it })}
                         </div>
-                        <div 
-                          onClick={() => window.open(deadline.link, '_blank')}
-                          className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-7 px-3 text-xs cursor-pointer"
-                        >
-                          <span className="flex items-center">
-                            Maggiori dettagli
-                            <ExternalLink className="h-3 w-3 ml-1" />
-                          </span>
+                        <div className="flex space-x-2">
+                          <a 
+                            href={`/strumenti/scadenze-fiscali/${deadline.id}`}
+                            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-7 px-3 text-xs cursor-pointer"
+                          >
+                            <span className="flex items-center">
+                              Visualizza dettagli
+                            </span>
+                          </a>
+                          <div 
+                            onClick={() => window.open(deadline.link, '_blank')}
+                            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-7 px-3 text-xs cursor-pointer"
+                          >
+                            <span className="flex items-center">
+                              Sito ufficiale
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </span>
+                          </div>
                         </div>
                       </CardFooter>
                     </Card>
@@ -396,23 +406,29 @@ export default function TaxDeadlinesTracker() {
               ) : upcomingData?.deadlines?.length > 0 ? (
                 <div className="space-y-4">
                   {upcomingData.deadlines.map((deadline: TaxDeadline) => (
-                    <div key={deadline.id} className="flex items-start space-x-3">
-                      <div className={`flex-shrink-0 rounded-full p-2 ${
-                        isDeadlineExpired(deadline) 
-                          ? 'bg-red-100 text-red-700' 
-                          : isDeadlineImminent(deadline) 
-                            ? 'bg-orange-100 text-orange-700' 
-                            : 'bg-blue-100 text-blue-700'
-                      }`}>
-                        <Calendar className="h-4 w-4" />
+                    <a 
+                      key={deadline.id} 
+                      href={`/strumenti/scadenze-fiscali/${deadline.id}`}
+                      className="block hover:bg-slate-50 rounded-lg p-1 -m-1 transition-colors"
+                    >
+                      <div className="flex items-start space-x-3">
+                        <div className={`flex-shrink-0 rounded-full p-2 ${
+                          isDeadlineExpired(deadline) 
+                            ? 'bg-red-100 text-red-700' 
+                            : isDeadlineImminent(deadline) 
+                              ? 'bg-orange-100 text-orange-700' 
+                              : 'bg-blue-100 text-blue-700'
+                        }`}>
+                          <Calendar className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">{deadline.title}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Scadenza: {formatDate(deadline.date)}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-medium">{deadline.title}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Scadenza: {formatDate(deadline.date)}
-                        </p>
-                      </div>
-                    </div>
+                    </a>
                   ))}
                 </div>
               ) : (
