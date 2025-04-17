@@ -304,7 +304,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Annuale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-20T14:30:00Z"
+    updatedAt: "2025-01-20T14:30:00Z",
+    targetAudience: "Società di capitali, enti commerciali e non commerciali, società di persone, imprese individuali in regime ordinario",
+    amount: "40% dell'imposta dovuta per l'anno in corso, calcolata in base alle regole specifiche per ogni categoria di contribuente",
+    paymentMethods: ["F24", "Home banking", "Servizi telematici dell'Agenzia delle Entrate"],
+    regulations: "D.Lgs. 15 dicembre 1997, n. 446 (Istituzione dell'IRAP); Legge 27 dicembre 2019, n. 160 (Legge di Bilancio 2020)",
+    consequences: "Sanzione del 30% dell'importo non versato. In caso di ravvedimento operoso, la sanzione è ridotta in base alla tempestività della regolarizzazione",
+    notes: "L'acconto IRAP si versa in due rate: la prima del 40% entro il 30 giugno e la seconda del 60% entro il 30 novembre. Per le società con esercizio non coincidente con l'anno solare, le scadenze cambiano in base alla chiusura dell'esercizio"
   },
   {
     id: "pg-6",
@@ -317,7 +323,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Annuale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-20T14:30:00Z"
+    updatedAt: "2025-01-20T14:30:00Z",
+    targetAudience: "Società di capitali, enti commerciali e non commerciali, società di persone, imprese individuali in regime ordinario",
+    amount: "60% dell'imposta dovuta per l'anno in corso, calcolata in base alle regole specifiche per ogni categoria di contribuente",
+    paymentMethods: ["F24", "Home banking", "Servizi telematici dell'Agenzia delle Entrate"],
+    regulations: "D.Lgs. 15 dicembre 1997, n. 446 (Istituzione dell'IRAP); Legge 27 dicembre 2019, n. 160 (Legge di Bilancio 2020)",
+    consequences: "Sanzione del 30% dell'importo non versato. In caso di ravvedimento operoso, la sanzione è ridotta in base alla tempestività della regolarizzazione",
+    notes: "La seconda rata di acconto, pari al 60% dell'imposta annuale stimata, deve essere versata entro il 30 novembre. In alcune situazioni particolari o per determinate categorie di contribuenti, possono essere previste modalità di calcolo alternative o date differenti"
   },
   {
     id: "pg-7",
@@ -330,7 +342,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Annuale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-05T11:20:00Z"
+    updatedAt: "2025-01-05T11:20:00Z",
+    targetAudience: "Sostituti d'imposta: datori di lavoro, enti pensionistici, e soggetti che hanno erogato redditi di lavoro dipendente, assimilati e autonomi",
+    amount: "Non applicabile, trattandosi di un adempimento documentale senza versamento",
+    paymentMethods: ["Non applicabile"],
+    regulations: "D.P.R. 22 luglio 1998, n. 322, art. 4; Provvedimento annuale dell'Agenzia delle Entrate sui modelli CU",
+    consequences: "Sanzione di 100 euro per ciascuna certificazione omessa, tardiva o errata. La sanzione non si applica se la certificazione è corretta e inviata entro i 5 giorni successivi alla scadenza",
+    notes: "La Certificazione Unica deve essere consegnata ai percettori entro il 16 marzo (o primo giorno lavorativo successivo se cade di sabato o domenica). La consegna può avvenire in formato cartaceo o elettronico, purché il percettore abbia la possibilità di materializzare il documento"
   },
   {
     id: "pg-8",
@@ -343,7 +361,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Annuale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-05T11:20:00Z"
+    updatedAt: "2025-01-05T11:20:00Z",
+    targetAudience: "Sostituti d'imposta: datori di lavoro, enti pensionistici, e soggetti che hanno erogato redditi di lavoro dipendente, assimilati e autonomi",
+    amount: "Non applicabile, trattandosi di un adempimento telematico senza versamento",
+    paymentMethods: ["Non applicabile"],
+    regulations: "D.P.R. 22 luglio 1998, n. 322, art. 4; Provvedimento annuale dell'Agenzia delle Entrate sui modelli CU",
+    consequences: "Sanzione di 100 euro per ciascuna certificazione omessa, tardiva o errata. La sanzione non si applica se la trasmissione è effettuata entro i 5 giorni successivi alla scadenza",
+    notes: "L'invio telematico deve essere effettuato entro il 16 marzo (o primo giorno lavorativo successivo). Le CU contenenti esclusivamente redditi esenti o non dichiarabili con modello 730 precompilato possono essere trasmesse entro il termine per la presentazione del modello 770 (31 ottobre)"
   },
   {
     id: "pg-9",
@@ -356,7 +380,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Trimestrale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-15T16:45:00Z"
+    updatedAt: "2025-01-15T16:45:00Z",
+    targetAudience: "Soggetti passivi IVA residenti o stabiliti nel territorio dello Stato italiano",
+    amount: "Non applicabile, trattandosi di un adempimento comunicativo senza versamento",
+    paymentMethods: ["Non applicabile"],
+    regulations: "Art. 1, comma 3-bis, del D.Lgs. n. 127/2015, come modificato dall'art. 1, comma 1103, della Legge n. 178/2020",
+    consequences: "Sanzione di 2 euro per ciascuna fattura omessa o errata, fino a un massimo di 400 euro per trimestre. La sanzione è ridotta alla metà se la trasmissione è effettuata entro i 15 giorni successivi alla scadenza",
+    notes: "Dal 1° gennaio 2022 l'esterometro è stato sostituito dall'obbligo di fatturazione elettronica tramite SdI anche per le operazioni transfrontaliere. Tuttavia, per le operazioni per le quali non è stata emessa o ricevuta fattura elettronica, persiste l'obbligo di comunicazione trimestrale"
   },
   {
     id: "pg-10",
@@ -369,7 +399,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Trimestrale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-15T16:45:00Z"
+    updatedAt: "2025-01-15T16:45:00Z",
+    targetAudience: "Soggetti passivi IVA residenti o stabiliti nel territorio dello Stato italiano",
+    amount: "Non applicabile, trattandosi di un adempimento comunicativo senza versamento",
+    paymentMethods: ["Non applicabile"],
+    regulations: "Art. 1, comma 3-bis, del D.Lgs. n. 127/2015, come modificato dall'art. 1, comma 1103, della Legge n. 178/2020",
+    consequences: "Sanzione di 2 euro per ciascuna fattura omessa o errata, fino a un massimo di 400 euro per trimestre. La sanzione è ridotta alla metà se la trasmissione è effettuata entro i 15 giorni successivi alla scadenza",
+    notes: "Dal 1° gennaio 2022 l'esterometro è stato sostituito dall'obbligo di fatturazione elettronica tramite SdI anche per le operazioni transfrontaliere. Tuttavia, per le operazioni per le quali non è stata emessa o ricevuta fattura elettronica, persiste l'obbligo di comunicazione trimestrale"
   },
   {
     id: "pg-11",
@@ -382,7 +418,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Trimestrale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-12T10:30:00Z"
+    updatedAt: "2025-01-12T10:30:00Z",
+    targetAudience: "Tutti i soggetti passivi IVA obbligati alla presentazione della dichiarazione IVA, salvo specifiche esenzioni",
+    amount: "Non applicabile, trattandosi di un adempimento comunicativo senza versamento",
+    paymentMethods: ["Non applicabile"],
+    regulations: "Art. 21-bis del D.L. n. 78/2010, convertito con modificazioni dalla Legge n. 122/2010, come modificato dal D.L. n. 193/2016",
+    consequences: "Sanzione da 500 a 2.000 euro per omessa, incompleta o infedele comunicazione. Possibile ravvedimento operoso con sanzioni ridotte",
+    notes: "La comunicazione deve contenere i dati riepilogativi delle liquidazioni periodiche IVA effettuate nel trimestre. L'invio è telematico tramite i servizi dell'Agenzia delle Entrate, direttamente o tramite intermediari abilitati. La scadenza è fissata all'ultimo giorno del secondo mese successivo al trimestre di riferimento"
   },
   {
     id: "pg-12",
@@ -395,7 +437,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Trimestrale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-12T10:30:00Z"
+    updatedAt: "2025-01-12T10:30:00Z",
+    targetAudience: "Tutti i soggetti passivi IVA obbligati alla presentazione della dichiarazione IVA, salvo specifiche esenzioni",
+    amount: "Non applicabile, trattandosi di un adempimento comunicativo senza versamento",
+    paymentMethods: ["Non applicabile"],
+    regulations: "Art. 21-bis del D.L. n. 78/2010, convertito con modificazioni dalla Legge n. 122/2010, come modificato dal D.L. n. 193/2016",
+    consequences: "Sanzione da 500 a 2.000 euro per omessa, incompleta o infedele comunicazione. Possibile ravvedimento operoso con sanzioni ridotte",
+    notes: "La comunicazione deve contenere i dati riepilogativi delle liquidazioni periodiche IVA effettuate nel trimestre. L'invio è telematico tramite i servizi dell'Agenzia delle Entrate, direttamente o tramite intermediari abilitati. Per il secondo trimestre, la scadenza è fissata al 16 settembre, anziché il 31 agosto"
   },
   {
     id: "pg-13",
