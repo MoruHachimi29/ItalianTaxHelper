@@ -46,7 +46,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Annuale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-15T10:00:00Z"
+    updatedAt: "2025-01-15T10:00:00Z",
+    targetAudience: "Lavoratori dipendenti, pensionati e contribuenti che percepiscono redditi assimilati a quelli di lavoro dipendente",
+    amount: "Non applicabile per la presentazione della dichiarazione. Eventuali importi a debito o a credito risultanti dalla dichiarazione saranno trattenuti/rimborsati dal sostituto d'imposta",
+    paymentMethods: ["Non applicabile per la presentazione - versamenti/rimborsi tramite sostituto d'imposta"],
+    regulations: "D.P.R. 22 luglio 1998, n. 322, art. 13; D.lgs. 9 luglio 1997, n. 241",
+    consequences: "In caso di omessa presentazione si applicano sanzioni dal 120% al 240% delle imposte dovute, con un minimo di 250 euro. In caso di dichiarazione infedele, le sanzioni vanno dal 90% al 180% della maggiore imposta dovuta",
+    notes: "Il Modello 730 può essere presentato direttamente dal contribuente tramite il sito dell'Agenzia delle Entrate (730 precompilato), tramite CAF o professionisti abilitati. La scadenza è il 30 settembre dell'anno successivo a quello di riferimento dei redditi"
   },
   {
     id: "pf-2",
@@ -59,7 +65,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Annuale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-15T10:00:00Z"
+    updatedAt: "2025-01-15T10:00:00Z",
+    targetAudience: "Titolari di partita IVA, possessori di redditi da partecipazione in società, contribuenti con redditi di natura diversa non compatibili con il modello 730, chi non ha un sostituto d'imposta",
+    amount: "Non applicabile per la presentazione della dichiarazione. Eventuali imposte a saldo o in acconto vanno versate secondo le scadenze previste",
+    paymentMethods: ["F24", "Servizi telematici dell'Agenzia delle Entrate"],
+    regulations: "D.P.R. 22 luglio 1998, n. 322, art. 2; D.lgs. 9 luglio 1997, n. 241",
+    consequences: "In caso di omessa presentazione si applicano sanzioni dal 120% al 240% delle imposte dovute, con un minimo di 250 euro. In caso di dichiarazione infedele, le sanzioni vanno dal 90% al 180% della maggiore imposta dovuta",
+    notes: "Il Modello Redditi PF deve essere presentato in forma telematica, direttamente o tramite intermediari abilitati. La scadenza è fissata al 30 novembre dell'anno successivo a quello cui si riferisce la dichiarazione"
   },
   {
     id: "pf-3",
@@ -110,7 +122,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Annuale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-20T09:15:00Z"
+    updatedAt: "2025-01-20T09:15:00Z",
+    targetAudience: "Contribuenti che hanno presentato la dichiarazione dei redditi nell'anno precedente e prevedono di dover pagare l'IRPEF anche per l'anno in corso",
+    amount: "40% dell'imposta sul reddito dovuta per l'anno in corso, calcolata in base all'imposta dovuta per l'anno precedente o in base al reddito presunto per l'anno in corso",
+    paymentMethods: ["F24", "Home banking", "Servizi telematici dell'Agenzia delle Entrate"],
+    regulations: "D.P.R. 22 dicembre 1986, n. 917 (TUIR); D.P.R. 7 dicembre 2001, n. 435",
+    consequences: "Sanzione del 30% dell'importo non versato, ridotta in caso di ravvedimento operoso. Interessi di mora calcolati dal giorno successivo alla scadenza fino al giorno del pagamento",
+    notes: "Non è dovuto l'acconto se l'imposta dichiarata nell'anno precedente è inferiore a 51,65 euro. Per contribuenti soggetti a ISA (Indici Sintetici di Affidabilità), l'acconto può essere versato in due rate: 50% entro il 30 giugno e 50% entro il 30 novembre"
   },
   {
     id: "pf-6",
@@ -123,7 +141,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Annuale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-20T09:15:00Z"
+    updatedAt: "2025-01-20T09:15:00Z",
+    targetAudience: "Contribuenti che hanno presentato la dichiarazione dei redditi nell'anno precedente e prevedono di dover pagare l'IRPEF anche per l'anno in corso",
+    amount: "60% dell'imposta sul reddito dovuta per l'anno in corso, calcolata in base all'imposta dovuta per l'anno precedente o in base al reddito presunto per l'anno in corso",
+    paymentMethods: ["F24", "Home banking", "Servizi telematici dell'Agenzia delle Entrate"],
+    regulations: "D.P.R. 22 dicembre 1986, n. 917 (TUIR); D.P.R. 7 dicembre 2001, n. 435",
+    consequences: "Sanzione del 30% dell'importo non versato, ridotta in caso di ravvedimento operoso. Interessi di mora calcolati dal giorno successivo alla scadenza fino al giorno del pagamento",
+    notes: "La seconda rata di acconto deve essere versata in un'unica soluzione entro il 30 novembre. È possibile rideterminare l'acconto in corso d'anno se si prevedono redditi inferiori rispetto all'anno precedente, assumendosi la responsabilità di tale scelta"
   },
   {
     id: "pf-7",
@@ -290,7 +314,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Mensile",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-10T09:00:00Z"
+    updatedAt: "2025-01-10T09:00:00Z",
+    targetAudience: "Imprese e professionisti in regime IVA mensile",
+    amount: "Variabile in base all'eccedenza tra IVA a debito e IVA a credito",
+    paymentMethods: ["F24", "Home banking", "Servizi telematici dell'Agenzia delle Entrate"],
+    regulations: "D.P.R. 26 ottobre 1972, n. 633 (Testo Unico IVA), art. 27",
+    consequences: "In caso di omesso, insufficiente o tardivo versamento: sanzione del 30% dell'importo non versato, ridotta in caso di ravvedimento operoso",
+    notes: "Il termine di versamento è fissato al giorno 16 del mese successivo a quello di riferimento. Se il giorno 16 cade di sabato o in un giorno festivo, il termine è posticipato al primo giorno lavorativo successivo."
   },
   {
     id: "pg-4",
