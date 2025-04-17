@@ -72,7 +72,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Semestrale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-10T14:30:00Z"
+    updatedAt: "2025-01-10T14:30:00Z",
+    targetAudience: "Proprietari di immobili, titolari di diritti reali di usufrutto, uso, abitazione, enfiteusi, superficie su immobili",
+    amount: "50% dell'importo totale annuale calcolato in base alle aliquote comunali",
+    paymentMethods: ["F24", "PagoPA", "Home banking"],
+    regulations: "Legge 160/2019 (Legge di Bilancio 2020), articoli 738-783",
+    consequences: "Sanzione del 30% dell'importo non versato. Per versamenti tardivi con ravvedimento operoso entro 14 giorni: sanzione ridotta dello 0,1% giornaliero, fino al 1,4%",
+    notes: "L'IMU non è dovuta per l'abitazione principale (eccetto categorie catastali A/1, A/8 e A/9). Alcune categorie di contribuenti possono beneficiare di esenzioni o riduzioni in base ai regolamenti comunali."
   },
   {
     id: "pf-4",
@@ -124,7 +130,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Annuale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-05T11:20:00Z"
+    updatedAt: "2025-01-05T11:20:00Z",
+    targetAudience: "Lavoratori dipendenti, pensionati, lavoratori autonomi occasionali e percettori di redditi di lavoro autonomo",
+    amount: "Non applicabile - documento certificativo non soggetto a pagamento",
+    paymentMethods: [],
+    regulations: "D.P.R. 22 luglio 1998, n. 322, articolo 4; Decreto Legislativo 21 novembre 2014, n. 175, articolo 15",
+    consequences: "La mancata consegna della Certificazione Unica ai percettori comporta sanzioni amministrative a carico del sostituto d'imposta. Per il contribuente, la mancata ricezione non comporta sanzioni ma può rendere più complessa la compilazione della dichiarazione dei redditi",
+    notes: "La Certificazione Unica contiene i dati relativi ai redditi di lavoro dipendente, assimilati e di lavoro autonomo, e deve essere consegnata al contribuente entro il 31 marzo. È un documento fondamentale per la compilazione della dichiarazione dei redditi"
   },
   {
     id: "pf-8",
@@ -182,7 +194,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Annuale",
     link: "https://sistemats1.sanita.finanze.it/",
-    updatedAt: "2024-12-15T09:45:00Z"
+    updatedAt: "2024-12-15T09:45:00Z",
+    targetAudience: "Professionisti sanitari, medici, farmacisti, strutture sanitarie, ottici, psicologi e altri operatori del settore sanitario",
+    amount: "Non applicabile - si tratta di un obbligo di comunicazione, non di pagamento",
+    paymentMethods: [],
+    regulations: "D.M. 31 luglio 2015 e successive modifiche; art. 3 del D.Lgs. n. 175/2014",
+    consequences: "Sanzioni da 100 a 500 euro per ciascuna comunicazione omessa o errata. La sanzione è ridotta a un terzo se la trasmissione viene effettuata entro 60 giorni dalla scadenza",
+    notes: "La comunicazione deve essere effettuata tramite il portale del Sistema Tessera Sanitaria. I dati inviati vengono utilizzati per la predisposizione delle dichiarazioni dei redditi precompilate"
   },
   {
     id: "pf-12",
@@ -195,7 +213,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Annuale - la data esatta dipende dal mese di immatricolazione",
     link: "https://www.aci.it/",
-    updatedAt: "2025-01-18T15:20:00Z"
+    updatedAt: "2025-01-18T15:20:00Z",
+    targetAudience: "Proprietari di veicoli, usufruttuari, acquirenti con patto di riservato dominio, utilizzatori a titolo di locazione finanziaria",
+    amount: "Variabile in base alla potenza del veicolo (kW), classe ambientale, regione di residenza e tipo di veicolo",
+    paymentMethods: ["PagoPA", "Tabaccherie e ricevitorie autorizzate", "Poste Italiane", "Home banking", "App IO", "Servizi ACI"],
+    regulations: "D.P.R. 5 febbraio 1953, n. 39 (Testo Unico sulle tasse automobilistiche); leggi regionali specifiche",
+    consequences: "Sanzioni pari al 30% della tassa non versata, più interessi moratori. Per pagamenti con ritardo entro 14 giorni, si applica una sovrattassa ridotta del 2,8% (0,2% per ogni giorno di ritardo)",
+    notes: "Il bollo auto deve essere pagato entro l'ultimo giorno del mese successivo alla scadenza del bollo precedente o al mese di immatricolazione. Esistono alcune categorie di veicoli esenti (es. veicoli elettrici, veicoli per disabili, veicoli storici)"
   },
 
   // PERSONE GIURIDICHE
@@ -398,7 +422,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Annuale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-20T09:30:00Z"
+    updatedAt: "2025-01-20T09:30:00Z",
+    targetAudience: "Soggetti passivi IVA, imprese, società, professionisti con partita IVA",
+    amount: "Non applicabile per la presentazione della dichiarazione. L'eventuale versamento del saldo è calcolato sulla base dei dati dichiarati",
+    paymentMethods: ["F24", "Servizi telematici dell'Agenzia delle Entrate"],
+    regulations: "D.P.R. 26 ottobre 1972, n. 633; D.P.R. 22 luglio 1998, n. 322, art. 8",
+    consequences: "Sanzioni dal 120% al 240% dell'imposta dovuta per omessa presentazione. Sanzioni dal 90% al 180% per dichiarazione infedele. Possibile ravvedimento operoso con sanzioni ridotte entro termini specifici",
+    notes: "La dichiarazione IVA deve essere presentata esclusivamente per via telematica, direttamente o tramite intermediari abilitati. È necessario compilare il modello IVA/2025 per le operazioni effettuate nell'anno 2024"
   }
 ];
 
