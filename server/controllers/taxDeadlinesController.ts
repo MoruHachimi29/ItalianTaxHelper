@@ -234,7 +234,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Annuale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-15T10:00:00Z"
+    updatedAt: "2025-01-15T10:00:00Z",
+    targetAudience: "Società di capitali, enti commerciali ed equiparati, enti non commerciali ed equiparati",
+    amount: "Non applicabile per la presentazione della dichiarazione. Eventuali imposte a saldo o in acconto vanno versate secondo le scadenze previste",
+    paymentMethods: ["F24", "Servizi telematici dell'Agenzia delle Entrate"],
+    regulations: "D.P.R. 22 luglio 1998, n. 322, art. 2; D.P.R. 22 dicembre 1986, n. 917 (TUIR)",
+    consequences: "Sanzioni per omessa presentazione dal 120% al 240% delle imposte dovute, con un minimo di 250 euro. Sanzioni per dichiarazione infedele dal 90% al 180% della maggiore imposta dovuta",
+    notes: "La dichiarazione deve essere presentata in via telematica, direttamente o tramite intermediari abilitati, entro l'ultimo giorno dell'undicesimo mese successivo a quello di chiusura del periodo d'imposta"
   },
   {
     id: "pg-2",
@@ -279,7 +285,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Trimestrale",
     link: "https://www.agenziaentrate.gov.it/",
-    updatedAt: "2025-01-10T09:00:00Z"
+    updatedAt: "2025-01-10T09:00:00Z",
+    targetAudience: "Imprese e professionisti in regime IVA trimestrale (contribuenti con volume d'affari non superiore a 400.000 euro per prestazioni di servizi o 700.000 euro per altre attività)",
+    amount: "Variabile in base all'eccedenza tra IVA a debito e IVA a credito, con maggiorazione dell'1% a titolo di interessi",
+    paymentMethods: ["F24", "Home banking", "Servizi telematici dell'Agenzia delle Entrate"],
+    regulations: "D.P.R. 26 ottobre 1972, n. 633 (Testo Unico IVA), art. 7 D.P.R. 14 ottobre 1999, n. 542",
+    consequences: "In caso di omesso, insufficiente o tardivo versamento: sanzione del 30% dell'importo non versato, ridotta in caso di ravvedimento operoso",
+    notes: "La liquidazione trimestrale prevede l'applicazione di un interesse dell'1% sull'importo da versare. La scadenza cade il giorno 16 del secondo mese successivo al trimestre di riferimento"
   },
   {
     id: "pg-5",
@@ -396,7 +408,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Annuale",
     link: "https://www.inail.it/",
-    updatedAt: "2025-01-08T11:00:00Z"
+    updatedAt: "2025-01-08T11:00:00Z",
+    targetAudience: "Datori di lavoro obbligati all'assicurazione contro gli infortuni sul lavoro e le malattie professionali",
+    amount: "Variabile in base alle retribuzioni erogate nell'anno precedente, ai tassi applicabili per le diverse lavorazioni e al numero di dipendenti",
+    paymentMethods: ["F24", "Home banking", "Servizi telematici dell'INAIL"],
+    regulations: "Decreto del Presidente della Repubblica 30 giugno 1965, n. 1124; Decreto Legislativo 23 febbraio 2000, n. 38",
+    consequences: "Sanzione civile pari al tasso ufficiale di riferimento maggiorato di 5,5 punti percentuali, fino ad un massimo del 40% dell'importo dei premi non versati",
+    notes: "L'autoliquidazione è la procedura con cui il datore di lavoro comunica all'INAIL le retribuzioni erogate nell'anno precedente e calcola il premio dovuto. Il versamento può essere effettuato in unica soluzione entro il 16 febbraio o in quattro rate trimestrali (16 febbraio, 16 maggio, 16 agosto e 16 novembre)"
   },
   {
     id: "pg-14",
@@ -409,7 +427,13 @@ export const taxDeadlines: TaxDeadline[] = [
     isRecurring: true,
     recurringInfo: "Mensile",
     link: "https://www.inps.it/",
-    updatedAt: "2025-01-10T14:00:00Z"
+    updatedAt: "2025-01-10T14:00:00Z",
+    targetAudience: "Datori di lavoro con dipendenti, committenti di collaborazioni coordinate e continuative, associanti in partecipazione",
+    amount: "Variabile in base alle retribuzioni erogate nel mese precedente e alle aliquote contributive applicabili in base al settore e al tipo di rapporto",
+    paymentMethods: ["F24", "Home banking", "Servizi telematici dell'INPS"],
+    regulations: "Decreto Legislativo 9 luglio 1997, n. 241 (art. 18); Legge 8 agosto 1995, n. 335",
+    consequences: "Sanzione civile dal 5,5% al 40% dell'importo dei contributi non versati, a seconda della gravità e della durata del ritardo. Sono previste anche sanzioni amministrative e penali in casi gravi",
+    notes: "Il termine di versamento è fissato al giorno 16 del mese successivo a quello di riferimento. Se il giorno 16 cade di sabato o in un giorno festivo, il termine è posticipato al primo giorno lavorativo successivo"
   },
   {
     id: "pg-15",
