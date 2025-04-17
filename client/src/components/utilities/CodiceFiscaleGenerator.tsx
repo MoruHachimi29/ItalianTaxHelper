@@ -9,17 +9,17 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// Lista dei comuni italiani con relativi codici (versione ridotta per l'esempio)
+// Lista dei comuni italiani con relativi codici
 const COMUNI = [
   { nome: "AGRIGENTO", codice: "A089" },
   { nome: "ALESSANDRIA", codice: "A182" },
@@ -129,15 +129,72 @@ const COMUNI = [
   { nome: "VITERBO", codice: "M082" },
 ];
 
-// Schema per la validazione del form
-const formSchema = z.object({
+// Stati esteri più comuni con relativi codici
+const STATI_ESTERI = [
+  { nome: "ALBANIA", codice: "Z100" },
+  { nome: "ARGENTINA", codice: "Z200" },
+  { nome: "AUSTRALIA", codice: "Z700" },
+  { nome: "AUSTRIA", codice: "Z102" },
+  { nome: "BELGIO", codice: "Z103" },
+  { nome: "BRASILE", codice: "Z203" },
+  { nome: "BULGARIA", codice: "Z104" },
+  { nome: "CANADA", codice: "Z401" },
+  { nome: "CINA", codice: "Z210" },
+  { nome: "CROAZIA", codice: "Z118" },
+  { nome: "DANIMARCA", codice: "Z107" },
+  { nome: "EGITTO", codice: "Z301" },
+  { nome: "FRANCIA", codice: "Z110" },
+  { nome: "GERMANIA", codice: "Z112" },
+  { nome: "GIAPPONE", codice: "Z219" },
+  { nome: "GRECIA", codice: "Z115" },
+  { nome: "INDIA", codice: "Z222" },
+  { nome: "IRLANDA", codice: "Z116" },
+  { nome: "ISRAELE", codice: "Z226" },
+  { nome: "LITUANIA", codice: "Z129" },
+  { nome: "LUSSEMBURGO", codice: "Z119" },
+  { nome: "MAROCCO", codice: "Z330" },
+  { nome: "MESSICO", codice: "Z404" },
+  { nome: "MONTENEGRO", codice: "Z159" },
+  { nome: "NORVEGIA", codice: "Z125" },
+  { nome: "PAESI BASSI", codice: "Z126" },
+  { nome: "POLONIA", codice: "Z127" },
+  { nome: "PORTOGALLO", codice: "Z128" },
+  { nome: "REGNO UNITO", codice: "Z114" },
+  { nome: "REPUBBLICA CECA", codice: "Z156" },
+  { nome: "ROMANIA", codice: "Z129" },
+  { nome: "RUSSIA", codice: "Z154" },
+  { nome: "SERBIA", codice: "Z158" },
+  { nome: "SLOVENIA", codice: "Z150" },
+  { nome: "SPAGNA", codice: "Z131" },
+  { nome: "STATI UNITI", codice: "Z404" },
+  { nome: "SVEZIA", codice: "Z132" },
+  { nome: "SVIZZERA", codice: "Z133" },
+  { nome: "TUNISIA", codice: "Z352" },
+  { nome: "TURCHIA", codice: "Z243" },
+  { nome: "UCRAINA", codice: "Z138" },
+  { nome: "UNGHERIA", codice: "Z134" },
+  { nome: "VENEZUELA", codice: "Z614" },
+];
+
+// Schema per la validazione del form di calcolo
+const calcoloFormSchema = z.object({
   nome: z.string().min(2, { message: "Il nome deve avere almeno 2 caratteri" }),
   cognome: z.string().min(2, { message: "Il cognome deve avere almeno 2 caratteri" }),
   dataNascita: z.string().min(10, { message: "Inserisci una data valida" }),
   sesso: z.enum(["M", "F"], {
     required_error: "Seleziona il sesso",
   }),
-  luogoNascita: z.string().min(1, { message: "Seleziona un comune" }),
+  luogoNascitaTipo: z.enum(["comune", "estero"], {
+    required_error: "Seleziona il tipo di luogo",
+  }),
+  luogoNascita: z.string().min(1, { message: "Seleziona un luogo di nascita" }),
+});
+
+// Schema per la validazione del form di decodifica
+const decodificaFormSchema = z.object({
+  codiceFiscale: z.string().min(16, { message: "Il codice fiscale deve avere 16 caratteri" })
+    .max(16, { message: "Il codice fiscale deve avere 16 caratteri" })
+    .regex(/^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$/, { message: "Formato codice fiscale non valido" }),
 });
 
 // Funzioni per il calcolo del codice fiscale
@@ -236,7 +293,7 @@ const calcolaCarattereControllo = (codice: string): string => {
   return String.fromCharCode(65 + resto); // A = 65, B = 66, ...
 };
 
-const calcolaCodiceFiscale = (dati: z.infer<typeof formSchema>): string => {
+const calcolaCodiceFiscale = (dati: z.infer<typeof calcoloFormSchema>): string => {
   try {
     // Calcola i vari componenti del codice fiscale
     const codiceCognome = getCodiceCognome(dati.cognome);
@@ -258,43 +315,156 @@ const calcolaCodiceFiscale = (dati: z.infer<typeof formSchema>): string => {
   }
 };
 
+// Funzioni per la decodifica del codice fiscale
+const decodificaMese = (carattere: string): number => {
+  const codiciMesi = ['A', 'B', 'C', 'D', 'E', 'H', 'L', 'M', 'P', 'R', 'S', 'T'];
+  return codiciMesi.indexOf(carattere);
+};
+
+const decodificaCodiceFiscale = (cf: string): {
+  sesso: string;
+  annoNascita: string;
+  meseNascita: string;
+  giornoNascita: string;
+  luogoNascita: string;
+  valido: boolean;
+} => {
+  // Verifica che il codice fiscale sia valido
+  if (!/^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$/.test(cf)) {
+    return {
+      sesso: "",
+      annoNascita: "",
+      meseNascita: "",
+      giornoNascita: "",
+      luogoNascita: "",
+      valido: false
+    };
+  }
+  
+  // Estrai le componenti
+  const anno = cf.substring(6, 8);
+  const codice_mese = cf.charAt(8);
+  const giorno = parseInt(cf.substring(9, 11));
+  const codice_luogo = cf.substring(11, 15);
+  
+  // Determina il sesso
+  const sesso = giorno > 40 ? "F" : "M";
+  
+  // Ottieni il giorno effettivo
+  const giornoEffettivo = sesso === "F" ? giorno - 40 : giorno;
+  
+  // Ottieni l'anno completo (assumiamo persone nate nel XX o XXI secolo)
+  const annoCompleto = parseInt(anno) < 30 ? "20" + anno : "19" + anno;
+  
+  // Ottieni il mese
+  const mese = decodificaMese(codice_mese);
+  const mesiNomi = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", 
+                    "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
+  const meseNome = mesiNomi[mese];
+  
+  // Cerca il luogo di nascita
+  let luogoNascita = "";
+  const comune = COMUNI.find(c => c.codice === codice_luogo);
+  if (comune) {
+    luogoNascita = comune.nome;
+  } else {
+    const statoEstero = STATI_ESTERI.find(s => s.codice === codice_luogo);
+    if (statoEstero) {
+      luogoNascita = statoEstero.nome + " (Stato Estero)";
+    } else {
+      luogoNascita = "Sconosciuto (codice: " + codice_luogo + ")";
+    }
+  }
+  
+  return {
+    sesso,
+    annoNascita: annoCompleto,
+    meseNascita: meseNome,
+    giornoNascita: giornoEffettivo.toString(),
+    luogoNascita,
+    valido: true
+  };
+};
+
 const CodiceFiscaleGenerator = () => {
   const [codiceFiscale, setCodiceFiscale] = useState<string>("");
-  const [filteredComuni, setFilteredComuni] = useState<typeof COMUNI>([]);
-  const [searchTerm, setSearchTerm] = useState<string>("");
   const [copiato, setCopiato] = useState<boolean>(false);
+  const [filteredLuoghi, setFilteredLuoghi] = useState<Array<{nome: string, codice: string}>>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [tipoLuogo, setTipoLuogo] = useState<"comune" | "estero">("comune");
+  const [datiDecodificati, setDatiDecodificati] = useState<ReturnType<typeof decodificaCodiceFiscale> | null>(null);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  // Form per calcolo codice fiscale
+  const calcoloForm = useForm<z.infer<typeof calcoloFormSchema>>({
+    resolver: zodResolver(calcoloFormSchema),
     defaultValues: {
       nome: "",
       cognome: "",
       dataNascita: "",
       sesso: "M",
+      luogoNascitaTipo: "comune",
       luogoNascita: "",
     },
   });
 
+  // Form per decodifica codice fiscale
+  const decodificaForm = useForm<z.infer<typeof decodificaFormSchema>>({
+    resolver: zodResolver(decodificaFormSchema),
+    defaultValues: {
+      codiceFiscale: "",
+    },
+  });
+
+  // Effetto per filtrare i luoghi in base alla ricerca e al tipo
   useEffect(() => {
     if (searchTerm.length > 1) {
-      const filtered = COMUNI.filter(comune => 
-        comune.nome.toLowerCase().includes(searchTerm.toLowerCase())
+      const sourceList = tipoLuogo === "comune" ? COMUNI : STATI_ESTERI;
+      const filtered = sourceList.filter(luogo => 
+        luogo.nome.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      setFilteredComuni(filtered.slice(0, 15)); // Limita a 15 risultati per performance
+      setFilteredLuoghi(filtered.slice(0, 15)); // Limita a 15 risultati per performance
     } else {
-      setFilteredComuni([]);
+      setFilteredLuoghi([]);
     }
-  }, [searchTerm]);
+  }, [searchTerm, tipoLuogo]);
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  // Gestisce il cambio di tipo di luogo di nascita
+  useEffect(() => {
+    // Quando cambia il tipo di luogo, resetta la selezione
+    calcoloForm.setValue('luogoNascita', '');
+    setSearchTerm('');
+  }, [tipoLuogo, calcoloForm]);
+
+  // Submit per calcolo del codice fiscale
+  const onCalcoloSubmit = (values: z.infer<typeof calcoloFormSchema>) => {
     const cf = calcolaCodiceFiscale(values);
     setCodiceFiscale(cf);
     toast({
       title: "Codice fiscale calcolato",
-      description: `Il codice fiscale calcolato è: ${cf}`,
+      description: `Il codice fiscale è: ${cf}`,
     });
   };
 
+  // Submit per decodifica del codice fiscale
+  const onDecodificaSubmit = (values: z.infer<typeof decodificaFormSchema>) => {
+    const result = decodificaCodiceFiscale(values.codiceFiscale.toUpperCase());
+    setDatiDecodificati(result);
+    
+    if (result.valido) {
+      toast({
+        title: "Codice fiscale decodificato",
+        description: "I dati anagrafici sono stati estratti correttamente.",
+      });
+    } else {
+      toast({
+        title: "Errore nella decodifica",
+        description: "Il codice fiscale potrebbe non essere valido.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Funzione per copiare il codice fiscale
   const copiaCodice = () => {
     if (codiceFiscale) {
       navigator.clipboard.writeText(codiceFiscale)
@@ -318,64 +488,257 @@ const CodiceFiscaleGenerator = () => {
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Calcolo Codice Fiscale</CardTitle>
-        <CardDescription>
-          Inserisci i tuoi dati anagrafici per calcolare il codice fiscale
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="calcolo">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="calcolo">Calcolo Codice Fiscale</TabsTrigger>
-            <TabsTrigger value="info">Informazioni</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="calcolo">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="w-full max-w-6xl mx-auto bg-white">
+      <div className="py-6 px-4 border-b text-center">
+        <h1 className="text-2xl font-bold mb-2">Calcolo Codice Fiscale</h1>
+        <p className="text-sm text-gray-500">Calcola il tuo codice fiscale o decodifica un codice fiscale esistente</p>
+      </div>
+
+      <Tabs defaultValue="calcolo" className="w-full">
+        <TabsList className="w-full grid grid-cols-2 my-4">
+          <TabsTrigger value="calcolo" className="py-2">Calcolo Codice Fiscale</TabsTrigger>
+          <TabsTrigger value="decodifica" className="py-2">Decodifica Codice Fiscale</TabsTrigger>
+        </TabsList>
+
+        {/* TAB CALCOLO */}
+        <TabsContent value="calcolo" className="px-4 pb-6">
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Sezione sinistra - Form */}
+            <div className="lg:w-1/2">
+              <Form {...calcoloForm}>
+                <form onSubmit={calcoloForm.handleSubmit(onCalcoloSubmit)} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={calcoloForm.control}
+                      name="cognome"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Cognome</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Rossi" {...field} className="border-gray-300" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={calcoloForm.control}
+                      name="nome"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nome</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Mario" {...field} className="border-gray-300" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={calcoloForm.control}
+                      name="dataNascita"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Data di nascita</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="date" 
+                              {...field} 
+                              className="border-gray-300"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={calcoloForm.control}
+                      name="sesso"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2">
+                          <FormLabel>Sesso</FormLabel>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex space-x-4"
+                            >
+                              <div className="flex items-center space-x-1">
+                                <RadioGroupItem value="M" id="sesso-m" />
+                                <Label htmlFor="sesso-m">Maschile</Label>
+                              </div>
+                              <div className="flex items-center space-x-1">
+                                <RadioGroupItem value="F" id="sesso-f" />
+                                <Label htmlFor="sesso-f">Femminile</Label>
+                              </div>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
                   <FormField
-                    control={form.control}
-                    name="cognome"
+                    control={calcoloForm.control}
+                    name="luogoNascitaTipo"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Cognome</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Rossi" {...field} />
-                        </FormControl>
+                      <FormItem className="space-y-2">
+                        <FormLabel>Tipo di luogo di nascita</FormLabel>
+                        <Select 
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setTipoLuogo(value as "comune" | "estero");
+                          }} 
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="border-gray-300">
+                              <SelectValue placeholder="Seleziona tipo" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="comune">Comune Italiano</SelectItem>
+                            <SelectItem value="estero">Stato Estero</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   
                   <FormField
-                    control={form.control}
-                    name="nome"
+                    control={calcoloForm.control}
+                    name="luogoNascita"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nome</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Mario" {...field} />
-                        </FormControl>
+                        <FormLabel>{tipoLuogo === "comune" ? "Comune" : "Stato"} di nascita</FormLabel>
+                        <div className="relative">
+                          <Input
+                            type="text"
+                            placeholder={`Cerca ${tipoLuogo === "comune" ? "comune" : "stato"}...`}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="border-gray-300 mb-1"
+                          />
+                          {filteredLuoghi.length > 0 && (
+                            <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                              {filteredLuoghi.map(luogo => (
+                                <div
+                                  key={luogo.codice}
+                                  className="px-3 py-2 cursor-pointer hover:bg-gray-100"
+                                  onClick={() => {
+                                    setSearchTerm(luogo.nome);
+                                    calcoloForm.setValue('luogoNascita', luogo.codice);
+                                    setFilteredLuoghi([]);
+                                  }}
+                                >
+                                  {luogo.nome}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          <Input
+                            type="hidden"
+                            {...field}
+                          />
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                  
+                  <Button type="submit" className="w-full bg-black hover:bg-gray-800 mt-6">
+                    Calcola Codice Fiscale
+                  </Button>
+                </form>
+              </Form>
+            </div>
+            
+            {/* Sezione destra - Risultato e informazioni */}
+            <div className="lg:w-1/2 space-y-6">
+              {codiceFiscale ? (
+                <div className="border p-4 rounded">
+                  <h3 className="text-lg font-semibold mb-3">Risultato</h3>
+                  <div className="p-3 bg-gray-50 border rounded flex items-center justify-between">
+                    <div className="text-xl font-mono tracking-wider">{codiceFiscale}</div>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={copiaCodice}
+                      className={copiato ? "bg-green-50" : ""}
+                    >
+                      {copiato ? "Copiato!" : "Copia"}
+                    </Button>
+                  </div>
                 </div>
+              ) : null}
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Composizione del Codice Fiscale</h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <table className="w-full border-collapse">
+                  <tbody>
+                    <tr className="border-b">
+                      <td className="py-2 pr-4 font-semibold w-1/4">Posizioni 1-3</td>
+                      <td className="py-2">Prime consonanti del COGNOME</td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2 pr-4 font-semibold">Posizioni 4-6</td>
+                      <td className="py-2">Prime consonanti del NOME</td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2 pr-4 font-semibold">Posizioni 7-8</td>
+                      <td className="py-2">Ultime due cifre dell'ANNO di nascita</td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2 pr-4 font-semibold">Posizione 9</td>
+                      <td className="py-2">Lettera del MESE di nascita</td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2 pr-4 font-semibold">Posizioni 10-11</td>
+                      <td className="py-2">GIORNO di nascita (+ 40 per le donne)</td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2 pr-4 font-semibold">Posizioni 12-15</td>
+                      <td className="py-2">Codice del COMUNE o STATO di nascita</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-semibold">Posizione 16</td>
+                      <td className="py-2">CARATTERE DI CONTROLLO</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* TAB DECODIFICA */}
+        <TabsContent value="decodifica" className="px-4 pb-6">
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Sezione sinistra - Form */}
+            <div className="lg:w-1/2">
+              <Form {...decodificaForm}>
+                <form onSubmit={decodificaForm.handleSubmit(onDecodificaSubmit)} className="space-y-4">
                   <FormField
-                    control={form.control}
-                    name="dataNascita"
+                    control={decodificaForm.control}
+                    name="codiceFiscale"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Data di nascita</FormLabel>
+                        <FormLabel>Inserisci il codice fiscale da decodificare</FormLabel>
                         <FormControl>
                           <Input 
-                            type="date" 
+                            placeholder="RSSMRA80A01H501X" 
                             {...field} 
+                            className="border-gray-300 uppercase"
+                            maxLength={16}
+                            onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                           />
                         </FormControl>
                         <FormMessage />
@@ -383,154 +746,80 @@ const CodiceFiscaleGenerator = () => {
                     )}
                   />
                   
-                  <FormField
-                    control={form.control}
-                    name="sesso"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Sesso</FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex space-x-4"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="M" id="sesso-m" />
-                              <Label htmlFor="sesso-m">Maschile</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="F" id="sesso-f" />
-                              <Label htmlFor="sesso-f">Femminile</Label>
-                            </div>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <FormField
-                  control={form.control}
-                  name="luogoNascita"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Comune di nascita</FormLabel>
-                      <div className="relative">
-                        <Input
-                          type="text"
-                          placeholder="Cerca comune..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="mb-1"
-                        />
-                        {filteredComuni.length > 0 && (
-                          <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                            {filteredComuni.map(comune => (
-                              <div
-                                key={comune.codice}
-                                className="px-4 py-2 cursor-pointer hover:bg-gray-100"
-                                onClick={() => {
-                                  setSearchTerm(comune.nome);
-                                  form.setValue('luogoNascita', comune.codice);
-                                  setFilteredComuni([]);
-                                }}
-                              >
-                                {comune.nome}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                        <Input
-                          type="hidden"
-                          {...field}
-                        />
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <Button type="submit" className="w-full">Calcola Codice Fiscale</Button>
-              </form>
-            </Form>
-            
-            {codiceFiscale && (
-              <div className="mt-8 p-4 border rounded-md bg-gray-50">
-                <div className="text-center mb-4">
-                  <h3 className="text-lg font-medium">Risultato</h3>
-                  <p className="text-sm text-gray-500">Ecco il codice fiscale calcolato</p>
-                </div>
-                <div className="flex items-center justify-center space-x-2">
-                  <div className="text-2xl font-bold tracking-widest bg-white p-3 border rounded">
-                    {codiceFiscale}
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={copiaCodice}
-                    className={copiato ? "bg-green-50" : ""}
-                  >
-                    {copiato ? "Copiato!" : "Copia"}
+                  <Button type="submit" className="w-full bg-black hover:bg-gray-800 mt-2">
+                    Decodifica Codice Fiscale
                   </Button>
-                </div>
-              </div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="info">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Struttura del Codice Fiscale</h3>
-              <p>Il codice fiscale italiano è composto da 16 caratteri alfanumerici, suddivisi come segue:</p>
+                </form>
+              </Form>
               
-              <div className="space-y-2">
-                <div className="flex items-start">
-                  <span className="font-semibold w-24">Posizioni 1-3:</span>
-                  <span>Prime 3 consonanti del cognome (se non sufficienti, si utilizzano le vocali; se ancora insufficienti si utilizzano le lettere X)</span>
+              {datiDecodificati && datiDecodificati.valido && (
+                <div className="mt-6 border p-4 rounded">
+                  <h3 className="text-lg font-semibold mb-3">Dati anagrafici estratti</h3>
+                  <table className="w-full">
+                    <tbody>
+                      <tr className="border-b">
+                        <td className="py-2 pr-4 font-semibold w-1/3">Sesso</td>
+                        <td className="py-2">{datiDecodificati.sesso === "M" ? "Maschio" : "Femmina"}</td>
+                      </tr>
+                      <tr className="border-b">
+                        <td className="py-2 pr-4 font-semibold">Data di nascita</td>
+                        <td className="py-2">{datiDecodificati.giornoNascita} {datiDecodificati.meseNascita} {datiDecodificati.annoNascita}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 pr-4 font-semibold">Luogo di nascita</td>
+                        <td className="py-2">{datiDecodificati.luogoNascita}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <p className="text-xs text-gray-500 mt-4">
+                    * Nota: La decodifica non può recuperare nome e cognome originali
+                  </p>
                 </div>
-                <div className="flex items-start">
-                  <span className="font-semibold w-24">Posizioni 4-6:</span>
-                  <span>Prime 3 consonanti del nome (se il nome contiene 4 o più consonanti, si prendono la 1ª, 3ª e 4ª)</span>
-                </div>
-                <div className="flex items-start">
-                  <span className="font-semibold w-24">Posizioni 7-8:</span>
-                  <span>Ultime due cifre dell'anno di nascita</span>
-                </div>
-                <div className="flex items-start">
-                  <span className="font-semibold w-24">Posizione 9:</span>
-                  <span>Lettera del mese di nascita (A=gennaio, B=febbraio, ...)</span>
-                </div>
-                <div className="flex items-start">
-                  <span className="font-semibold w-24">Posizioni 10-11:</span>
-                  <span>Giorno di nascita (per le donne si aggiunge 40 al giorno)</span>
-                </div>
-                <div className="flex items-start">
-                  <span className="font-semibold w-24">Posizioni 12-15:</span>
-                  <span>Codice del comune di nascita (o stato estero)</span>
-                </div>
-                <div className="flex items-start">
-                  <span className="font-semibold w-24">Posizione 16:</span>
-                  <span>Carattere di controllo calcolato sulle 15 posizioni precedenti</span>
-                </div>
-              </div>
-              
-              <h3 className="text-lg font-semibold mt-6">Note Importanti</h3>
-              <ul className="list-disc list-inside space-y-1">
-                <li>Questo calcolatore fornisce il codice fiscale teorico che potrebbe differire da quello ufficiale in casi specifici (ad esempio, omocodie).</li>
-                <li>Per ottenere il codice fiscale ufficiale, rivolgersi all'Agenzia delle Entrate.</li>
-                <li>I dati inseriti non vengono memorizzati o trasmessi ad alcun server esterno.</li>
-              </ul>
+              )}
             </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-      <CardFooter className="flex justify-center border-t pt-6">
-        <p className="text-xs text-gray-500 text-center">
-          Questo strumento calcola il codice fiscale in base ai dati inseriti. Il risultato è puramente indicativo e non sostituisce documenti ufficiali.
+            
+            {/* Sezione destra - Informazioni */}
+            <div className="lg:w-1/2 space-y-6">
+              <div className="border p-4 rounded">
+                <h3 className="text-lg font-semibold mb-3">Come si decodifica un codice fiscale</h3>
+                <p className="text-sm mb-4">
+                  Il codice fiscale italiano contiene informazioni codificate che possono essere estratte per risalire a:
+                </p>
+                <ul className="list-disc list-inside space-y-2 mb-4 text-sm">
+                  <li>Sesso della persona</li>
+                  <li>Data di nascita</li>
+                  <li>Luogo di nascita</li>
+                </ul>
+                <p className="text-sm mb-2">
+                  Non è possibile risalire al nome e cognome originali poiché il processo di codifica non è reversibile in modo univoco.
+                </p>
+                
+                <Separator className="my-4" />
+                
+                <h4 className="font-semibold mb-2">Esempi di codici validi:</h4>
+                <div className="grid grid-cols-2 gap-2 mb-4 text-sm">
+                  <div><code>RSSMRA80A01H501X</code> - Mario Rossi</div>
+                  <div><code>BNCNNA95D57F205Y</code> - Anna Bianchi</div>
+                </div>
+                
+                <h4 className="font-semibold mb-2">Limitazioni:</h4>
+                <p className="text-sm">
+                  La decodifica fornisce informazioni parziali e approssimative. Per omocodie o casi particolari, 
+                  il risultato potrebbe non corrispondere esattamente ai dati originali.
+                </p>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
+      
+      <div className="p-4 border-t mt-6 text-center">
+        <p className="text-xs text-gray-500">
+          Questo strumento calcola e decodifica codici fiscali a scopo informativo. 
+          I dati inseriti non vengono memorizzati o trasmessi ad alcun server esterno.
         </p>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 };
 

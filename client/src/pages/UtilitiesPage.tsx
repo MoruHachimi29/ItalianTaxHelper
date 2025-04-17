@@ -104,10 +104,8 @@ export default function UtilitiesPage() {
                   <div className="text-4xl mb-4 text-center">{tool.icon}</div>
                   <h3 className="text-xl font-bold mb-3">{tool.title}</h3>
                   <p className="text-sm text-gray-600 mb-6 flex-grow">{tool.description}</p>
-                  <Link href={tool.path}>
-                    <a className="block w-full bg-black text-white text-center py-2 rounded hover:bg-gray-900 transition-colors">
+                  <Link href={tool.path} className="block w-full bg-black text-white text-center py-2 rounded hover:bg-gray-900 transition-colors">
                       Apri Strumento
-                    </a>
                   </Link>
                 </div>
               </div>
