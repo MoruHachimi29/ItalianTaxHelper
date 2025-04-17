@@ -329,19 +329,17 @@ export default function TaxDeadlinesTracker() {
                           <Clock className="h-3 w-3 mr-1" />
                           Aggiornato: {format(parseISO(deadline.updatedAt), "d MMM yyyy", { locale: it })}
                         </div>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          asChild
-                          className="text-xs"
+                        <a 
+                          href={deadline.link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center text-xs px-3 py-1 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
                         >
-                          <a href={deadline.link} target="_blank" rel="noopener noreferrer">
-                            <span className="flex items-center">
-                              Maggiori dettagli
-                              <ExternalLink className="h-3 w-3 ml-1" />
-                            </span>
-                          </a>
-                        </Button>
+                          <span className="flex items-center">
+                            Maggiori dettagli
+                            <ExternalLink className="h-3 w-3 ml-1" />
+                          </span>
+                        </a>
                       </CardFooter>
                     </Card>
                   ))}
