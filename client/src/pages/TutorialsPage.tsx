@@ -152,7 +152,7 @@ export default function TutorialsPage() {
                       <p className="text-sm text-gray-600 mb-4">{tutorial.content}</p>
                       {tutorial.isVideo ? (
                         <a 
-                          href={`/video-tutorial/come-pagare-imposte-f24`}
+                          href={tutorial.id === 3 ? `/video-tutorial/come-pagare-imposte-f24` : `/video-tutorial/${tutorial.id}`}
                           className="text-black font-medium hover:underline flex items-center"
                         >
                           Guarda il video
