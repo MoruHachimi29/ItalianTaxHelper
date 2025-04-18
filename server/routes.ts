@@ -37,7 +37,7 @@ const NEWS_API_URL = "https://newsapi.org/v2";
 export async function registerRoutes(app: Express): Promise<Server> {
   // API routes - all prefixed with /api
   
-  // Get all tutorials
+  // Tutorial routes
   app.get("/api/tutorials", async (req, res) => {
     try {
       const tutorials = await storage.getTutorials();
@@ -48,13 +48,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get tutorials by type
-  app.get("/api/tutorials/:type", async (req, res) => {
+  app.get("/api/tutorials/type/:type", async (req, res) => {
     try {
       const { type } = req.params;
       const tutorials = await storage.getTutorialsByType(type);
       res.json(tutorials);
     } catch (error) {
       res.status(500).json({ message: "Errore nel recupero dei tutorial" });
+    }
+  });
+  
+  // Get video tutorials
+  app.get("/api/tutorials/video", async (req, res) => {
+    try {
+      const tutorials = await storage.getTutorials();
+      const videoTutorials = tutorials.filter(tutorial => tutorial.isVideo === true);
+      res.json(videoTutorials);
+    } catch (error) {
+      res.status(500).json({ message: "Errore nel recupero dei tutorial video" });
+    }
+  });
+  
+  // Get tutorial by ID
+  app.get("/api/tutorials/id/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "ID tutorial non valido" });
+      }
+      
+      const tutorial = await storage.getTutorial(id);
+      if (!tutorial) {
+        return res.status(404).json({ message: "Tutorial non trovato" });
+      }
+      
+      res.json(tutorial);
+    } catch (error) {
+      res.status(500).json({ message: "Errore nel recupero del tutorial" });
     }
   });
   
