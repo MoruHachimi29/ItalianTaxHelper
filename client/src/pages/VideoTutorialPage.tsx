@@ -55,8 +55,8 @@ export default function VideoTutorialPage() {
   
   // If slug doesn't match any of our predefined videos, try to find it in the tutorials
   if (!videoData && !isLoading && tutorials) {
-    const tutorial = tutorials.find(t => t.isVideo && t.videoUrl);
-    if (tutorial) {
+    const tutorial = tutorials.find(t => t.isVideo && typeof t.videoUrl === 'string' && t.videoUrl.trim() !== '');
+    if (tutorial && tutorial.videoUrl) {
       return (
         <div className="container mx-auto px-4 py-8">
           <Helmet>
@@ -152,11 +152,9 @@ export default function VideoTutorialPage() {
               <div className="space-y-4">
                 {videoData.resources.map((resource, index) => (
                   <div key={index}>
-                    <Link href={resource.url}>
-                      <a className="flex items-center gap-2 text-black hover:underline">
-                        <span className="material-icons text-gray-600 text-sm">arrow_forward</span>
-                        {resource.title}
-                      </a>
+                    <Link href={resource.url} className="flex items-center gap-2 text-black hover:underline">
+                      <span className="material-icons text-gray-600 text-sm">arrow_forward</span>
+                      {resource.title}
                     </Link>
                   </div>
                 ))}
@@ -178,11 +176,9 @@ export default function VideoTutorialPage() {
               <h3 className="text-lg font-bold mb-4">Scarica i modelli</h3>
               <div className="space-y-3">
                 <div>
-                  <Link href="/assets/Modello_F24_Ordinario.pdf" target="_blank">
-                    <a className="flex items-center gap-2 text-black hover:underline">
-                      <span className="material-icons text-gray-600">download</span>
-                      Modello F24 (PDF)
-                    </a>
+                  <Link href="/assets/Modello_F24_Ordinario.pdf" className="flex items-center gap-2 text-black hover:underline" target="_blank">
+                    <span className="material-icons text-gray-600">download</span>
+                    Modello F24 (PDF)
                   </Link>
                 </div>
                 <div>
