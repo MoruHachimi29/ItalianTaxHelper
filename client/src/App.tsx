@@ -8,6 +8,7 @@ import Home from "@/pages/Home";
 import FormPage from "@/pages/FormPage";
 import ModulesPage from "@/pages/ModulesPage";
 import TutorialsPage from "@/pages/TutorialsPage";
+import VideoTutorialPage from "@/pages/VideoTutorialPage";
 import NewsPage from "@/pages/NewsPage";
 import BlogPage from "@/pages/BlogPage";
 import BlogPostPage from "@/pages/BlogPostPage";
@@ -34,6 +35,7 @@ function Router() {
         <Route path="/moduli" component={ModulesPage} />
         <Route path="/moduli/:formType" component={FormPage} />
         <Route path="/tutorial" component={TutorialsPage} />
+        <Route path="/video-tutorial/:slug" component={VideoTutorialPage} />
         <Route path="/notizie" component={NewsPage} />
         <Route path="/blog" component={BlogPage} />
         <Route path="/blog/:slug" component={BlogPostPage} />
