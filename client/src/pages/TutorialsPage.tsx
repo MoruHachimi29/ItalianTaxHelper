@@ -117,59 +117,61 @@ export default function TutorialsPage() {
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
           <TabsList className="grid w-full grid-cols-3 mb-8">
-            <TabsTrigger value="tutorial">Guide Video</TabsTrigger>
+            <TabsTrigger value="tutorial">Guida Video</TabsTrigger>
             <TabsTrigger value="modelli">Modelli</TabsTrigger>
             <TabsTrigger value="istruzioni">Istruzioni</TabsTrigger>
           </TabsList>
           
           <TabsContent value="tutorial">
-            <h2 className="text-2xl font-bold mb-6">Guide e Tutorial Video</h2>
+            <h2 className="text-2xl font-bold mb-6">Guida Video alla Compilazione del Modello F24</h2>
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                    <Skeleton className="h-40 w-full" />
-                    <div className="p-4">
-                      <Skeleton className="h-6 w-3/4 mb-2" />
-                      <Skeleton className="h-4 w-full mb-2" />
-                      <Skeleton className="h-4 w-full mb-2" />
-                      <Skeleton className="h-6 w-1/3 mt-4" />
-                    </div>
-                  </div>
-                ))}
+              <div className="w-full max-w-4xl mx-auto border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                <Skeleton className="aspect-video w-full" />
+                <div className="p-6">
+                  <Skeleton className="h-8 w-3/4 mb-4" />
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-8 w-1/4 mt-6" />
+                </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {tutorials?.map((tutorial) => (
-                  <div key={tutorial.id} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                    <div className="h-40 bg-gray-100 flex items-center justify-center">
-                      <span className="material-icons text-5xl text-gray-400">
-                        {tutorial.isVideo ? "play_circle" : "menu_book"}
-                      </span>
-                    </div>
-                    <div className="p-4">
-                      <h3 className="text-lg font-bold mb-2">{tutorial.title}</h3>
-                      <p className="text-sm text-gray-600 mb-4">{tutorial.content}</p>
-                      {tutorial.isVideo ? (
-                        <a 
-                          href={tutorial.id === 3 ? `/video-tutorial/come-pagare-imposte-f24` : `/video-tutorial/${tutorial.id}`}
-                          className="text-black font-medium hover:underline flex items-center"
-                        >
-                          Guarda il video
-                          <span className="material-icons text-sm ml-1">play_circle</span>
-                        </a>
-                      ) : (
-                        <a 
-                          href={`#tutorial-${tutorial.id}`}
-                          className="text-black font-medium hover:underline flex items-center"
-                        >
-                          Leggi la guida
-                          <span className="material-icons text-sm ml-1">arrow_forward</span>
-                        </a>
-                      )}
-                    </div>
+              <div className="w-full max-w-4xl mx-auto border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                <div className="aspect-video bg-black">
+                  <iframe 
+                    className="w-full h-full"
+                    src="https://www.youtube.com/embed/9U2gTSVmGx4"
+                    title="Come compilare il modello F24: Guida Completa"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold mb-4">Come compilare il modello F24: Guida Completa</h3>
+                  <p className="text-gray-700 mb-6">
+                    Questa video guida comprende tutte le istruzioni necessarie per compilare correttamente 
+                    il modello F24, incluse le sezioni contribuente, erario, INPS, regioni ed enti locali. 
+                    Include esempi pratici di compilazione e mostra come calcolare correttamente gli importi 
+                    a debito e a credito.
+                  </p>
+                  <div className="flex flex-wrap gap-4">
+                    <a 
+                      href="/moduli/f24-ordinario"
+                      className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors flex items-center"
+                    >
+                      <span className="material-icons mr-2">description</span>
+                      Compila F24 Online
+                    </a>
+                    <a 
+                      href="/tutorial?tab=modelli"
+                      className="border border-black px-4 py-2 rounded-md hover:bg-gray-100 transition-colors flex items-center"
+                    >
+                      <span className="material-icons mr-2">download</span>
+                      Scarica Modello F24
+                    </a>
                   </div>
-                ))}
+                </div>
               </div>
             )}
           </TabsContent>
