@@ -88,6 +88,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Update tutorial
+  app.put("/api/tutorials/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "ID tutorial non valido" });
+      }
+      
+      // Verifica che il tutorial esista
+      const existingTutorial = await storage.getTutorial(id);
+      if (!existingTutorial) {
+        return res.status(404).json({ message: "Tutorial non trovato" });
+      }
+      
+      // Prepara i dati per l'aggiornamento
+      const updatedData = {
+        ...req.body,
+        id: undefined // Assicuriamoci che non si possa cambiare l'ID
+      };
+      
+      // Aggiorna il tutorial
+      const tutorial = await storage.updateTutorial(id, updatedData);
+      if (!tutorial) {
+        return res.status(500).json({ message: "Errore nell'aggiornamento del tutorial" });
+      }
+      
+      res.json(tutorial);
+    } catch (error) {
+      console.error("Error updating tutorial:", error);
+      res.status(500).json({ message: "Errore nell'aggiornamento del tutorial" });
+    }
+  });
+  
   // Get latest news
   app.get("/api/news", async (req, res) => {
     try {
