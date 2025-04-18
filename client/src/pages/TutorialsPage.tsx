@@ -138,14 +138,13 @@ export default function TutorialsPage() {
             ) : (
               <div className="w-full max-w-4xl mx-auto border border-gray-200 rounded-lg overflow-hidden shadow-sm">
                 <div className="aspect-video bg-black">
-                  <iframe 
+                  <video 
                     className="w-full h-full"
-                    src="https://www.youtube.com/embed/9U2gTSVmGx4"
+                    src="/videos/f24-tutorial.mp4"
                     title="Come compilare il modello F24: Guida Completa"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
+                    controls
+                    poster="/assets/Modello_F24.png"
+                  ></video>
                 </div>
                 <div className="p-6">
                   <h3 className="text-2xl font-bold mb-4">Come compilare il modello F24: Guida Completa</h3>
