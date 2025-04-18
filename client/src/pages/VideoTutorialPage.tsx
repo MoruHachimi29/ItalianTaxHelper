@@ -182,11 +182,9 @@ export default function VideoTutorialPage() {
                   </Link>
                 </div>
                 <div>
-                  <Link href="/assets/Istruzioni_modello_F24.pdf" target="_blank">
-                    <a className="flex items-center gap-2 text-black hover:underline">
-                      <span className="material-icons text-gray-600">download</span>
-                      Istruzioni F24 (PDF)
-                    </a>
+                  <Link href="/assets/Istruzioni_modello_F24.pdf" className="flex items-center gap-2 text-black hover:underline" target="_blank">
+                    <span className="material-icons text-gray-600">download</span>
+                    Istruzioni F24 (PDF)
                   </Link>
                 </div>
               </div>

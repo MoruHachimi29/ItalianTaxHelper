@@ -28,6 +28,7 @@ export interface IStorage {
   getTutorials(): Promise<Tutorial[]>;
   getTutorialsByType(type: string): Promise<Tutorial[]>;
   createTutorial(tutorial: InsertTutorial): Promise<Tutorial>;
+  updateTutorial(id: number, data: Partial<Tutorial>): Promise<Tutorial | undefined>;
   
   // News methods
   getNews(id: number): Promise<News | undefined>;
@@ -141,6 +142,20 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return tutorial;
+  }
+  
+  async updateTutorial(id: number, data: Partial<Tutorial>): Promise<Tutorial | undefined> {
+    try {
+      const [tutorial] = await db
+        .update(tutorials)
+        .set(data)
+        .where(eq(tutorials.id, id))
+        .returning();
+      return tutorial;
+    } catch (error) {
+      console.error("Error updating tutorial:", error);
+      return undefined;
+    }
   }
   
   // News methods
