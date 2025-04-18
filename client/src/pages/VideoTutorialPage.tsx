@@ -11,7 +11,7 @@ import thumbnailImage from "@assets/f24-video-thumbnail.svg";
 const videoEmbeds = {
   "come-pagare-imposte-f24": {
     title: "Come Pagare le Imposte con Modello F24",
-    videoId: "dQw4w9WgXcQ", // Example video ID, replace with actual video
+    videoId: "u8wprfHYkuY", // Video specifico per la compilazione F24
     description: `
       <p>Questo tutorial video ti guida passo passo attraverso il processo di pagamento delle imposte utilizzando il modello F24, spiegando in modo chiaro e dettagliato:</p>
       <ul>
