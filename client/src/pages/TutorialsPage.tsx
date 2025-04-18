@@ -150,15 +150,23 @@ export default function TutorialsPage() {
                     <div className="p-4">
                       <h3 className="text-lg font-bold mb-2">{tutorial.title}</h3>
                       <p className="text-sm text-gray-600 mb-4">{tutorial.content}</p>
-                      <a 
-                        href={tutorial.isVideo && tutorial.videoUrl ? tutorial.videoUrl : `#tutorial-${tutorial.id}`}
-                        className="text-black font-medium hover:underline flex items-center"
-                        target={tutorial.isVideo && tutorial.videoUrl ? "_blank" : undefined}
-                        rel={tutorial.isVideo && tutorial.videoUrl ? "noopener noreferrer" : undefined}
-                      >
-                        {tutorial.isVideo ? "Guarda il video" : "Leggi la guida"} 
-                        <span className="material-icons text-sm ml-1">arrow_forward</span>
-                      </a>
+                      {tutorial.isVideo ? (
+                        <a 
+                          href={`/video-tutorial/come-pagare-imposte-f24`}
+                          className="text-black font-medium hover:underline flex items-center"
+                        >
+                          Guarda il video
+                          <span className="material-icons text-sm ml-1">play_circle</span>
+                        </a>
+                      ) : (
+                        <a 
+                          href={`#tutorial-${tutorial.id}`}
+                          className="text-black font-medium hover:underline flex items-center"
+                        >
+                          Leggi la guida
+                          <span className="material-icons text-sm ml-1">arrow_forward</span>
+                        </a>
+                      )}
                     </div>
                   </div>
                 ))}
