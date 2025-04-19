@@ -5,6 +5,9 @@ import { Helmet } from "react-helmet";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PDFDocumentCard from "@/components/PDFDocumentCard";
+import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
 
 // Import PDF documents
 import modelloF23PDF from "@assets/Modello_F23.pdf";
@@ -192,20 +195,21 @@ export default function TutorialsPage() {
                     a debito e a credito.
                   </p>
                   <div className="flex flex-wrap gap-4">
-                    <a 
+                    <Link 
                       href="/moduli"
                       className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors flex items-center"
                     >
                       <span className="material-icons mr-2">edit_note</span>
                       Compila Moduli
-                    </a>
-                    <a 
+                    </Link>
+                    <Link 
                       href="/tutorial?tab=modelli"
+                      onClick={() => setActiveTab("modelli")}
                       className="border border-black px-4 py-2 rounded-md hover:bg-gray-100 transition-colors flex items-center"
                     >
                       <span className="material-icons mr-2">cloud_download</span>
                       Scarica Modelli
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>

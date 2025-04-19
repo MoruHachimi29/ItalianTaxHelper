@@ -165,9 +165,15 @@ export default function VideoTutorialPage() {
                 <p className="text-sm text-gray-600 mb-4">
                   Dopo aver guardato il tutorial, puoi compilare il modello F24 direttamente online:
                 </p>
-                <Link href="/moduli/f24-ordinario">
+                <a
+                  href="/moduli/f24-ordinario"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = "/moduli/f24-ordinario";
+                  }}
+                >
                   <Button className="w-full bg-black hover:bg-gray-800">Compila F24 Online</Button>
-                </Link>
+                </a>
               </div>
             </div>
             
@@ -176,16 +182,34 @@ export default function VideoTutorialPage() {
               <h3 className="text-lg font-bold mb-4">Scarica i modelli</h3>
               <div className="space-y-3">
                 <div>
-                  <Link href="/assets/Modello_F24_Ordinario.pdf" className="flex items-center gap-2 text-black hover:underline" target="_blank">
+                  <a 
+                    href="/assets/Modello_F24_Ordinario.pdf" 
+                    className="flex items-center gap-2 text-black hover:underline" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.open("/assets/Modello_F24_Ordinario.pdf", "_blank");
+                    }}
+                  >
                     <span className="material-icons text-gray-600">download</span>
                     Modello F24 (PDF)
-                  </Link>
+                  </a>
                 </div>
                 <div>
-                  <Link href="/assets/Istruzioni_modello_F24.pdf" className="flex items-center gap-2 text-black hover:underline" target="_blank">
+                  <a 
+                    href="/assets/Istruzioni_modello_F24.pdf" 
+                    className="flex items-center gap-2 text-black hover:underline" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.open("/assets/Istruzioni_modello_F24.pdf", "_blank");
+                    }}
+                  >
                     <span className="material-icons text-gray-600">download</span>
                     Istruzioni F24 (PDF)
-                  </Link>
+                  </a>
                 </div>
               </div>
             </div>
