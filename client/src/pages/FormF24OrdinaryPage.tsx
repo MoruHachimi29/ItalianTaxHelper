@@ -11,7 +11,7 @@ import { jsPDF } from "jspdf";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import modelloF24ImgPath from "@assets/Modello_F24_Ordinario.pdf";
+import modelloF24ImgPath from "@assets/Modello_F24.png";
 
 // Interfacce per i dati del form
 interface ContribuenteData {
@@ -80,6 +80,17 @@ export default function FormF24OrdinaryPage() {
   const [loadingPdf, setLoadingPdf] = useState(false);
   const [showFormHelp, setShowFormHelp] = useState(false);
 
+  // Funzione per creare un array di tributi vuoti
+  const createEmptyTributi = (count: number) => {
+    return Array.from({ length: count }, () => ({
+      codiceTributo: "",
+      riferimento: "",
+      anno: "",
+      importoDebito: "",
+      importoCredito: ""
+    }));
+  };
+
   // Stato per i dati del form F24
   const [formData, setFormData] = useState<F24OrdinaryData>({
     contribuente: {
@@ -98,48 +109,24 @@ export default function FormF24OrdinaryPage() {
     delega: false,
     dataDelega: "",
     erario: {
-      tributi: Array(6).fill({
-        codiceTributo: "",
-        riferimento: "",
-        anno: "",
-        importoDebito: "",
-        importoCredito: ""
-      }),
+      tributi: createEmptyTributi(6),
       totaleDebiti: "0,00",
       totaleCrediti: "0,00"
     },
     inps: {
-      tributi: Array(4).fill({
-        codiceTributo: "",
-        riferimento: "",
-        anno: "",
-        importoDebito: "",
-        importoCredito: ""
-      }),
+      tributi: createEmptyTributi(4),
       totaleDebiti: "0,00",
       totaleCrediti: "0,00"
     },
     regioni: {
       regione: "",
-      tributi: Array(4).fill({
-        codiceTributo: "",
-        riferimento: "",
-        anno: "",
-        importoDebito: "",
-        importoCredito: ""
-      }),
+      tributi: createEmptyTributi(4),
       totaleDebiti: "0,00",
       totaleCrediti: "0,00"
     },
     imposteLocali: {
       codiceEnte: "",
-      tributi: Array(4).fill({
-        codiceTributo: "",
-        riferimento: "",
-        anno: "",
-        importoDebito: "",
-        importoCredito: ""
-      }),
+      tributi: createEmptyTributi(4),
       totaleDebiti: "0,00",
       totaleCrediti: "0,00"
     },
@@ -236,16 +223,47 @@ export default function FormF24OrdinaryPage() {
           [field]: value
         };
       } else if (["erario", "inps", "regioni", "imposteLocali"].includes(section) && index !== undefined) {
-        const sectionData = { ...prev[section as keyof F24OrdinaryData] };
-        const tributi = [...sectionData.tributi] as SezioneTributi[];
-        tributi[index] = { ...tributi[index], [field]: value };
-        return {
-          ...prev,
-          [section]: {
-            ...sectionData,
-            tributi
-          }
-        };
+        if (section === "erario") {
+          const newTributi = [...prev.erario.tributi];
+          newTributi[index] = { ...newTributi[index], [field]: value };
+          return {
+            ...prev,
+            erario: {
+              ...prev.erario,
+              tributi: newTributi
+            }
+          };
+        } else if (section === "inps") {
+          const newTributi = [...prev.inps.tributi];
+          newTributi[index] = { ...newTributi[index], [field]: value };
+          return {
+            ...prev,
+            inps: {
+              ...prev.inps,
+              tributi: newTributi
+            }
+          };
+        } else if (section === "regioni") {
+          const newTributi = [...prev.regioni.tributi];
+          newTributi[index] = { ...newTributi[index], [field]: value };
+          return {
+            ...prev,
+            regioni: {
+              ...prev.regioni,
+              tributi: newTributi
+            }
+          };
+        } else if (section === "imposteLocali") {
+          const newTributi = [...prev.imposteLocali.tributi];
+          newTributi[index] = { ...newTributi[index], [field]: value };
+          return {
+            ...prev,
+            imposteLocali: {
+              ...prev.imposteLocali,
+              tributi: newTributi
+            }
+          };
+        }
       } else if (section === "regioni" && field === "regione") {
         return {
           ...prev,
@@ -397,48 +415,24 @@ export default function FormF24OrdinaryPage() {
         delega: false,
         dataDelega: "",
         erario: {
-          tributi: Array(6).fill({
-            codiceTributo: "",
-            riferimento: "",
-            anno: "",
-            importoDebito: "",
-            importoCredito: ""
-          }),
+          tributi: createEmptyTributi(6),
           totaleDebiti: "0,00",
           totaleCrediti: "0,00"
         },
         inps: {
-          tributi: Array(4).fill({
-            codiceTributo: "",
-            riferimento: "",
-            anno: "",
-            importoDebito: "",
-            importoCredito: ""
-          }),
+          tributi: createEmptyTributi(4),
           totaleDebiti: "0,00",
           totaleCrediti: "0,00"
         },
         regioni: {
           regione: "",
-          tributi: Array(4).fill({
-            codiceTributo: "",
-            riferimento: "",
-            anno: "",
-            importoDebito: "",
-            importoCredito: ""
-          }),
+          tributi: createEmptyTributi(4),
           totaleDebiti: "0,00",
           totaleCrediti: "0,00"
         },
         imposteLocali: {
           codiceEnte: "",
-          tributi: Array(4).fill({
-            codiceTributo: "",
-            riferimento: "",
-            anno: "",
-            importoDebito: "",
-            importoCredito: ""
-          }),
+          tributi: createEmptyTributi(4),
           totaleDebiti: "0,00",
           totaleCrediti: "0,00"
         },
@@ -1086,7 +1080,7 @@ export default function FormF24OrdinaryPage() {
                 
                 <div className="relative rounded-lg overflow-hidden">
                   <ImageWithSkeleton
-                    src="/assets/ef7985b0-789e-49da-a51e-6c2b4ba1cc31 (1).png"
+                    src="@assets/Modello_F24.png"
                     alt="Esempio F24 Ordinario compilato"
                     aspectRatio="4/3"
                     objectFit="cover"
