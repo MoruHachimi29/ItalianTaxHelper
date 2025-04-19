@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 
 interface ImageWithSkeletonProps {
@@ -26,7 +26,14 @@ export function ImageWithSkeleton({
   objectFit = "cover",
 }: ImageWithSkeletonProps) {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [ref, isVisible] = useIntersectionObserver({ threshold: 0.1, freezeOnceVisible: true });
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Utilizziamo il custom hook per l'intersezione
+  // Osserviamo direttamente l'elemento
+  const [_, isVisible] = useIntersectionObserver({
+    threshold: 0.1,
+    freezeOnceVisible: true
+  });
 
   // Calcoliamo lo stile CSS per mantenere il rapporto di aspetto
   const containerStyle = {
@@ -44,7 +51,7 @@ export function ImageWithSkeleton({
 
   return (
     <div 
-      ref={ref} 
+      ref={containerRef} 
       className={`${className} bg-gray-100 rounded overflow-hidden`} 
       style={containerStyle}
     >
@@ -58,9 +65,9 @@ export function ImageWithSkeleton({
         <img
           src={src}
           alt={alt}
-          className={`absolute inset-0 w-full h-full transition-opacity duration-300 object-${objectFit} ${
-            isLoaded ? "opacity-100" : "opacity-0"
-          }`}
+          className={`absolute inset-0 w-full h-full transition-opacity duration-300 ${
+            objectFit === 'cover' ? 'object-cover' : 'object-contain'
+          } ${isLoaded ? "opacity-100" : "opacity-0"}`}
           onLoad={handleImageLoad}
           loading="lazy"
           width={width}
