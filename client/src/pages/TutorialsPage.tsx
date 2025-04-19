@@ -142,15 +142,20 @@ export default function TutorialsPage() {
               </div>
             ) : (
               <div className="w-full max-w-4xl mx-auto border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                <div className="aspect-video bg-black relative group">
-                  <video 
-                    className="w-full h-full"
-                    id="f24-tutorial-video"
-                    src="/videos/f24-tutorial.mp4"
-                    title="Come compilare il modello F24: Guida Completa"
-                    controls
-                    poster="/assets/Modello_F24.png"
-                  ></video>
+                <div className="aspect-video bg-black relative group overflow-hidden">
+                  {/* Aggiungiamo uno stile per nascondere la parte inferiore del video (sottotitoli) */}
+                  <div className="relative w-full h-full overflow-hidden">
+                    <video 
+                      className="w-full h-auto scale-110 -translate-y-2" /* Aumentiamo la scala e spostiamo leggermente verso l'alto */
+                      id="f24-tutorial-video"
+                      src="/videos/f24-tutorial.mp4"
+                      title="Come compilare il modello F24: Guida Completa"
+                      controls
+                      poster="/assets/Modello_F24.png"
+                    ></video>
+                    {/* Aggiungiamo un overlay nero nella parte inferiore per nascondere i sottotitoli */}
+                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-black"></div>
+                  </div>
                   <div 
                     className="absolute inset-0 flex items-center justify-center cursor-pointer group-hover:opacity-100 opacity-90 transition-opacity bg-black bg-opacity-20 play-button"
                     onClick={() => {
