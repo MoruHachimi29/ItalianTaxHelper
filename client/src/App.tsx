@@ -1,7 +1,8 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import { useEffect } from "react";
 import NotFound from "@/pages/not-found";
 import Layout from "@/components/Layout";
 import Home from "@/pages/Home";
@@ -27,9 +28,22 @@ import PdfEditorPage from "@/pages/PdfEditorPage";
 import PdfToWordConverterPage from "@/pages/PdfToWordConverterPage";
 import CodiceFiscalePage from "@/pages/CodiceFiscalePage";
 
+// Componente che fa scrollare all'inizio della pagina ad ogni cambio di route
+function ScrollToTop() {
+  const [location] = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+  
+  return null;
+}
+
 function Router() {
   return (
     <Layout>
+      {/* Aggiungiamo il componente per scrollare all'inizio della pagina */}
+      <ScrollToTop />
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/moduli" component={ModulesPage} />
