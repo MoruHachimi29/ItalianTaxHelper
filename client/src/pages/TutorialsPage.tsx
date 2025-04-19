@@ -197,14 +197,14 @@ export default function TutorialsPage() {
                       className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors flex items-center"
                     >
                       <span className="material-icons mr-2">edit_note</span>
-                      Vai alla sezione Moduli
+                      Compila Moduli
                     </a>
                     <a 
                       href="/tutorial?tab=modelli"
                       className="border border-black px-4 py-2 rounded-md hover:bg-gray-100 transition-colors flex items-center"
                     >
                       <span className="material-icons mr-2">cloud_download</span>
-                      Vai alla sezione Modelli
+                      Scarica Modelli
                     </a>
                   </div>
                 </div>
