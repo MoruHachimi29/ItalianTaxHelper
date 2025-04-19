@@ -16,7 +16,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 // Questo riduce significativamente la dimensione iniziale del bundle
 const FormPage = lazy(() => import("@/pages/FormPage"));
 const ModulesPage = lazy(() => import("@/pages/ModulesPage"));
-const FormF24OrdinaryPage = lazy(() => import("@/pages/FormF24OrdinaryPage"));
 const TutorialsPage = lazy(() => import("@/pages/TutorialsPage"));
 const VideoTutorialPage = lazy(() => import("@/pages/VideoTutorialPage"));
 const NewsPage = lazy(() => import("@/pages/NewsPage"));
@@ -81,7 +80,6 @@ function Router() {
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/moduli" component={ModulesPage} />
-          <Route path="/moduli/f24-ordinario" component={FormF24OrdinaryPage} />
           <Route path="/moduli/:formType" component={FormPage} />
           <Route path="/tutorial" component={TutorialsPage} />
           <Route path="/video-tutorial/:slug" component={VideoTutorialPage} />
