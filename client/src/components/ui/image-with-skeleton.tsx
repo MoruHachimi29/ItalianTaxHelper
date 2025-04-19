@@ -1,20 +1,24 @@
 import { useState, useRef } from "react";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
+import { parseDimension } from "@/lib/imageOptimizer";
 
 interface ImageWithSkeletonProps {
   src: string;
   alt: string;
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
   className?: string;
   aspectRatio?: string;
   objectFit?: "cover" | "contain";
+  placeholderColor?: string;
+  priority?: boolean;
+  onLoad?: () => void;
 }
 
 /**
- * Componente ottimizzato per immagini che previene il Cumulative Layout Shift (CLS)
- * mantenendo lo spazio riservato all'immagine prima che venga caricata.
- * Migliora il punteggio di Core Web Vitals.
+ * Componente per immagini con caricamento ottimizzato e skeleton loader
+ * Previene Cumulative Layout Shift (CLS) mantenendo le dimensioni durante il caricamento
+ * Utilizza lazy loading per migliorare le prestazioni
  */
 export function ImageWithSkeleton({
   src,
@@ -24,6 +28,9 @@ export function ImageWithSkeleton({
   className = "",
   aspectRatio = "16/9",
   objectFit = "cover",
+  placeholderColor = "#f3f4f6",
+  priority = false,
+  onLoad,
 }: ImageWithSkeletonProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,6 +54,7 @@ export function ImageWithSkeleton({
   // Gestisce il caricamento completo dell'immagine
   const handleImageLoad = () => {
     setIsLoaded(true);
+    if (onLoad) onLoad();
   };
 
   return (
@@ -61,7 +69,7 @@ export function ImageWithSkeleton({
       )}
       
       {/* Carica l'immagine solo quando diventa visibile nel viewport */}
-      {isVisible && (
+      {(isVisible || priority) && (
         <img
           src={src}
           alt={alt}
@@ -69,9 +77,9 @@ export function ImageWithSkeleton({
             objectFit === 'cover' ? 'object-cover' : 'object-contain'
           } ${isLoaded ? "opacity-100" : "opacity-0"}`}
           onLoad={handleImageLoad}
-          loading="lazy"
-          width={width}
-          height={height}
+          loading={priority ? "eager" : "lazy"}
+          width={parseDimension(width)}
+          height={parseDimension(height)}
           decoding="async"
         />
       )}

@@ -3,20 +3,60 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
 import { fileURLToPath } from "url";
+import compression from "compression"; // Per la compressione GZIP
 
 // Ottieni il percorso corrente in moduli ES
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// Compressione GZIP per migliorare la velocità di caricamento
+app.use(compression({
+  level: 6, // Livello di compressione ottimale (0-9)
+  threshold: 1024, // Non comprimere risposte più piccole di 1KB
+  filter: (req, res) => {
+    // Non comprimere immagini già compresse
+    if (req.headers['accept']?.includes('image/')) {
+      return false;
+    }
+    // Usa la compressione di default per tutto il resto
+    return compression.filter(req, res);
+  }
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Serve i file SEO statici dalla cartella client/public
-app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
+// Serve i file SEO statici dalla cartella client/public con cache ottimizzata
+app.use(express.static(path.join(__dirname, '..', 'client', 'public'), {
+  maxAge: '30d', // Cache per 30 giorni
+  etag: true,    // Supporto per ETag
+  lastModified: true
+}));
 
-// Serve i file dalla cartella attached_assets
-app.use('/assets', express.static(path.join(__dirname, '..', 'attached_assets')));
+// Serve i file dalla cartella attached_assets con cache ottimizzata
+app.use('/assets', express.static(path.join(__dirname, '..', 'attached_assets'), {
+  maxAge: '30d', // Cache per 30 giorni
+  etag: true,    // Supporto per ETag
+  lastModified: true
+}));
+
+// Aggiungi header per migliorare Core Web Vitals
+app.use((req, res, next) => {
+  // Abilita la pre-connessione per le risorse critiche
+  res.setHeader('Link', [
+    '</assets/fonts.css>; rel=preload; as=style',
+    '<https://fonts.googleapis.com>; rel=preconnect',
+    '<https://fonts.gstatic.com>; rel=preconnect; crossorigin'
+  ].join(', '));
+  
+  // Ottimizzazioni di sicurezza e performance
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Permissions-Policy', 'interest-cohort=()'); // Disabilita FLoC
+  
+  next();
+});
 
 app.use((req, res, next) => {
   const start = Date.now();
