@@ -193,18 +193,18 @@ export default function TutorialsPage() {
                   </p>
                   <div className="flex flex-wrap gap-4">
                     <a 
-                      href="/moduli/f24-ordinario"
+                      href="/moduli"
                       className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors flex items-center"
                     >
-                      <span className="material-icons mr-2">description</span>
-                      Compila F24 Online
+                      <span className="material-icons mr-2">edit_note</span>
+                      Vai alla sezione Moduli
                     </a>
                     <a 
                       href="/tutorial?tab=modelli"
                       className="border border-black px-4 py-2 rounded-md hover:bg-gray-100 transition-colors flex items-center"
                     >
-                      <span className="material-icons mr-2">download</span>
-                      Scarica Modello F24
+                      <span className="material-icons mr-2">cloud_download</span>
+                      Vai alla sezione Modelli
                     </a>
                   </div>
                 </div>
