@@ -70,31 +70,36 @@ const instructionDocuments = [
     id: "istruzioni-f23",
     title: "Istruzioni Modello F23",
     description: "Guida alla compilazione del modello F23",
-    pdfPath: istruzioniF23PDF
+    pdfPath: istruzioniF23PDF,
+    thumbnailImage: modelloF23Image
   },
   {
     id: "istruzioni-f24",
     title: "Istruzioni Modello F24",
     description: "Guida alla compilazione del modello F24 ordinario",
-    pdfPath: istruzioniF24PDF
+    pdfPath: istruzioniF24PDF,
+    thumbnailImage: modelloF24Image
   },
   {
     id: "istruzioni-f24-semplificato",
     title: "Istruzioni F24 Semplificato",
     description: "Guida alla compilazione del modello F24 semplificato",
-    pdfPath: istruzioniF24SemplificatoPDF
+    pdfPath: istruzioniF24SemplificatoPDF,
+    thumbnailImage: modelloF24SemplificatoImage
   },
   {
     id: "istruzioni-f24-accise",
     title: "Istruzioni F24 Accise",
     description: "Guida alla compilazione del modello F24 accise",
-    pdfPath: istruzioniF24AccisePDF
+    pdfPath: istruzioniF24AccisePDF,
+    thumbnailImage: modelloF24AcciseImage
   },
   {
     id: "istruzioni-f24-elide",
     title: "Istruzioni F24 Elide",
     description: "Guida alla compilazione del modello F24 elementi identificativi",
-    pdfPath: istruzioniF24ElidePDF
+    pdfPath: istruzioniF24ElidePDF,
+    thumbnailImage: modelloF24ElideImage
   }
 ];
 
@@ -137,14 +142,46 @@ export default function TutorialsPage() {
               </div>
             ) : (
               <div className="w-full max-w-4xl mx-auto border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                <div className="aspect-video bg-black">
+                <div className="aspect-video bg-black relative group">
                   <video 
                     className="w-full h-full"
+                    id="f24-tutorial-video"
                     src="/videos/f24-tutorial.mp4"
                     title="Come compilare il modello F24: Guida Completa"
                     controls
                     poster="/assets/Modello_F24.png"
                   ></video>
+                  <div 
+                    className="absolute inset-0 flex items-center justify-center cursor-pointer group-hover:opacity-100 opacity-90 transition-opacity bg-black bg-opacity-20 play-button"
+                    onClick={() => {
+                      const video = document.getElementById('f24-tutorial-video') as HTMLVideoElement;
+                      const playButton = document.querySelector('.play-button') as HTMLElement;
+                      
+                      if (video && playButton) {
+                        if (video.paused) {
+                          video.play();
+                          playButton.style.opacity = '0';
+                          
+                          // Aggiungiamo listener per quando il video viene messo in pausa
+                          video.onpause = () => {
+                            playButton.style.opacity = '1';
+                          };
+                          
+                          // Aggiungiamo listener per quando il video termina
+                          video.onended = () => {
+                            playButton.style.opacity = '1';
+                          };
+                        } else {
+                          video.pause();
+                          playButton.style.opacity = '1';
+                        }
+                      }
+                    }}
+                  >
+                    <div className="w-20 h-20 rounded-full bg-black bg-opacity-60 flex items-center justify-center border-2 border-white shadow-lg transform transition-transform hover:scale-110">
+                      <span className="material-icons text-white text-5xl">play_arrow</span>
+                    </div>
+                  </div>
                 </div>
                 <div className="p-6">
                   <h3 className="text-2xl font-bold mb-4">Come compilare il modello F24: Guida Completa</h3>
@@ -199,6 +236,7 @@ export default function TutorialsPage() {
                   title={doc.title}
                   description={doc.description}
                   pdfPath={doc.pdfPath}
+                  thumbnailImage={doc.thumbnailImage}
                 />
               ))}
             </div>
