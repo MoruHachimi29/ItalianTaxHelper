@@ -53,9 +53,20 @@
     
     <title>F24Editabile - Moduli Fiscali Italiani Compilabili Online</title>
     
-    <!-- Font e Icone -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Font e Icone ottimizzati per prestazioni -->
+    <!-- Preload e display=swap per migliorare Core Web Vitals e ridurre CLS (Cumulative Layout Shift) -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap&text=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.,%" rel="stylesheet" media="print" onload="this.media='all'">
+    
+    <!-- Icone: caricamento ottimizzato utilizzando preload e display=swap -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/icon?family=Material+Icons&display=block">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=block" rel="stylesheet" media="print" onload="this.media='all'">
+    
+    <!-- Fallback per browser senza JS -->
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    </noscript>
   </head>
   <body>
     <div id="root"></div>
