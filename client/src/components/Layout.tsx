@@ -69,8 +69,7 @@ export default function Layout({ children }: LayoutProps) {
                 <li>
                   <Link href="/strumenti">
                     <div 
-                      className={`text-gray-300 hover:text-white hover:underline ${location === "/strumenti" ? "font-bold text-white" : ""}`}
-                      onClick={() => window.scrollTo(0, 0)}
+                      className={`text-gray-300 hover:text-white hover:underline ${location === "/strumenti" || location.startsWith("/strumenti/") ? "font-bold text-white" : ""}`}
                     >
                       Strumenti
                     </div>
