@@ -5,6 +5,7 @@ interface UseIntersectionObserverProps {
   root?: Element | null;
   rootMargin?: string;
   freezeOnceVisible?: boolean;
+  rootRef?: RefObject<HTMLElement>;
 }
 
 /**
@@ -17,12 +18,17 @@ export function useIntersectionObserver({
   root = null,
   rootMargin = '0px',
   freezeOnceVisible = true,
+  rootRef,
 }: UseIntersectionObserverProps = {}): [
   RefObject<HTMLElement>,
   boolean,
   IntersectionObserverEntry | null
 ] {
-  const observerRef = useRef<HTMLElement>(null);
+  // Se viene fornito un riferimento esterno, lo utilizziamo
+  // altrimenti ne creiamo uno interno
+  const localRef = useRef<HTMLElement>(null);
+  const observerRef = rootRef || localRef;
+  
   const [entry, setEntry] = useState<IntersectionObserverEntry | null>(null);
   const [isIntersecting, setIsIntersecting] = useState<boolean>(false);
   
@@ -54,7 +60,7 @@ export function useIntersectionObserver({
     return () => {
       observer.disconnect();
     };
-  }, [threshold, root, rootMargin, frozen]);
+  }, [threshold, root, rootMargin, frozen, observerRef]);
 
   return [observerRef, isIntersecting, entry];
 }
