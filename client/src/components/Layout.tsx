@@ -68,7 +68,10 @@ export default function Layout({ children }: LayoutProps) {
                 </li>
                 <li>
                   <Link href="/strumenti">
-                    <div className={`text-gray-300 hover:text-white hover:underline ${location === "/strumenti" ? "font-bold text-white" : ""}`}>
+                    <div 
+                      className={`text-gray-300 hover:text-white hover:underline ${location === "/strumenti" ? "font-bold text-white" : ""}`}
+                      onClick={() => window.scrollTo(0, 0)}
+                    >
                       Strumenti
                     </div>
                   </Link>
@@ -151,7 +154,10 @@ export default function Layout({ children }: LayoutProps) {
                 <div 
                   className={`block px-3 py-2 rounded-md ${location === "/strumenti" ? 
                     "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    window.scrollTo(0, 0);
+                  }}
                 >
                   Strumenti
                 </div>
@@ -237,7 +243,12 @@ export default function Layout({ children }: LayoutProps) {
                 </li>
                 <li>
                   <Link href="/strumenti">
-                    <div className="text-gray-400 hover:text-white">Strumenti</div>
+                    <div 
+                      className="text-gray-400 hover:text-white" 
+                      onClick={() => window.scrollTo(0, 0)}
+                    >
+                      Strumenti
+                    </div>
                   </Link>
                 </li>
                 <li>
