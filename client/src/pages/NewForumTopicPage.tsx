@@ -53,8 +53,10 @@ const formSchema = z.object({
     .transform(val => parseInt(val)),
 });
 
-// Tipo derivato dallo schema Zod
-type FormData = z.infer<typeof formSchema>;
+// Tipo derivato dallo schema Zod, ma con override per categoryId
+type FormData = Omit<z.infer<typeof formSchema>, 'categoryId'> & {
+  categoryId: string;
+};
 
 export default function NewForumTopicPage() {
   const [, navigate] = useLocation();
@@ -223,7 +225,7 @@ export default function NewForumTopicPage() {
                           <FormLabel>Categoria</FormLabel>
                           <Select 
                             onValueChange={field.onChange} 
-                            defaultValue={field.value.toString()}
+                            defaultValue={field.value}
                           >
                             <FormControl>
                               <SelectTrigger>
