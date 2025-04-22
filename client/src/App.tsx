@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { useEffect, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { AuthProvider } from "./hooks/use-auth";
+import { ProtectedRoute } from "./lib/protected-route";
 
 // Importazione immediata solo per le pagine critiche del percorso principale
 import Home from "@/pages/Home";
@@ -111,7 +112,7 @@ function Router() {
           {/* Rotte per il forum */}
           <Route path="/forum" component={ForumPage} />
           <Route path="/forum/topic/:slug" component={ForumTopicPage} />
-          <Route path="/forum/nuovo-topic" component={NewForumTopicPage} />
+          <ProtectedRoute path="/forum/nuovo-topic" component={NewForumTopicPage} />
           
           {/* Autenticazione */}
           <Route path="/auth" component={AuthPage} />
