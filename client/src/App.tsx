@@ -36,6 +36,11 @@ const PdfEditorPage = lazy(() => import("@/pages/PdfEditorPage"));
 const PdfToWordConverterPage = lazy(() => import("@/pages/PdfToWordConverterPage"));
 const CodiceFiscalePage = lazy(() => import("@/pages/CodiceFiscalePage"));
 
+// Pagine del forum
+const ForumPage = lazy(() => import("@/pages/ForumPage"));
+const ForumTopicPage = lazy(() => import("@/pages/ForumTopicPage"));
+const NewForumTopicPage = lazy(() => import("@/pages/NewForumTopicPage"));
+
 // Componente che fa scrollare all'inizio della pagina ad ogni cambio di route
 function ScrollToTop() {
   const [location] = useLocation();
@@ -100,6 +105,12 @@ function Router() {
           <Route path="/strumenti/pdf-editor" component={PdfEditorPage} />
           <Route path="/strumenti/pdf-word" component={PdfToWordConverterPage} />
           <Route path="/contatti" component={ContactPage} />
+          
+          {/* Rotte per il forum */}
+          <Route path="/forum" component={ForumPage} />
+          <Route path="/forum/topic/:slug" component={ForumTopicPage} />
+          <Route path="/forum/nuovo-topic" component={NewForumTopicPage} />
+          
           <Route component={NotFound} />
         </Switch>
       </Suspense>
