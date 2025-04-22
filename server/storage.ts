@@ -3,7 +3,11 @@ import {
   forms, type Form, type InsertForm, 
   tutorials, type Tutorial, type InsertTutorial, 
   news, type News, type InsertNews,
-  blogPosts, type BlogPost, type InsertBlogPost 
+  blogPosts, type BlogPost, type InsertBlogPost,
+  forumCategories, type ForumCategory, type InsertForumCategory,
+  forumTopics, type ForumTopic, type InsertForumTopic,
+  forumPosts, type ForumPost, type InsertForumPost,
+  forumReactions, type ForumReaction, type InsertForumReaction
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, count, and, like, sql, or } from "drizzle-orm";
@@ -47,6 +51,41 @@ export interface IStorage {
   createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
   updateBlogPost(id: number, data: Partial<BlogPost>): Promise<BlogPost | undefined>;
   deleteBlogPost(id: number): Promise<boolean>;
+  
+  // Forum Category methods
+  getForumCategory(id: number): Promise<ForumCategory | undefined>;
+  getForumCategoryBySlug(slug: string): Promise<ForumCategory | undefined>;
+  getAllForumCategories(): Promise<ForumCategory[]>;
+  createForumCategory(category: InsertForumCategory): Promise<ForumCategory>;
+  updateForumCategory(id: number, data: Partial<ForumCategory>): Promise<ForumCategory | undefined>;
+  deleteForumCategory(id: number): Promise<boolean>;
+  
+  // Forum Topic methods
+  getForumTopic(id: number): Promise<ForumTopic | undefined>;
+  getForumTopicBySlug(slug: string): Promise<ForumTopic | undefined>;
+  getForumTopicsByCategoryId(categoryId: number, page?: number, limit?: number): Promise<{ topics: ForumTopic[], totalCount: number }>;
+  searchForumTopics(query: string, page?: number, limit?: number): Promise<{ topics: ForumTopic[], totalCount: number }>;
+  getLatestForumTopics(limit: number): Promise<ForumTopic[]>;
+  createForumTopic(topic: InsertForumTopic): Promise<ForumTopic>;
+  updateForumTopic(id: number, data: Partial<ForumTopic>): Promise<ForumTopic | undefined>;
+  deleteForumTopic(id: number): Promise<boolean>;
+  incrementForumTopicViewCount(id: number): Promise<ForumTopic | undefined>;
+  
+  // Forum Post methods
+  getForumPost(id: number): Promise<ForumPost | undefined>;
+  getForumPostsByTopicId(topicId: number, page?: number, limit?: number): Promise<{ posts: ForumPost[], totalCount: number }>;
+  getLatestForumPosts(limit: number): Promise<ForumPost[]>;
+  createForumPost(post: InsertForumPost): Promise<ForumPost>;
+  updateForumPost(id: number, data: Partial<ForumPost>): Promise<ForumPost | undefined>;
+  deleteForumPost(id: number): Promise<boolean>;
+  markForumPostAsAnswer(id: number): Promise<ForumPost | undefined>;
+  
+  // Forum Reaction methods
+  getForumReaction(id: number): Promise<ForumReaction | undefined>;
+  getForumReactionsByPostId(postId: number): Promise<ForumReaction[]>;
+  getUserReactionToPost(userId: number, postId: number): Promise<ForumReaction | undefined>;
+  createForumReaction(reaction: InsertForumReaction): Promise<ForumReaction>;
+  deleteForumReaction(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -349,6 +388,359 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(blogPosts)
       .where(eq(blogPosts.id, id));
+    
+    return true;
+  }
+  
+  // Forum Category methods
+  async getForumCategory(id: number): Promise<ForumCategory | undefined> {
+    const [category] = await db.select().from(forumCategories).where(eq(forumCategories.id, id));
+    return category || undefined;
+  }
+  
+  async getForumCategoryBySlug(slug: string): Promise<ForumCategory | undefined> {
+    const [category] = await db.select().from(forumCategories).where(eq(forumCategories.slug, slug));
+    return category || undefined;
+  }
+  
+  async getAllForumCategories(): Promise<ForumCategory[]> {
+    return await db
+      .select()
+      .from(forumCategories)
+      .orderBy(forumCategories.order);
+  }
+  
+  async createForumCategory(insertCategory: InsertForumCategory): Promise<ForumCategory> {
+    const now = new Date();
+    const categoryWithTimestamps = {
+      ...insertCategory,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    const [category] = await db
+      .insert(forumCategories)
+      .values(categoryWithTimestamps)
+      .returning();
+    
+    return category;
+  }
+  
+  async updateForumCategory(id: number, data: Partial<ForumCategory>): Promise<ForumCategory | undefined> {
+    const [category] = await db
+      .update(forumCategories)
+      .set({
+        ...data,
+        updatedAt: new Date()
+      })
+      .where(eq(forumCategories.id, id))
+      .returning();
+    
+    return category || undefined;
+  }
+  
+  async deleteForumCategory(id: number): Promise<boolean> {
+    await db
+      .delete(forumCategories)
+      .where(eq(forumCategories.id, id));
+    
+    return true;
+  }
+  
+  // Forum Topic methods
+  async getForumTopic(id: number): Promise<ForumTopic | undefined> {
+    const [topic] = await db.select().from(forumTopics).where(eq(forumTopics.id, id));
+    return topic || undefined;
+  }
+  
+  async getForumTopicBySlug(slug: string): Promise<ForumTopic | undefined> {
+    const [topic] = await db.select().from(forumTopics).where(eq(forumTopics.slug, slug));
+    return topic || undefined;
+  }
+  
+  async getForumTopicsByCategoryId(categoryId: number, page: number = 1, limit: number = 20): Promise<{ topics: ForumTopic[], totalCount: number }> {
+    const offset = (page - 1) * limit;
+    
+    // Get total count
+    const [result] = await db
+      .select({ count: count() })
+      .from(forumTopics)
+      .where(eq(forumTopics.categoryId, categoryId));
+    
+    const totalCount = Number(result.count);
+    
+    // Get topics, pinned ones first
+    const topics = await db
+      .select()
+      .from(forumTopics)
+      .where(eq(forumTopics.categoryId, categoryId))
+      .orderBy(desc(forumTopics.isPinned), desc(forumTopics.lastActivityAt))
+      .limit(limit)
+      .offset(offset);
+    
+    return { topics, totalCount };
+  }
+  
+  async searchForumTopics(query: string, page: number = 1, limit: number = 20): Promise<{ topics: ForumTopic[], totalCount: number }> {
+    const offset = (page - 1) * limit;
+    const searchPattern = `%${query}%`;
+    
+    // Get total count
+    const [result] = await db
+      .select({ count: count() })
+      .from(forumTopics)
+      .where(or(
+        like(forumTopics.title, searchPattern),
+        like(forumTopics.content, searchPattern)
+      ));
+    
+    const totalCount = Number(result.count);
+    
+    // Get topics
+    const topics = await db
+      .select()
+      .from(forumTopics)
+      .where(or(
+        like(forumTopics.title, searchPattern),
+        like(forumTopics.content, searchPattern)
+      ))
+      .orderBy(desc(forumTopics.lastActivityAt))
+      .limit(limit)
+      .offset(offset);
+    
+    return { topics, totalCount };
+  }
+  
+  async getLatestForumTopics(limit: number): Promise<ForumTopic[]> {
+    return await db
+      .select()
+      .from(forumTopics)
+      .orderBy(desc(forumTopics.lastActivityAt))
+      .limit(limit);
+  }
+  
+  async createForumTopic(insertTopic: InsertForumTopic): Promise<ForumTopic> {
+    const now = new Date();
+    const topicWithTimestamps = {
+      ...insertTopic,
+      lastActivityAt: now,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    const [topic] = await db
+      .insert(forumTopics)
+      .values(topicWithTimestamps)
+      .returning();
+    
+    return topic;
+  }
+  
+  async updateForumTopic(id: number, data: Partial<ForumTopic>): Promise<ForumTopic | undefined> {
+    const [topic] = await db
+      .update(forumTopics)
+      .set({
+        ...data,
+        updatedAt: new Date()
+      })
+      .where(eq(forumTopics.id, id))
+      .returning();
+    
+    return topic || undefined;
+  }
+  
+  async deleteForumTopic(id: number): Promise<boolean> {
+    await db
+      .delete(forumTopics)
+      .where(eq(forumTopics.id, id));
+    
+    return true;
+  }
+  
+  async incrementForumTopicViewCount(id: number): Promise<ForumTopic | undefined> {
+    const [topic] = await db
+      .update(forumTopics)
+      .set({
+        viewCount: sql`${forumTopics.viewCount} + 1`,
+        updatedAt: new Date()
+      })
+      .where(eq(forumTopics.id, id))
+      .returning();
+    
+    return topic || undefined;
+  }
+  
+  // Forum Post methods
+  async getForumPost(id: number): Promise<ForumPost | undefined> {
+    const [post] = await db.select().from(forumPosts).where(eq(forumPosts.id, id));
+    return post || undefined;
+  }
+  
+  async getForumPostsByTopicId(topicId: number, page: number = 1, limit: number = 20): Promise<{ posts: ForumPost[], totalCount: number }> {
+    const offset = (page - 1) * limit;
+    
+    // Get total count
+    const [result] = await db
+      .select({ count: count() })
+      .from(forumPosts)
+      .where(eq(forumPosts.topicId, topicId));
+    
+    const totalCount = Number(result.count);
+    
+    // Get posts, answers first, then chronological
+    const posts = await db
+      .select()
+      .from(forumPosts)
+      .where(eq(forumPosts.topicId, topicId))
+      .orderBy(desc(forumPosts.isAnswer), forumPosts.createdAt)
+      .limit(limit)
+      .offset(offset);
+    
+    return { posts, totalCount };
+  }
+  
+  async getLatestForumPosts(limit: number): Promise<ForumPost[]> {
+    return await db
+      .select()
+      .from(forumPosts)
+      .orderBy(desc(forumPosts.createdAt))
+      .limit(limit);
+  }
+  
+  async createForumPost(insertPost: InsertForumPost): Promise<ForumPost> {
+    const now = new Date();
+    const postWithTimestamps = {
+      ...insertPost,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    const [post] = await db
+      .insert(forumPosts)
+      .values(postWithTimestamps)
+      .returning();
+    
+    // Update the lastActivityAt timestamp on the parent topic
+    await db
+      .update(forumTopics)
+      .set({
+        lastActivityAt: now,
+        updatedAt: now
+      })
+      .where(eq(forumTopics.id, insertPost.topicId));
+    
+    return post;
+  }
+  
+  async updateForumPost(id: number, data: Partial<ForumPost>): Promise<ForumPost | undefined> {
+    const [post] = await db
+      .update(forumPosts)
+      .set({
+        ...data,
+        updatedAt: new Date()
+      })
+      .where(eq(forumPosts.id, id))
+      .returning();
+    
+    return post || undefined;
+  }
+  
+  async deleteForumPost(id: number): Promise<boolean> {
+    const [post] = await db
+      .select()
+      .from(forumPosts)
+      .where(eq(forumPosts.id, id));
+    
+    if (!post) return false;
+    
+    await db
+      .delete(forumPosts)
+      .where(eq(forumPosts.id, id));
+    
+    // Update the lastActivityAt timestamp on the parent topic
+    const now = new Date();
+    await db
+      .update(forumTopics)
+      .set({
+        lastActivityAt: now,
+        updatedAt: now
+      })
+      .where(eq(forumTopics.id, post.topicId));
+    
+    return true;
+  }
+  
+  async markForumPostAsAnswer(id: number): Promise<ForumPost | undefined> {
+    const [post] = await db
+      .update(forumPosts)
+      .set({ 
+        isAnswer: true,
+        updatedAt: new Date()
+      })
+      .where(eq(forumPosts.id, id))
+      .returning();
+    
+    return post || undefined;
+  }
+  
+  // Forum Reaction methods
+  async getForumReaction(id: number): Promise<ForumReaction | undefined> {
+    const [reaction] = await db.select().from(forumReactions).where(eq(forumReactions.id, id));
+    return reaction || undefined;
+  }
+  
+  async getForumReactionsByPostId(postId: number): Promise<ForumReaction[]> {
+    return await db
+      .select()
+      .from(forumReactions)
+      .where(eq(forumReactions.postId, postId));
+  }
+  
+  async getUserReactionToPost(userId: number, postId: number): Promise<ForumReaction | undefined> {
+    const [reaction] = await db
+      .select()
+      .from(forumReactions)
+      .where(and(
+        eq(forumReactions.userId, userId),
+        eq(forumReactions.postId, postId)
+      ));
+    
+    return reaction || undefined;
+  }
+  
+  async createForumReaction(insertReaction: InsertForumReaction): Promise<ForumReaction> {
+    // Check if user already reacted to this post
+    const existingReaction = await this.getUserReactionToPost(
+      insertReaction.userId,
+      insertReaction.postId
+    );
+    
+    // If there's an existing reaction of the same type, return it
+    if (existingReaction && existingReaction.reactionType === insertReaction.reactionType) {
+      return existingReaction;
+    }
+    
+    // If there's an existing reaction of a different type, delete it
+    if (existingReaction) {
+      await this.deleteForumReaction(existingReaction.id);
+    }
+    
+    // Create the new reaction
+    const [reaction] = await db
+      .insert(forumReactions)
+      .values({
+        ...insertReaction,
+        createdAt: new Date()
+      })
+      .returning();
+    
+    return reaction;
+  }
+  
+  async deleteForumReaction(id: number): Promise<boolean> {
+    await db
+      .delete(forumReactions)
+      .where(eq(forumReactions.id, id));
     
     return true;
   }
