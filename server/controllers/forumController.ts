@@ -4,6 +4,20 @@ import { insertForumCategorySchema, insertForumTopicSchema, insertForumPostSchem
 import { ZodError } from "zod";
 import slugify from "../utils/slugify";
 
+// Estensione di Express.Request per incluedere l'autenticazione
+declare global {
+  namespace Express {
+    interface Request {
+      isAuthenticated(): boolean;
+      user?: {
+        id: number;
+        username: string;
+        [key: string]: any;
+      };
+    }
+  }
+}
+
 // Utility per creare slug basati sul titolo
 const createSlug = (title: string): string => {
   return slugify(title);

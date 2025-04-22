@@ -30,6 +30,27 @@ import {
   getUpcomingDeadlines,
   getTaxDeadlineById
 } from "./controllers/taxDeadlinesController";
+import {
+  getAllForumCategories,
+  getForumCategoryBySlug,
+  createForumCategory,
+  updateForumCategory,
+  deleteForumCategory,
+  getForumTopicsByCategoryId,
+  getForumTopicBySlug,
+  createForumTopic,
+  updateForumTopic,
+  deleteForumTopic,
+  searchForumTopics,
+  getForumPostsByTopicId,
+  createForumPost,
+  updateForumPost,
+  deleteForumPost,
+  markForumPostAsAnswer,
+  createForumReaction,
+  deleteForumReaction,
+  getForumReactionsByPostId
+} from "./controllers/forumController";
 
 const NEWS_API_KEY = process.env.NEWS_API_KEY;
 const NEWS_API_URL = "https://newsapi.org/v2";
