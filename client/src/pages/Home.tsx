@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import FormsList from "@/components/FormsList";
-import TutorialsList from "@/components/TutorialsList";
+import VideoTutorialPreview from "@/components/VideoTutorialPreview";
 import NewsList from "@/components/NewsList";
 import FAQSection from "@/components/FAQSection";
 import NewsletterSignup from "@/components/NewsletterSignup";
@@ -53,8 +53,8 @@ export default function Home() {
       {/* Forms List */}
       <FormsList />
       
-      {/* Tutorials */}
-      <TutorialsList limit={3} />
+      {/* Video Tutorial Preview */}
+      <VideoTutorialPreview />
       
       {/* News */}
       <NewsList limit={3} />
