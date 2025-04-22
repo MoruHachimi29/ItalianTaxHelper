@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { useEffect, useState, useRef } from "react";
-import videoThumbnail from "@assets/ef7985b0-789e-49da-a51e-6c2b4ba1cc31 (1).png";
+// Utilizziamo l'immagine del modello F24 come thumbnail per il video
+import videoThumbnail from "@assets/Modello_F24.png";
 
 /**
  * Componente che mostra l'anteprima del video tutorial F24
