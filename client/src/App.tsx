@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { useEffect, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
+import { AuthProvider } from "./hooks/use-auth";
 
 // Importazione immediata solo per le pagine critiche del percorso principale
 import Home from "@/pages/Home";
@@ -40,6 +41,7 @@ const CodiceFiscalePage = lazy(() => import("@/pages/CodiceFiscalePage"));
 const ForumPage = lazy(() => import("@/pages/ForumPage"));
 const ForumTopicPage = lazy(() => import("@/pages/ForumTopicPage"));
 const NewForumTopicPage = lazy(() => import("@/pages/NewForumTopicPage"));
+const AuthPage = lazy(() => import("@/pages/AuthPage"));
 
 // Componente che fa scrollare all'inizio della pagina ad ogni cambio di route
 function ScrollToTop() {
@@ -111,6 +113,9 @@ function Router() {
           <Route path="/forum/topic/:slug" component={ForumTopicPage} />
           <Route path="/forum/nuovo-topic" component={NewForumTopicPage} />
           
+          {/* Autenticazione */}
+          <Route path="/auth" component={AuthPage} />
+          
           <Route component={NotFound} />
         </Switch>
       </Suspense>
@@ -121,8 +126,10 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
-      <Toaster />
+      <AuthProvider>
+        <Router />
+        <Toaster />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
