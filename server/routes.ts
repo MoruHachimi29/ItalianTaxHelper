@@ -730,6 +730,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Ottieni una scadenza specifica per ID
   app.get("/api/tax-deadlines/:id", getTaxDeadlineById);
 
+  // Forum Routes
+  // Category routes
+  app.get("/api/forum/categories", getAllForumCategories);
+  app.get("/api/forum/categories/:slug", getForumCategoryBySlug);
+  app.post("/api/forum/categories", createForumCategory);
+  app.put("/api/forum/categories/:id", updateForumCategory);
+  app.delete("/api/forum/categories/:id", deleteForumCategory);
+  
+  // Topic routes
+  app.get("/api/forum/categories/:categoryId/topics", getForumTopicsByCategoryId);
+  app.get("/api/forum/topics/search", searchForumTopics);
+  app.get("/api/forum/topics/:slug", getForumTopicBySlug);
+  app.post("/api/forum/topics", createForumTopic);
+  app.put("/api/forum/topics/:id", updateForumTopic);
+  app.delete("/api/forum/topics/:id", deleteForumTopic);
+  
+  // Post routes
+  app.get("/api/forum/topics/:topicId/posts", getForumPostsByTopicId);
+  app.post("/api/forum/posts", createForumPost);
+  app.put("/api/forum/posts/:id", updateForumPost);
+  app.delete("/api/forum/posts/:id", deleteForumPost);
+  app.post("/api/forum/posts/:postId/mark-as-answer", markForumPostAsAnswer);
+  
+  // Reaction routes
+  app.get("/api/forum/posts/:postId/reactions", getForumReactionsByPostId);
+  app.post("/api/forum/reactions", createForumReaction);
+  app.delete("/api/forum/reactions/:id", deleteForumReaction);
+
   const httpServer = createServer(app);
   return httpServer;
 }
