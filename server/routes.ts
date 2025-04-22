@@ -1,6 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { setupAuth } from "./auth";
 import fetch from "node-fetch";
 import { 
   insertFormSchema, 
@@ -56,6 +57,9 @@ const NEWS_API_KEY = process.env.NEWS_API_KEY;
 const NEWS_API_URL = "https://newsapi.org/v2";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup authentication
+  setupAuth(app);
+  
   // API routes - all prefixed with /api
   
   // Tutorial routes
