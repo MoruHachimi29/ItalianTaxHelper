@@ -4,10 +4,10 @@ import {
   useMutation,
   UseMutationResult,
 } from "@tanstack/react-query";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { queryClient } from "@/lib/queryClient";
 
-// Tipi per l'autenticazione
+// Definisce l'interfaccia per l'oggetto utente
 interface User {
   id: number;
   username: string;
@@ -15,16 +15,19 @@ interface User {
   fullName?: string;
 }
 
+// Definisce l'interfaccia per i dati di login
 interface LoginData {
   username: string;
   password: string;
 }
 
+// Definisce l'interfaccia per i dati di registrazione
 interface RegisterData extends LoginData {
   email?: string;
   fullName?: string;
 }
 
+// Definisce il tipo di contesto per l'autenticazione
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
@@ -34,12 +37,14 @@ type AuthContextType = {
   registerMutation: UseMutationResult<User, Error, RegisterData>;
 };
 
+// Crea il contesto per l'autenticazione
 export const AuthContext = createContext<AuthContextType | null>(null);
 
+// Componente provider per l'autenticazione
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   
-  // Fetch dell'utente corrente
+  // Query per ottenere i dati dell'utente corrente
   const {
     data: user,
     error,
@@ -48,12 +53,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryKey: ["/api/user"],
     queryFn: async () => {
       try {
-        const res = await fetch("/api/user");
-        if (res.status === 401) return null;
-        if (!res.ok) throw new Error("Errore nel recupero dei dati utente");
-        return res.json();
+        const res = await apiRequest("GET", "/api/user");
+        if (!res.ok) {
+          if (res.status === 401) {
+            return null;
+          }
+          throw new Error("Errore nel recupero dei dati utente");
+        }
+        return await res.json();
       } catch (error) {
-        console.error("Errore nel recupero dei dati utente:", error);
+        console.error("Error fetching user:", error);
         return null;
       }
     },
@@ -62,33 +71,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Mutation per il login
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-      });
-
+      const res = await apiRequest("POST", "/api/login", credentials);
       if (!res.ok) {
-        if (res.status === 401) {
-          throw new Error("Credenziali non valide");
-        }
-        throw new Error("Errore durante il login");
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Errore durante il login");
       }
-
-      return res.json() as Promise<User>;
+      return await res.json();
     },
-    onSuccess: (user: User) => {
-      queryClient.setQueryData(["/api/user"], user);
+    onSuccess: (userData: User) => {
+      queryClient.setQueryData(["/api/user"], userData);
       toast({
         title: "Login effettuato",
-        description: `Benvenuto, ${user.username}!`,
+        description: `Benvenuto, ${userData.username}!`,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Login fallito",
+        title: "Errore di login",
         description: error.message,
         variant: "destructive",
       });
@@ -98,31 +97,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Mutation per la registrazione
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterData) => {
-      const res = await fetch("/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
+      const res = await apiRequest("POST", "/api/register", data);
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || "Errore durante la registrazione");
       }
-
-      return res.json() as Promise<User>;
+      return await res.json();
     },
-    onSuccess: (user: User) => {
-      queryClient.setQueryData(["/api/user"], user);
+    onSuccess: (userData: User) => {
+      queryClient.setQueryData(["/api/user"], userData);
       toast({
         title: "Registrazione completata",
-        description: `Benvenuto, ${user.username}!`,
+        description: `Benvenuto in F24Editabile, ${userData.username}!`,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Registrazione fallita",
+        title: "Errore di registrazione",
         description: error.message,
         variant: "destructive",
       });
@@ -132,24 +123,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Mutation per il logout
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/logout", {
-        method: "POST",
-      });
-
+      const res = await apiRequest("POST", "/api/logout");
       if (!res.ok) {
-        throw new Error("Errore durante il logout");
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Errore durante il logout");
       }
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/user"], null);
       toast({
         title: "Logout effettuato",
-        description: "Hai effettuato il logout con successo",
+        description: "Sei stato disconnesso con successo.",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Logout fallito",
+        title: "Errore di logout",
         description: error.message,
         variant: "destructive",
       });
@@ -172,10 +161,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// Hook per utilizzare il contesto di autenticazione
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth deve essere usato all'interno di un AuthProvider");
+    throw new Error("useAuth deve essere utilizzato all'interno di un AuthProvider");
   }
   return context;
 }

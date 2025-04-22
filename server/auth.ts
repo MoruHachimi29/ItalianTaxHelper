@@ -10,7 +10,15 @@ import { User } from "@shared/schema";
 // Estende il namespace Express per includere l'utente autenticato
 declare global {
   namespace Express {
-    interface User extends User {}
+    // Definisce l'interfaccia utente per Express
+    interface User {
+      id: number;
+      username: string;
+      password: string;
+      email?: string | null;
+      fullName?: string | null;
+      createdAt?: Date;
+    }
   }
 }
 
@@ -114,12 +122,12 @@ export function setupAuth(app: Express) {
 
   // Login
   app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err, user, info) => {
+    passport.authenticate("local", (err: any, user: any, info: any) => {
       if (err) return next(err);
       if (!user) {
         return res.status(401).json({ message: "Credenziali non valide" });
       }
-      req.login(user, (err) => {
+      req.login(user, (err: any) => {
         if (err) return next(err);
         res.status(200).json({
           id: user.id,
@@ -145,6 +153,9 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ message: "Non autenticato" });
     }
     const user = req.user;
+    if (!user) {
+      return res.status(401).json({ message: "Utente non trovato" });
+    }
     res.status(200).json({
       id: user.id,
       username: user.username,
