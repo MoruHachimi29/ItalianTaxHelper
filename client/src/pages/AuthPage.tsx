@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Helmet } from "react-helmet";
 import { Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { SiGoogle } from "react-icons/si";
+import { GoogleButton } from "@/components/GoogleButton";
 
 // Schema di validazione per il login
 const loginSchema = z.object({
@@ -182,25 +182,11 @@ export default function AuthPage() {
                         </div>
                       </div>
                       
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full mt-4 flex items-center justify-center gap-2"
-                        onClick={handleGoogleAuth}
-                        disabled={googleAuthMutation.isPending}
-                      >
-                        {googleAuthMutation.isPending ? (
-                          <>
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            Autenticazione in corso...
-                          </>
-                        ) : (
-                          <>
-                            <SiGoogle className="h-4 w-4" />
-                            Google
-                          </>
-                        )}
-                      </Button>
+                      <GoogleButton 
+                        onClick={handleGoogleAuth} 
+                        isLoading={googleAuthMutation.isPending}
+                        className="mt-4"
+                      />
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-center">
