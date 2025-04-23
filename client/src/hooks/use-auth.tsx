@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { signInWithGoogle, FirebaseUser } from "@/lib/firebase";
 
 // Definisce l'interfaccia per l'oggetto utente
 interface User {
@@ -27,6 +28,13 @@ interface RegisterData extends LoginData {
   fullName?: string;
 }
 
+// Interfaccia per i dati dell'autenticazione Google
+interface GoogleAuthData {
+  username: string;
+  email: string;
+  fullName?: string;
+}
+
 // Definisce il tipo di contesto per l'autenticazione
 type AuthContextType = {
   user: User | null;
@@ -35,6 +43,7 @@ type AuthContextType = {
   loginMutation: UseMutationResult<User, Error, LoginData>;
   logoutMutation: UseMutationResult<void, Error, void>;
   registerMutation: UseMutationResult<User, Error, RegisterData>;
+  googleAuthMutation: UseMutationResult<User, Error, void>;
 };
 
 // Crea il contesto per l'autenticazione
@@ -145,6 +154,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   });
 
+  // Mutation per l'autenticazione tramite Google
+  const googleAuthMutation = useMutation({
+    mutationFn: async () => {
+      try {
+        // Autenticazione con Firebase
+        const result = await signInWithGoogle();
+        const firebaseUser = result.user;
+        
+        if (!firebaseUser || !firebaseUser.email) {
+          throw new Error("Dati utente Google non disponibili");
+        }
+        
+        // Prepara i dati per l'autenticazione sul server
+        const googleAuthData: GoogleAuthData = {
+          username: firebaseUser.email.split('@')[0] + '_google', // Crea username dall'email
+          email: firebaseUser.email,
+          fullName: firebaseUser.displayName || undefined
+        };
+        
+        // Invia i dati al nostro server
+        const res = await apiRequest("POST", "/api/auth/google", googleAuthData);
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || "Errore durante l'autenticazione con Google");
+        }
+        
+        return await res.json();
+      } catch (error) {
+        console.error("Errore durante l'autenticazione con Google:", error);
+        throw error;
+      }
+    },
+    onSuccess: (userData: User) => {
+      queryClient.setQueryData(["/api/user"], userData);
+      toast({
+        title: "Accesso con Google completato",
+        description: `Benvenuto, ${userData.username}!`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Errore di autenticazione Google",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   return (
     <AuthContext.Provider
       value={{
@@ -154,6 +211,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginMutation,
         logoutMutation,
         registerMutation,
+        googleAuthMutation,
       }}
     >
       {children}
