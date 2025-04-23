@@ -31,12 +31,18 @@ const registerSchema = z.object({
   password: z.string().min(6, {
     message: "La password deve contenere almeno 6 caratteri",
   }),
+  confirmPassword: z.string().min(1, {
+    message: "Conferma la password",
+  }),
   email: z.string().email({
     message: "Inserisci un indirizzo email valido",
   }).optional().or(z.literal("")),
   fullName: z.string().min(2, {
     message: "Il nome completo deve contenere almeno 2 caratteri",
   }).optional().or(z.literal("")),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Le password non coincidono",
+  path: ["confirmPassword"],
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -61,6 +67,7 @@ export default function AuthPage() {
     defaultValues: {
       username: "",
       password: "",
+      confirmPassword: "",
       email: "",
       fullName: "",
     },
@@ -73,7 +80,9 @@ export default function AuthPage() {
 
   // Gestione submit registrazione
   const onRegisterSubmit = (data: RegisterFormData) => {
-    registerMutation.mutate(data);
+    // Rimuovi confirmPassword prima di inviare
+    const { confirmPassword, ...registerData } = data;
+    registerMutation.mutate(registerData);
   };
 
   // Reindirizza alla home se l'utente è già autenticato
@@ -201,6 +210,19 @@ export default function AuthPage() {
                               <FormLabel>Password</FormLabel>
                               <FormControl>
                                 <Input type="password" placeholder="Password" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={registerForm.control}
+                          name="confirmPassword"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Ripeti password</FormLabel>
+                              <FormControl>
+                                <Input type="password" placeholder="Ripeti password" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
