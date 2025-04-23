@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Helmet } from "react-helmet";
 import { Loader2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { SiGoogle } from "react-icons/si";
 
 // Schema di validazione per il login
 const loginSchema = z.object({
@@ -50,7 +52,7 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<string>("login");
-  const { user, isLoading, loginMutation, registerMutation } = useAuth();
+  const { user, isLoading, loginMutation, registerMutation, googleAuthMutation } = useAuth();
 
   // Form di login
   const loginForm = useForm<LoginFormData>({
@@ -83,6 +85,11 @@ export default function AuthPage() {
     // Rimuovi confirmPassword prima di inviare
     const { confirmPassword, ...registerData } = data;
     registerMutation.mutate(registerData);
+  };
+  
+  // Gestione autenticazione Google
+  const handleGoogleAuth = () => {
+    googleAuthMutation.mutate();
   };
 
   // Reindirizza alla home se l'utente è già autenticato

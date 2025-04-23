@@ -147,6 +147,46 @@ export function setupAuth(app: Express) {
     });
   });
 
+  // Gestione login con Google
+  app.post("/api/auth/google", async (req, res, next) => {
+    try {
+      const { username, email, fullName } = req.body;
+      
+      if (!username || !email) {
+        return res.status(400).json({ message: "Dati mancanti per l'autenticazione Google" });
+      }
+      
+      // Verifica se l'utente esiste già
+      let user = await storage.getUserByUsername(username);
+      
+      if (!user) {
+        // Se l'utente non esiste, creane uno nuovo con una password casuale
+        // La password non verrà mai usata per login, ma è necessaria per il nostro schema
+        const randomPassword = randomBytes(16).toString("hex");
+        user = await storage.createUser({
+          username,
+          email,
+          fullName: fullName || null,
+          password: await hashPassword(randomPassword)
+        });
+      }
+      
+      // Esegui il login
+      req.login(user, (err) => {
+        if (err) return next(err);
+        res.status(200).json({
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          fullName: user.fullName
+        });
+      });
+    } catch (error) {
+      console.error("Error during Google authentication:", error);
+      res.status(500).json({ message: "Errore durante l'autenticazione con Google" });
+    }
+  });
+
   // Info utente corrente
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) {
