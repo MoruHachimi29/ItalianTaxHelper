@@ -18,7 +18,7 @@ import { GoogleButton } from "@/components/GoogleButton";
 // Schema di validazione per il login
 const loginSchema = z.object({
   username: z.string().min(3, {
-    message: "Il nome utente deve contenere almeno 3 caratteri",
+    message: "Il nome utente o email deve contenere almeno 3 caratteri",
   }),
   password: z.string().min(6, {
     message: "La password deve contenere almeno 6 caratteri",
@@ -38,10 +38,7 @@ const registerSchema = z.object({
   }),
   email: z.string().email({
     message: "Inserisci un indirizzo email valido",
-  }).optional().or(z.literal("")),
-  fullName: z.string().min(2, {
-    message: "Il nome completo deve contenere almeno 2 caratteri",
-  }).optional().or(z.literal("")),
+  }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Le password non coincidono",
   path: ["confirmPassword"],
@@ -71,7 +68,6 @@ export default function AuthPage() {
       password: "",
       confirmPassword: "",
       email: "",
-      fullName: "",
     },
   });
 
@@ -132,9 +128,9 @@ export default function AuthPage() {
                           name="username"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Nome utente</FormLabel>
+                              <FormLabel>Nome utente o email</FormLabel>
                               <FormControl>
-                                <Input placeholder="Nome utente" {...field} />
+                                <Input placeholder="Nome utente o email" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -259,22 +255,9 @@ export default function AuthPage() {
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email (opzionale)</FormLabel>
+                              <FormLabel>Email</FormLabel>
                               <FormControl>
                                 <Input type="email" placeholder="Email" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={registerForm.control}
-                          name="fullName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Nome completo (opzionale)</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Nome completo" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
