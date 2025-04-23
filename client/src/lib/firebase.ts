@@ -34,20 +34,33 @@ const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
 /**
- * Funzione per autenticarsi con Google
- * @returns Promise con il risultato dell'autenticazione
+ * Funzione per autenticarsi con Google tramite redirect
+ * Questo metodo avvia il flusso di autenticazione redirect
  */
-export async function signInWithGoogle(): Promise<UserCredential> {
+export async function signInWithGoogle(): Promise<void> {
   try {
     // Configura il provider per selezionare l'account
     googleProvider.setCustomParameters({
       prompt: "select_account"
     });
 
-    // Effettua l'autenticazione con il popup
-    return await signInWithPopup(auth, googleProvider);
+    // Effettua l'autenticazione con redirect invece di popup
+    await signInWithRedirect(auth, googleProvider);
   } catch (error) {
     console.error("Errore durante l'autenticazione con Google:", error);
+    throw error;
+  }
+}
+
+/**
+ * Funzione per ottenere il risultato del redirect di autenticazione
+ * Da chiamare quando l'utente viene reindirizzato all'applicazione
+ */
+export async function getGoogleAuthResult(): Promise<UserCredential | null> {
+  try {
+    return await getRedirectResult(auth);
+  } catch (error) {
+    console.error("Errore durante il recupero del risultato di autenticazione:", error);
     throw error;
   }
 }
