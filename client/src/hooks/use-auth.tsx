@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { signInWithGoogle, FirebaseUser } from "@/lib/firebase";
+import { signInWithGoogle, type FirebaseUser } from "@/lib/firebase";
 
 // Definisce l'interfaccia per l'oggetto utente
 interface User {
@@ -160,7 +160,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         // Autenticazione con Firebase
         const result = await signInWithGoogle();
-        const firebaseUser = result.user;
+        // Adattiamo il risultato al nostro tipo FirebaseUser
+        const firebaseUser: FirebaseUser = {
+          uid: result.user.uid,
+          email: result.user.email,
+          displayName: result.user.displayName,
+          photoURL: result.user.photoURL
+        };
         
         if (!firebaseUser || !firebaseUser.email) {
           throw new Error("Dati utente Google non disponibili");

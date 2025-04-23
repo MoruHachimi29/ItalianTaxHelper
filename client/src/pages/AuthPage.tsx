@@ -169,6 +169,39 @@ export default function AuthPage() {
                         </Button>
                       </form>
                     </Form>
+                    
+                    <div className="mt-4">
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <Separator className="w-full" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                          <span className="bg-background px-2 text-muted-foreground">
+                            Oppure accedi con
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full mt-4 flex items-center justify-center gap-2"
+                        onClick={handleGoogleAuth}
+                        disabled={googleAuthMutation.isPending}
+                      >
+                        {googleAuthMutation.isPending ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Autenticazione in corso...
+                          </>
+                        ) : (
+                          <>
+                            <SiGoogle className="h-4 w-4" />
+                            Google
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </CardContent>
                   <CardFooter className="flex justify-center">
                     <p className="text-sm text-muted-foreground">
@@ -277,6 +310,39 @@ export default function AuthPage() {
                         </Button>
                       </form>
                     </Form>
+                    
+                    <div className="mt-4">
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <Separator className="w-full" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                          <span className="bg-background px-2 text-muted-foreground">
+                            Oppure registrati con
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full mt-4 flex items-center justify-center gap-2"
+                        onClick={handleGoogleAuth}
+                        disabled={googleAuthMutation.isPending}
+                      >
+                        {googleAuthMutation.isPending ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Autenticazione in corso...
+                          </>
+                        ) : (
+                          <>
+                            <SiGoogle className="h-4 w-4" />
+                            Google
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </CardContent>
                   <CardFooter className="flex justify-center">
                     <p className="text-sm text-muted-foreground">
