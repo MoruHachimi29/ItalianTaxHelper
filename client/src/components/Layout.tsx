@@ -117,7 +117,7 @@ export default function Layout({ children }: LayoutProps) {
                 </div>
               ) : (
                 <Link href="/auth">
-                  <Button variant="outline" size="sm" className="flex items-center gap-1 border-gray-700 text-gray-300 hover:text-white">
+                  <Button variant="outline" size="sm" className="flex items-center gap-1 bg-white text-black hover:bg-gray-100 border-white">
                     <LogIn size={16} />
                     Accedi
                   </Button>
