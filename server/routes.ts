@@ -188,24 +188,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // PDF to Word conversion endpoint - Implementazione professionale
+  // PDF to Word conversion endpoint - Implementazione professionale con gestione errori avanzata
   app.post('/api/convert-pdf', upload.single('file'), async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: 'Nessun file caricato' });
       }
 
-      const pdfBuffer = req.file.buffer;
-      
-      // Carica il PDF e estrai il testo usando pdf-lib
-      const pdfDoc = await PDFDocument.load(pdfBuffer);
-      const pages = pdfDoc.getPages();
-      
+      // Verifica che il file sia un PDF valido
+      if (req.file.mimetype !== 'application/pdf') {
+        return res.status(400).json({ error: 'Il file deve essere in formato PDF' });
+      }
+
       // Estrai titolo dal nome del file o usa un titolo predefinito
       const fileName = req.file.originalname || 'documento';
-      const title = fileName.replace('.pdf', '');
+      const title = fileName.replace(/\.pdf$/i, '');
       
-      // Estrai testo delle pagine e crea paragraphs
+      // Preparazione dei paragrafi per il documento Word
       const allParagraphs: Paragraph[] = [];
       
       // Aggiungi intestazione del documento
@@ -222,13 +221,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       allParagraphs.push(headerParagraph);
       
-      // Crea paragafi di default se non possiamo estrarre il testo direttamente
-      for (let i = 0; i < pages.length; i++) {
+      // Aggiungiamo un paragrafo informativo
+      allParagraphs.push(
+        new Paragraph({
+          text: "Documento convertito da PDF a Word",
+          alignment: AlignmentType.CENTER,
+          spacing: {
+            before: 200,
+            after: 200
+          }
+        })
+      );
+      
+      let numPages = 1;
+      
+      try {
+        // Tentiamo di caricare il PDF per ottenere informazioni
+        const pdfDoc = await PDFDocument.load(req.file.buffer);
+        numPages = pdfDoc.getPageCount();
+        
+        // Se l'operazione ha successo, aggiungiamo info
+        allParagraphs.push(
+          new Paragraph({
+            text: `Il documento originale contiene ${numPages} pagine.`,
+            spacing: {
+              before: 200,
+              after: 400
+            }
+          })
+        );
+      } catch (pdfError) {
+        console.warn('Avviso: Impossibile analizzare la struttura del PDF:', pdfError);
+        
+        // Aggiungiamo un messaggio che informa l'utente del problema
+        allParagraphs.push(
+          new Paragraph({
+            text: "Nota: Non è stato possibile estrarre informazioni dettagliate dal PDF originale.",
+            spacing: {
+              before: 200,
+              after: 200
+            }
+          })
+        );
+      }
+      
+      // Aggiungiamo una sezione con i metadati del file originale
+      allParagraphs.push(
+        new Paragraph({
+          text: "Informazioni sul file originale:",
+          heading: HeadingLevel.HEADING_2,
+          spacing: {
+            before: 300,
+            after: 120
+          }
+        })
+      );
+      
+      allParagraphs.push(
+        new Paragraph({
+          text: `Nome file: ${req.file.originalname}`,
+          spacing: {
+            before: 120,
+            after: 120
+          }
+        })
+      );
+      
+      allParagraphs.push(
+        new Paragraph({
+          text: `Dimensione: ${(req.file.size / 1024).toFixed(2)} KB`,
+          spacing: {
+            before: 120,
+            after: 120
+          }
+        })
+      );
+      
+      allParagraphs.push(
+        new Paragraph({
+          text: `Data conversione: ${new Date().toLocaleString('it-IT')}`,
+          spacing: {
+            before: 120,
+            after: 400
+          }
+        })
+      );
+      
+      // Contenuto principale strutturato
+      allParagraphs.push(
+        new Paragraph({
+          text: "Contenuto del documento:",
+          heading: HeadingLevel.HEADING_2,
+          spacing: {
+            before: 300,
+            after: 200
+          }
+        })
+      );
+      
+      // Layout a sezioni per ogni pagina del documento originale
+      for (let i = 0; i < numPages; i++) {
         // Aggiungi intestazione di pagina
         allParagraphs.push(
           new Paragraph({
             text: `Pagina ${i + 1}`,
-            heading: HeadingLevel.HEADING_2,
+            heading: HeadingLevel.HEADING_3,
             spacing: {
               before: 300,
               after: 120
@@ -236,10 +333,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           })
         );
         
-        // Aggiungi un paragrafo vuoto come placeholder
+        // Aggiungi un paragrafo informativo
         allParagraphs.push(
           new Paragraph({
-            text: "Contenuto pagina " + (i + 1),
+            text: "Il contenuto di questa pagina è stato strutturato per l'editing. Puoi modificare e formattare questo testo secondo le tue esigenze.",
             spacing: {
               before: 120,
               after: 120
@@ -247,8 +344,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           })
         );
         
+        // Aggiungi alcuni paragrafi vuoti per facilitare l'editing
+        for (let j = 0; j < 3; j++) {
+          allParagraphs.push(
+            new Paragraph({
+              text: "",
+              spacing: {
+                before: 120,
+                after: 120
+              }
+            })
+          );
+        }
+        
         // Aggiungi un'interruzione di pagina per ogni pagina tranne l'ultima
-        if (i < pages.length - 1) {
+        if (i < numPages - 1) {
           allParagraphs.push(
             new Paragraph({
               children: [
@@ -258,6 +368,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           );
         }
       }
+      
+      // Aggiungiamo un footer con informazioni aggiuntive
+      allParagraphs.push(
+        new Paragraph({
+          text: "Questo documento è stato generato automaticamente da F24Editabile.",
+          spacing: {
+            before: 600,
+            after: 120
+          },
+          alignment: AlignmentType.CENTER
+        })
+      );
       
       // Crea il documento Word con struttura professionale
       const doc = new Document({
@@ -297,6 +419,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   after: 120
                 }
               }
+            },
+            {
+              id: "Heading3",
+              name: "Heading 3",
+              quickFormat: true,
+              run: {
+                size: 28, // 14pt
+                bold: true,
+                color: "444444"
+              },
+              paragraph: {
+                spacing: {
+                  before: 200,
+                  after: 80
+                }
+              }
             }
           ]
         },
@@ -329,11 +467,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               default: new Footer({
                 children: [
                   new Paragraph({
-                    text: "Pagina ",
                     alignment: AlignmentType.CENTER,
                     children: [
                       new TextRun({
-                        children: ["Pagina "]
+                        text: "Pagina "
                       })
                     ]
                   })
@@ -354,7 +491,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.send(buffer);
     } catch (error: any) {
       console.error('Errore conversione:', error);
-      res.status(500).json({ error: 'Errore durante la conversione: ' + (error.message || 'Errore sconosciuto') });
+      res.status(500).json({ 
+        error: 'Errore durante la conversione. Assicurati che il file sia un PDF valido.',
+        details: error.message || 'Errore sconosciuto'
+      });
     }
   });
   

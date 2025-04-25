@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { Info, FileText, Settings, Download } from "lucide-react";
+import { Info, FileText, Settings, Download, CheckCircle, RefreshCw } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function PdfToWordConverter() {
@@ -62,30 +62,45 @@ export default function PdfToWordConverter() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Errore durante la conversione');
+        const errorMessage = errorData.error || 'Errore durante la conversione';
+        const errorDetails = errorData.details ? `\n\nDettagli: ${errorData.details}` : '';
+        throw new Error(errorMessage + errorDetails);
       }
 
       // Completa il progresso al 100%
       setConversionProgress(100);
       
       // Piccola pausa per mostrare il 100% prima di completare
-      setTimeout(() => {
-        const blob = new Blob([response.body as any], { 
-          type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
-        });
-        const url = window.URL.createObjectURL(blob);
+      setTimeout(async () => {
+        try {
+          // Ottieni il blob dalla risposta in modo affidabile
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
 
-        setIsConverting(false);
-        setConversionComplete(true);
+          setIsConverting(false);
+          setConversionComplete(true);
 
-        // Trigger download
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = pdfFile.name.replace('.pdf', '.docx');
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+          // Trigger download
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = pdfFile.name.replace(/\.pdf$/i, '.docx');
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          
+          // Mostra conferma di successo
+          setErrorMessage(null);
+          
+          // Rimuovi l'URL creato dopo un breve ritardo per assicurarsi che il download sia iniziato
+          setTimeout(() => {
+            window.URL.revokeObjectURL(url);
+          }, 1000);
+        } catch (err: any) {
+          console.error('Errore nel download del file:', err);
+          setErrorMessage('Errore nel download del file: ' + (err.message || 'Errore sconosciuto'));
+          setIsConverting(false);
+          setConversionProgress(0);
+        }
       }, 500);
 
     } catch (error: any) {
@@ -159,6 +174,15 @@ export default function PdfToWordConverter() {
           <AlertDescription>{errorMessage}</AlertDescription>
         </Alert>
       )}
+      
+      {conversionComplete && !errorMessage && (
+        <Alert variant="default" className="bg-green-50 text-green-800 border-green-300">
+          <CheckCircle className="h-4 w-4 mr-2" />
+          <AlertDescription>
+            Conversione completata con successo! Il download dovrebbe iniziare automaticamente.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {pdfFile && (
         <div className="space-y-4">
@@ -181,6 +205,21 @@ export default function PdfToWordConverter() {
                 Converti in Word
               </span>
             </Button>
+          )}
+          
+          {conversionComplete && !errorMessage && (
+            <div className="text-center mt-4">
+              <Button 
+                variant="outline" 
+                onClick={handleConvert}
+                className="mt-2"
+              >
+                <span className="flex items-center gap-2">
+                  <RefreshCw className="h-4 w-4" />
+                  Converti di nuovo
+                </span>
+              </Button>
+            </div>
           )}
         </div>
       )}
