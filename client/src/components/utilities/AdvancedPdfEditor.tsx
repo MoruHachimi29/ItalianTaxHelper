@@ -19,9 +19,9 @@ import {
   FilePlus, X, Save, PanelLeft, PanelRight, Search
 } from "lucide-react";
 
-// Configurazione del worker PDF.js utilizzando il fallback
-// Questo permette a PDF.js di funzionare anche senza worker esterno
-pdfjs.GlobalWorkerOptions.workerSrc = '';
+// Configurazione del worker PDF.js utilizzando un worker locale
+// Utilizziamo un worker che abbiamo scaricato nella cartella public
+pdfjs.GlobalWorkerOptions.workerSrc = '/pdf-worker/pdf.worker.js';
 
 type AnnotationTool = 
   | 'text' 
