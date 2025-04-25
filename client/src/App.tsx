@@ -37,6 +37,7 @@ const XmlToPngConverterPage = lazy(() => import("@/pages/XmlToPngConverterPage")
 const PdfEditorPage = lazy(() => import("@/pages/PdfEditorPage"));
 const PdfToWordConverterPage = lazy(() => import("@/pages/PdfToWordConverterPage"));
 const AdvancedPdfEditorPage = lazy(() => import("@/pages/AdvancedPdfEditorPage"));
+const SimplePdfEditorPage = lazy(() => import("@/pages/SimplePdfEditorPage"));
 const CodiceFiscalePage = lazy(() => import("@/pages/CodiceFiscalePage"));
 
 // Pagine del forum
@@ -108,6 +109,7 @@ function Router() {
           <Route path="/strumenti/xml-png" component={XmlToPngConverterPage} />
           <Route path="/strumenti/pdf-editor" component={PdfEditorPage} />
           <Route path="/strumenti/pdf-editor-avanzato" component={AdvancedPdfEditorPage} />
+          <Route path="/strumenti/pdf-editor-semplice" component={SimplePdfEditorPage} />
           <Route path="/strumenti/pdf-word" component={PdfToWordConverterPage} />
           <Route path="/contatti" component={ContactPage} />
           
