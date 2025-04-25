@@ -86,6 +86,11 @@ export default function SimplePdfEditor() {
             console.error('Errore nel caricamento del file');
             setErrorMessage("Si è verificato un errore nella lettura del file PDF.");
             setIsProcessing(false);
+            toast({
+              title: "Errore",
+              description: "Si è verificato un errore nella lettura del file PDF",
+              variant: "destructive"
+            });
           };
           
           // Inizia caricamento file
@@ -95,12 +100,22 @@ export default function SimplePdfEditor() {
           console.error('Errore nel caricamento del PDF:', error);
           setErrorMessage("Si è verificato un errore nel caricamento del PDF.");
           setIsProcessing(false);
+          toast({
+            title: "Errore",
+            description: "Si è verificato un errore nel caricamento del PDF",
+            variant: "destructive"
+          });
         }
       } else {
         setPdfFile(null);
         setPdfUrl(null);
         setPdfBytes(null);
         setErrorMessage("Per favore, seleziona un file PDF (.pdf)");
+        toast({
+          title: "Formato non valido",
+          description: "Per favore, seleziona un file PDF (.pdf)",
+          variant: "destructive"
+        });
       }
     }
   };
@@ -145,6 +160,12 @@ export default function SimplePdfEditor() {
       console.error('Errore nel salvataggio del PDF:', error);
       setErrorMessage("Si è verificato un errore nel salvataggio del PDF.");
       setIsProcessing(false);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore nel salvataggio del PDF",
+        variant: "destructive",
+        duration: 3000
+      });
     }
   };
   
@@ -219,6 +240,12 @@ export default function SimplePdfEditor() {
       console.error('Errore nell\'applicazione della filigrana:', error);
       setErrorMessage("Si è verificato un errore nell'applicazione della filigrana.");
       setIsProcessing(false);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore nell'applicazione della filigrana",
+        variant: "destructive",
+        duration: 3000
+      });
     }
   };
 
