@@ -588,9 +588,9 @@ export default function AdvancedPdfEditor() {
       
       if (shape) {
         console.log('Forma creata, aggiunta al canvas');
-        fabricCanvasRef.current.add(shape);
-        fabricCanvasRef.current.setActiveObject(shape);
-        fabricCanvasRef.current.renderAll();
+        fabricCanvasRef.current?.add(shape);
+        fabricCanvasRef.current?.setActiveObject(shape);
+        fabricCanvasRef.current?.renderAll();
         
         addOperation({
           type: 'shape',
@@ -667,9 +667,9 @@ export default function AdvancedPdfEditor() {
               scaleY: scaleFactor
             });
             
-            fabricCanvasRef.current.add(image);
-            fabricCanvasRef.current.setActiveObject(image);
-            fabricCanvasRef.current.renderAll();
+            fabricCanvasRef.current?.add(image);
+            fabricCanvasRef.current?.setActiveObject(image);
+            fabricCanvasRef.current?.renderAll();
             
             console.log('Immagine aggiunta al canvas');
             
@@ -735,36 +735,93 @@ export default function AdvancedPdfEditor() {
   };
   
   const deleteSelectedObjects = () => {
-    if (!fabricCanvasRef.current) return;
+    if (!fabricCanvasRef.current) {
+      toast({
+        title: "Errore",
+        description: "Impossibile eliminare l'oggetto, ricarica la pagina",
+        variant: "destructive",
+        duration: 3000
+      });
+      return;
+    }
     
-    const activeObject = fabricCanvasRef.current.getActiveObject();
-    
-    if (activeObject) {
-      fabricCanvasRef.current.remove(activeObject);
-      addOperation({
-        type: 'delete',
-        description: 'Eliminato oggetto selezionato'
+    try {
+      const activeObject = fabricCanvasRef.current.getActiveObject();
+      
+      if (activeObject) {
+        fabricCanvasRef.current.remove(activeObject);
+        fabricCanvasRef.current.renderAll();
+        
+        addOperation({
+          type: 'delete',
+          description: 'Eliminato oggetto selezionato'
+        });
+        
+        toast({
+          title: "Oggetto eliminato",
+          description: "L'oggetto selezionato è stato eliminato",
+          duration: 2000
+        });
+      } else {
+        toast({
+          title: "Nessun oggetto selezionato",
+          description: "Seleziona prima un oggetto da eliminare",
+          duration: 2000
+        });
+      }
+    } catch (error) {
+      console.error('Errore nell\'eliminazione dell\'oggetto:', error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore nell'eliminazione dell'oggetto",
+        variant: "destructive",
+        duration: 3000
       });
     }
   };
   
   const startSignatureMode = () => {
-    if (!fabricCanvasRef.current) return;
-    
-    // Attiva modalità disegno con impostazioni per firma
-    fabricCanvasRef.current.isDrawingMode = true;
-    const brush = fabricCanvasRef.current.freeDrawingBrush;
-    if (brush) {
-      brush.color = inkColor;
-      brush.width = 2; // Linea sottile per firme
+    if (!fabricCanvasRef.current) {
+      toast({
+        title: "Errore",
+        description: "Impossibile attivare la modalità firma, ricarica la pagina",
+        variant: "destructive",
+        duration: 3000
+      });
+      return;
     }
     
-    // Avviso per l'utente
-    toast({
-      title: "Modalità firma attivata",
-      description: "Disegna la tua firma sul documento",
-      duration: 3000
-    });
+    try {
+      console.log('Attivazione modalità firma');
+      
+      // Attiva modalità disegno con impostazioni per firma
+      fabricCanvasRef.current.isDrawingMode = true;
+      const brush = fabricCanvasRef.current.freeDrawingBrush;
+      if (brush) {
+        brush.color = inkColor;
+        brush.width = 2; // Linea sottile per firme
+      }
+      
+      // Avviso per l'utente
+      toast({
+        title: "Modalità firma attivata",
+        description: "Disegna la tua firma sul documento",
+        duration: 3000
+      });
+      
+      addOperation({
+        type: 'annotate',
+        description: "Attivata modalità firma"
+      });
+    } catch (error) {
+      console.error('Errore nell\'attivazione della modalità firma:', error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore nell'attivazione della modalità firma",
+        variant: "destructive",
+        duration: 3000
+      });
+    }
   };
   
   // Aggiunta numeri di pagina
@@ -849,112 +906,152 @@ export default function AdvancedPdfEditor() {
   
   // Aggiunta di link ipertestuali
   const addHyperlink = () => {
-    if (!fabricCanvasRef.current) return;
+    if (!fabricCanvasRef.current) {
+      toast({
+        title: "Errore",
+        description: "Impossibile aggiungere il link, ricarica la pagina",
+        variant: "destructive",
+        duration: 3000
+      });
+      return;
+    }
     
-    // Apri un prompt per inserire l'URL
-    const url = window.prompt("Inserisci l'URL del link:", "https://");
-    if (!url) return;
-    
-    // Crea un rettangolo colorato che rappresenta il link
-    const link = new fabric.Rect({
-      left: 100,
-      top: 100,
-      width: 150,
-      height: 30,
-      fill: 'rgba(0, 0, 255, 0.2)',
-      stroke: 'blue',
-      strokeWidth: 1,
-      rx: 5,
-      ry: 5
-    });
-    
-    // Aggiungi un testo sopra il rettangolo
-    const linkText = new fabric.Text(url, {
-      left: 105,
-      top: 105,
-      fontSize: 14,
-      fill: 'blue',
-      underline: true
-    });
-    
-    // Raggruppa gli elementi
-    const group = new fabric.Group([link, linkText], {
-      left: 100,
-      top: 100
-    });
-    
-    // Aggiungi metadati personalizzati (in un'implementazione reale, questo verrebbe utilizzato per incorporare il link nel PDF)
-    group.set('linkUrl', url);
-    
-    fabricCanvasRef.current.add(group);
-    fabricCanvasRef.current.setActiveObject(group);
-    
-    addOperation({
-      type: 'annotate',
-      description: `Aggiunto link: ${url}`
-    });
-    
-    toast({
-      title: "Link aggiunto",
-      description: "Il link è stato aggiunto al documento",
-      duration: 3000
-    });
+    try {
+      // Apri un prompt per inserire l'URL
+      const url = window.prompt("Inserisci l'URL del link:", "https://");
+      if (!url) return;
+      
+      // Crea un rettangolo colorato che rappresenta il link
+      const link = new fabric.Rect({
+        left: 100,
+        top: 100,
+        width: 150,
+        height: 30,
+        fill: 'rgba(0, 0, 255, 0.2)',
+        stroke: 'blue',
+        strokeWidth: 1,
+        rx: 5,
+        ry: 5
+      });
+      
+      // Aggiungi un testo sopra il rettangolo
+      const linkText = new fabric.Text(url, {
+        left: 105,
+        top: 105,
+        fontSize: 14,
+        fill: 'blue',
+        underline: true
+      });
+      
+      // Raggruppa gli elementi
+      const group = new fabric.Group([link, linkText], {
+        left: 100,
+        top: 100
+      });
+      
+      // Aggiungi metadati personalizzati (in un'implementazione reale, questo verrebbe utilizzato per incorporare il link nel PDF)
+      group.set('linkUrl', url);
+      
+      fabricCanvasRef.current?.add(group);
+      fabricCanvasRef.current?.setActiveObject(group);
+      fabricCanvasRef.current?.renderAll();
+      
+      addOperation({
+        type: 'annotate',
+        description: `Aggiunto link: ${url}`
+      });
+      
+      toast({
+        title: "Link aggiunto",
+        description: "Il link è stato aggiunto al documento",
+        duration: 3000
+      });
+    } catch (error) {
+      console.error('Errore nell\'aggiunta del link:', error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore nell'aggiunta del link",
+        variant: "destructive",
+        duration: 3000
+      });
+    }
   };
   
   // Aggiunta di commenti
   const addComment = () => {
-    if (!fabricCanvasRef.current) return;
-    
-    // Apri un prompt per inserire il commento
-    const commentText = window.prompt("Inserisci il testo del commento:", "");
-    if (!commentText) return;
-    
-    // Crea un'icona di commento
-    const commentIcon = new fabric.Circle({
-      radius: 12,
-      fill: 'yellow',
-      left: 100,
-      top: 100
-    });
-    
-    // Aggiungi un simbolo di commento al centro
-    const commentSymbol = new fabric.Text("?", {
-      left: 108,
-      top: 102,
-      fontSize: 16,
-      fill: 'black'
-    });
-    
-    // Raggruppa gli elementi
-    const commentGroup = new fabric.Group([commentIcon, commentSymbol], {
-      left: 100,
-      top: 100
-    });
-    
-    // Aggiungi metadati personalizzati
-    commentGroup.set('commentText', commentText);
-    
-    // Aggiungi evento di click per mostrare il commento
-    commentGroup.on('selected', function() {
+    if (!fabricCanvasRef.current) {
       toast({
-        title: "Commento",
-        description: commentText,
-        duration: 5000
+        title: "Errore",
+        description: "Impossibile aggiungere il commento, ricarica la pagina",
+        variant: "destructive",
+        duration: 3000
       });
-    });
+      return;
+    }
     
-    fabricCanvasRef.current.add(commentGroup);
-    
-    addOperation({
-      type: 'annotate',
-      description: "Aggiunto commento"
-    });
-    
-    toast({
-      title: "Commento aggiunto",
-      description: "Clicca sull'icona per visualizzare il commento",
-      duration: 3000
-    });
+    try {
+      // Apri un prompt per inserire il commento
+      const commentText = window.prompt("Inserisci il testo del commento:", "");
+      if (!commentText) return;
+      
+      console.log('Aggiunta commento:', commentText);
+      
+      // Crea un'icona di commento
+      const commentIcon = new fabric.Circle({
+        radius: 12,
+        fill: 'yellow',
+        left: 100,
+        top: 100
+      });
+      
+      // Aggiungi un simbolo di commento al centro
+      const commentSymbol = new fabric.Text("?", {
+        left: 108,
+        top: 102,
+        fontSize: 16,
+        fill: 'black'
+      });
+      
+      // Raggruppa gli elementi
+      const commentGroup = new fabric.Group([commentIcon, commentSymbol], {
+        left: 100,
+        top: 100
+      });
+      
+      // Aggiungi metadati personalizzati
+      commentGroup.set('commentText', commentText);
+      
+      // Aggiungi evento di click per mostrare il commento
+      commentGroup.on('selected', function() {
+        toast({
+          title: "Commento",
+          description: commentText,
+          duration: 5000
+        });
+      });
+      
+      fabricCanvasRef.current?.add(commentGroup);
+      fabricCanvasRef.current?.renderAll();
+      
+      addOperation({
+        type: 'annotate',
+        description: "Aggiunto commento"
+      });
+      
+      toast({
+        title: "Commento aggiunto",
+        description: "Clicca sull'icona per visualizzare il commento",
+        duration: 3000
+      });
+    } catch (error) {
+      console.error('Errore nell\'aggiunta del commento:', error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore nell'aggiunta del commento",
+        variant: "destructive",
+        duration: 3000
+      });
+    }
   };
   
   // Funzioni di rotazione e trasformazione
