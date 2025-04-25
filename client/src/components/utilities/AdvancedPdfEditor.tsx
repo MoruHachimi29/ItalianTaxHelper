@@ -31,7 +31,10 @@ type AnnotationTool =
   | 'image' 
   | 'shape' 
   | 'signature'
-  | 'erase';
+  | 'erase'
+  | 'pageNumber'
+  | 'link'
+  | 'comment';
 
 type ShapeType = 'rectangle' | 'circle' | 'line' | 'arrow';
 
@@ -254,13 +257,28 @@ export default function AdvancedPdfEditor() {
           brush.color = inkColor;
           brush.width = inkWidth;
         }
+        toast({
+          title: "Strumento disegno attivato",
+          description: "Disegna liberamente sul documento",
+          duration: 2000
+        });
         break;
       case 'erase':
         // Attiva modalità di selezione per cancellare oggetti
         canvas.selection = true;
+        toast({
+          title: "Strumento cancellazione attivato",
+          description: "Seleziona e cancella gli elementi sul documento",
+          duration: 2000
+        });
         break;
       case 'text':
         addTextAnnotation();
+        toast({
+          title: "Strumento testo attivato",
+          description: "Clicca sul testo per modificarlo",
+          duration: 2000
+        });
         break;
       case 'highlight':
         canvas.isDrawingMode = true;
@@ -269,9 +287,19 @@ export default function AdvancedPdfEditor() {
           highlightBrush.color = 'rgba(255, 255, 0, 0.4)';  // Giallo semi-trasparente
           highlightBrush.width = 20;
         }
+        toast({
+          title: "Evidenziatore attivato",
+          description: "Evidenzia parti del documento",
+          duration: 2000
+        });
         break;
       case 'shape':
         addShape();
+        toast({
+          title: `Aggiunta forma: ${selectedShape}`,
+          description: "Puoi ridimensionare e spostare la forma",
+          duration: 2000
+        });
         break;
       case 'image':
         // Trigger file input
@@ -279,6 +307,15 @@ export default function AdvancedPdfEditor() {
         break;
       case 'signature':
         startSignatureMode();
+        break;
+      case 'pageNumber':
+        addPageNumbers();
+        break;
+      case 'link':
+        addHyperlink();
+        break;
+      case 'comment':
+        addComment();
         break;
     }
     
@@ -483,6 +520,196 @@ export default function AdvancedPdfEditor() {
     });
   };
   
+  // Aggiunta numeri di pagina
+  const addPageNumbers = async () => {
+    if (!pdfBytes) return;
+    
+    setIsProcessing(true);
+    setProgress(10);
+    
+    try {
+      // Carica il PDF esistente
+      const pdfDoc = await PDFDocument.load(pdfBytes);
+      const pages = pdfDoc.getPages();
+      
+      // Carica un font standard
+      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      
+      setProgress(30);
+      
+      // Aggiungi numeri di pagina a tutte le pagine
+      for (let i = 0; i < pages.length; i++) {
+        const page = pages[i];
+        const { width, height } = page.getSize();
+        
+        // Formatta il numero di pagina
+        const pageNumber = `${i + 1} / ${pages.length}`;
+        
+        // Posiziona il numero di pagina a piè di pagina centrato
+        page.drawText(pageNumber, {
+          x: width / 2 - 20,
+          y: 30, // Dal basso
+          size: 12,
+          font: font,
+          color: rgb(0, 0, 0),
+        });
+        
+        // Aggiorna progress per ogni pagina
+        setProgress(30 + (i / pages.length) * 60);
+      }
+      
+      setProgress(90);
+      
+      // Salva il PDF modificato
+      const modifiedPdfBytes = await pdfDoc.save();
+      
+      setProgress(95);
+      
+      // Aggiorna lo stato con il nuovo PDF
+      setPdfBytes(modifiedPdfBytes);
+      const modifiedPdfBlob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
+      const modifiedUrl = URL.createObjectURL(modifiedPdfBlob);
+      
+      // Aggiorna l'URL per il rendering
+      setPdfUrl(modifiedUrl);
+      
+      addOperation({
+        type: 'annotate',
+        description: "Aggiunti numeri di pagina"
+      });
+      
+      setProgress(100);
+      setTimeout(() => {
+        setIsProcessing(false);
+        toast({
+          title: "Numeri di pagina aggiunti",
+          description: "I numeri di pagina sono stati aggiunti al documento",
+          duration: 3000
+        });
+      }, 500);
+      
+    } catch (error) {
+      console.error('Errore nell\'aggiunta dei numeri di pagina:', error);
+      setErrorMessage("Si è verificato un errore nell'aggiunta dei numeri di pagina.");
+      setIsProcessing(false);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore nell'aggiunta dei numeri di pagina",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  // Aggiunta di link ipertestuali
+  const addHyperlink = () => {
+    if (!fabricCanvasRef.current) return;
+    
+    // Apri un prompt per inserire l'URL
+    const url = window.prompt("Inserisci l'URL del link:", "https://");
+    if (!url) return;
+    
+    // Crea un rettangolo colorato che rappresenta il link
+    const link = new fabric.Rect({
+      left: 100,
+      top: 100,
+      width: 150,
+      height: 30,
+      fill: 'rgba(0, 0, 255, 0.2)',
+      stroke: 'blue',
+      strokeWidth: 1,
+      rx: 5,
+      ry: 5
+    });
+    
+    // Aggiungi un testo sopra il rettangolo
+    const linkText = new fabric.Text(url, {
+      left: 105,
+      top: 105,
+      fontSize: 14,
+      fill: 'blue',
+      underline: true
+    });
+    
+    // Raggruppa gli elementi
+    const group = new fabric.Group([link, linkText], {
+      left: 100,
+      top: 100
+    });
+    
+    // Aggiungi metadati personalizzati (in un'implementazione reale, questo verrebbe utilizzato per incorporare il link nel PDF)
+    group.set('linkUrl', url);
+    
+    fabricCanvasRef.current.add(group);
+    fabricCanvasRef.current.setActiveObject(group);
+    
+    addOperation({
+      type: 'annotate',
+      description: `Aggiunto link: ${url}`
+    });
+    
+    toast({
+      title: "Link aggiunto",
+      description: "Il link è stato aggiunto al documento",
+      duration: 3000
+    });
+  };
+  
+  // Aggiunta di commenti
+  const addComment = () => {
+    if (!fabricCanvasRef.current) return;
+    
+    // Apri un prompt per inserire il commento
+    const commentText = window.prompt("Inserisci il testo del commento:", "");
+    if (!commentText) return;
+    
+    // Crea un'icona di commento
+    const commentIcon = new fabric.Circle({
+      radius: 12,
+      fill: 'yellow',
+      left: 100,
+      top: 100
+    });
+    
+    // Aggiungi un simbolo di commento al centro
+    const commentSymbol = new fabric.Text("?", {
+      left: 108,
+      top: 102,
+      fontSize: 16,
+      fill: 'black'
+    });
+    
+    // Raggruppa gli elementi
+    const commentGroup = new fabric.Group([commentIcon, commentSymbol], {
+      left: 100,
+      top: 100
+    });
+    
+    // Aggiungi metadati personalizzati
+    commentGroup.set('commentText', commentText);
+    
+    // Aggiungi evento di click per mostrare il commento
+    commentGroup.on('selected', function() {
+      toast({
+        title: "Commento",
+        description: commentText,
+        duration: 5000
+      });
+    });
+    
+    fabricCanvasRef.current.add(commentGroup);
+    
+    addOperation({
+      type: 'annotate',
+      description: "Aggiunto commento"
+    });
+    
+    toast({
+      title: "Commento aggiunto",
+      description: "Clicca sull'icona per visualizzare il commento",
+      duration: 3000
+    });
+  };
+  
   // Funzioni di rotazione e trasformazione
   const rotatePage = (angle: number) => {
     setRotation((prev) => (prev + angle) % 360);
@@ -632,9 +859,9 @@ export default function AdvancedPdfEditor() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Editor PDF Avanzato</h2>
+          <h2 className="text-2xl font-bold">Editor PDF Professionale</h2>
           <p className="text-gray-600">
-            Modifica, annota e trasforma i tuoi PDF con strumenti professionali.
+            Modifica, annota e trasforma i tuoi PDF con strumenti avanzati.
           </p>
         </div>
         
