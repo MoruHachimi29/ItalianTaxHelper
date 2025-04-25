@@ -39,6 +39,17 @@ export default function PdfToWordConverter() {
     setErrorMessage(null);
 
     try {
+      // Simula progresso graduale mentre il server elabora
+      const progressInterval = setInterval(() => {
+        setConversionProgress(prevProgress => {
+          // Progredisci fino all'80% durante il caricamento e l'elaborazione
+          if (prevProgress < 80) {
+            return prevProgress + Math.random() * 5;
+          }
+          return prevProgress;
+        });
+      }, 200);
+
       const formData = new FormData();
       formData.append('file', pdfFile);
 
@@ -47,28 +58,40 @@ export default function PdfToWordConverter() {
         body: formData
       });
 
+      clearInterval(progressInterval);
+
       if (!response.ok) {
-        throw new Error('Errore durante la conversione');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Errore durante la conversione');
       }
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      // Completa il progresso al 100%
+      setConversionProgress(100);
+      
+      // Piccola pausa per mostrare il 100% prima di completare
+      setTimeout(() => {
+        const blob = new Blob([response.body as any], { 
+          type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+        });
+        const url = window.URL.createObjectURL(blob);
 
+        setIsConverting(false);
+        setConversionComplete(true);
+
+        // Trigger download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = pdfFile.name.replace('.pdf', '.docx');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, 500);
+
+    } catch (error: any) {
+      setErrorMessage(error.message || "Si è verificato un errore durante la conversione");
       setIsConverting(false);
-      setConversionComplete(true);
-
-      // Trigger download
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = pdfFile.name.replace('.pdf', '.docx');
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-
-    } catch (error) {
-      setErrorMessage("Si è verificato un errore durante la conversione");
-      setIsConverting(false);
+      setConversionProgress(0);
     }
   };
 
