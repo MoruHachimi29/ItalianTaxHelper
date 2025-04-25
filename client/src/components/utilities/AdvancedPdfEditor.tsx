@@ -19,29 +19,9 @@ import {
   FilePlus, X, Save, PanelLeft, PanelRight, Search
 } from "lucide-react";
 
-// Configura worker per react-pdf
-// Utilizziamo un approccio più robusto per il worker di PDF.js
-// Invece di caricare il worker da un CDN, lo carica da un blob locale
-function setupPdfWorker() {
-  // Creiamo un semplice worker locale per evitare problemi di rete
-  const workerBlob = new Blob([
-    `
-    // Minimo worker PDF.js necessario
-    self.onmessage = function(e) {
-      postMessage({
-        isReady: true,
-        supportTransfers: true,
-      });
-    };
-    `
-  ], { type: 'application/javascript' });
-
-  const workerUrl = URL.createObjectURL(workerBlob);
-  pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
-}
-
-// Inizializza il worker
-setupPdfWorker();
+// Configurazione del worker PDF.js utilizzando il fallback
+// Questo permette a PDF.js di funzionare anche senza worker esterno
+pdfjs.GlobalWorkerOptions.workerSrc = '';
 
 type AnnotationTool = 
   | 'text' 
@@ -854,12 +834,6 @@ export default function AdvancedPdfEditor() {
                         <p>Caricamento documento...</p>
                       </div>
                     }
-                    externalLinkTarget="_blank"
-                    options={{
-                      cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.4.120/cmaps/',
-                      cMapPacked: true,
-                      standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.4.120/standard_fonts/'
-                    }}
                   >
                     <Page 
                       pageNumber={currentPage}
@@ -868,8 +842,6 @@ export default function AdvancedPdfEditor() {
                       className="shadow-lg"
                       renderTextLayer={false}
                       renderAnnotationLayer={false}
-                      loading={false}
-                      canvasBackground="transparent"
                     />
                   </Document>
                   
