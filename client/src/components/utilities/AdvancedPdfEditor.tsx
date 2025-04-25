@@ -19,9 +19,9 @@ import {
   FilePlus, X, Save, PanelLeft, PanelRight, Search
 } from "lucide-react";
 
-// Configurazione del worker PDF.js utilizzando un worker locale
-// Utilizziamo un worker che abbiamo scaricato nella cartella public
-pdfjs.GlobalWorkerOptions.workerSrc = '/pdf-worker/pdf.worker.js';
+// Configurazione del worker PDF.js usando la versione minificata più recente che abbiamo scaricato
+// Questo garantisce che il worker corrisponda esattamente alla versione della libreria
+pdfjs.GlobalWorkerOptions.workerSrc = '/pdf-worker/pdf.worker.min.js';
 
 type AnnotationTool = 
   | 'text' 
