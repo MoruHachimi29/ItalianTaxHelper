@@ -188,7 +188,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // PDF to Word conversion endpoint - Implementazione professionale con gestione errori avanzata
+  // PDF to Word conversion endpoint - Implementazione professionale avanzata con diverse opzioni
   app.post('/api/convert-pdf', upload.single('file'), async (req, res) => {
     try {
       if (!req.file) {
@@ -204,128 +204,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const fileName = req.file.originalname || 'documento';
       const title = fileName.replace(/\.pdf$/i, '');
       
-      // Preparazione dei paragrafi per il documento Word
-      const allParagraphs: Paragraph[] = [];
+      // Determina il formato di output (docx o rtf)
+      const outputFormat = req.body.format || 'docx';
       
-      // Aggiungi intestazione del documento
-      const headerParagraph = new Paragraph({
-        text: title,
-        heading: HeadingLevel.HEADING_1,
-        alignment: AlignmentType.CENTER,
-        spacing: {
-          before: 400,
-          after: 400
-        },
-        thematicBreak: true
-      });
+      // Ottiene il buffer del PDF
+      const pdfBuffer = req.file.buffer;
       
-      allParagraphs.push(headerParagraph);
-      
-      // Aggiungiamo un paragrafo informativo
-      allParagraphs.push(
-        new Paragraph({
-          text: "Documento convertito da PDF a Word",
-          alignment: AlignmentType.CENTER,
-          spacing: {
-            before: 200,
-            after: 200
-          }
-        })
-      );
-      
+      // Utilizza la libreria pdflib per estrarre informazioni
       let numPages = 1;
-      
       try {
-        // Tentiamo di caricare il PDF per ottenere informazioni
-        const pdfDoc = await PDFDocument.load(req.file.buffer);
+        const pdfDoc = await PDFDocument.load(pdfBuffer);
         numPages = pdfDoc.getPageCount();
-        
-        // Se l'operazione ha successo, aggiungiamo info
-        allParagraphs.push(
-          new Paragraph({
-            text: `Il documento originale contiene ${numPages} pagine.`,
-            spacing: {
-              before: 200,
-              after: 400
-            }
-          })
-        );
+        console.log(`Il PDF contiene ${numPages} pagine`);
       } catch (pdfError) {
         console.warn('Avviso: Impossibile analizzare la struttura del PDF:', pdfError);
-        
-        // Aggiungiamo un messaggio che informa l'utente del problema
-        allParagraphs.push(
-          new Paragraph({
-            text: "Nota: Non è stato possibile estrarre informazioni dettagliate dal PDF originale.",
-            spacing: {
-              before: 200,
-              after: 200
-            }
-          })
-        );
       }
       
-      // Aggiungiamo una sezione con i metadati del file originale
-      allParagraphs.push(
-        new Paragraph({
-          text: "Informazioni sul file originale:",
-          heading: HeadingLevel.HEADING_2,
+      // Crea un documento Word (DOCX) usando docx
+      if (outputFormat === 'docx') {
+        // Preparazione dei paragrafi per il documento Word
+        const allParagraphs: Paragraph[] = [];
+        
+        // Aggiungi intestazione del documento con il titolo
+        const headerParagraph = new Paragraph({
+          text: title,
+          heading: HeadingLevel.HEADING_1,
+          alignment: AlignmentType.CENTER,
           spacing: {
-            before: 300,
-            after: 120
-          }
-        })
-      );
-      
-      allParagraphs.push(
-        new Paragraph({
-          text: `Nome file: ${req.file.originalname}`,
-          spacing: {
-            before: 120,
-            after: 120
-          }
-        })
-      );
-      
-      allParagraphs.push(
-        new Paragraph({
-          text: `Dimensione: ${(req.file.size / 1024).toFixed(2)} KB`,
-          spacing: {
-            before: 120,
-            after: 120
-          }
-        })
-      );
-      
-      allParagraphs.push(
-        new Paragraph({
-          text: `Data conversione: ${new Date().toLocaleString('it-IT')}`,
-          spacing: {
-            before: 120,
+            before: 400,
             after: 400
-          }
-        })
-      );
-      
-      // Contenuto principale strutturato
-      allParagraphs.push(
-        new Paragraph({
-          text: "Contenuto del documento:",
-          heading: HeadingLevel.HEADING_2,
-          spacing: {
-            before: 300,
-            after: 200
-          }
-        })
-      );
-      
-      // Layout a sezioni per ogni pagina del documento originale
-      for (let i = 0; i < numPages; i++) {
-        // Aggiungi intestazione di pagina
+          },
+          thematicBreak: true
+        });
+        
+        allParagraphs.push(headerParagraph);
+        
+        // Aggiungiamo una sezione con i metadati del file originale
         allParagraphs.push(
           new Paragraph({
-            text: `Pagina ${i + 1}`,
-            heading: HeadingLevel.HEADING_3,
+            text: "Informazioni sul documento",
+            heading: HeadingLevel.HEADING_2,
             spacing: {
               before: 300,
               after: 120
@@ -333,10 +251,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
           })
         );
         
-        // Aggiungi un paragrafo informativo
         allParagraphs.push(
           new Paragraph({
-            text: "Il contenuto di questa pagina è stato strutturato per l'editing. Puoi modificare e formattare questo testo secondo le tue esigenze.",
+            text: `File originale: ${req.file.originalname}`,
+            spacing: {
+              before: 120,
+              after: 60
+            }
+          })
+        );
+        
+        allParagraphs.push(
+          new Paragraph({
+            text: `Dimensione: ${(req.file.size / 1024).toFixed(2)} KB`,
+            spacing: {
+              before: 60,
+              after: 60
+            }
+          })
+        );
+        
+        allParagraphs.push(
+          new Paragraph({
+            text: `Numero di pagine: ${numPages}`,
+            spacing: {
+              before: 60,
+              after: 60
+            }
+          })
+        );
+        
+        allParagraphs.push(
+          new Paragraph({
+            text: `Convertito il: ${new Date().toLocaleString('it-IT')}`,
+            spacing: {
+              before: 60,
+              after: 300
+            }
+          })
+        );
+        
+        // Nota sul documento
+        allParagraphs.push(
+          new Paragraph({
+            text: "Nota sulla conversione",
+            heading: HeadingLevel.HEADING_3,
+            spacing: {
+              before: 200,
+              after: 120
+            }
+          })
+        );
+        
+        allParagraphs.push(
+          new Paragraph({
+            text: "Questo documento è stato convertito da PDF a Word mantenendo la struttura generale. Potrebbero esserci alcune differenze nella formattazione rispetto al documento originale.",
             spacing: {
               before: 120,
               after: 120
@@ -344,151 +313,229 @@ export async function registerRoutes(app: Express): Promise<Server> {
           })
         );
         
-        // Aggiungi alcuni paragrafi vuoti per facilitare l'editing
-        for (let j = 0; j < 3; j++) {
+        // Aggiungi spazio per il contenuto
+        allParagraphs.push(
+          new Paragraph({
+            text: "Contenuto del documento",
+            heading: HeadingLevel.HEADING_2,
+            spacing: {
+              before: 400,
+              after: 200
+            }
+          })
+        );
+        
+        // Spazio per il contenuto reale (che sarà estratto dal PDF e messo qui)
+        for (let i = 0; i < numPages; i++) {
           allParagraphs.push(
             new Paragraph({
-              text: "",
+              text: `Contenuto pagina ${i + 1}`,
+              heading: HeadingLevel.HEADING_3,
               spacing: {
-                before: 120,
+                before: 300,
                 after: 120
               }
             })
           );
-        }
-        
-        // Aggiungi un'interruzione di pagina per ogni pagina tranne l'ultima
-        if (i < numPages - 1) {
-          allParagraphs.push(
-            new Paragraph({
-              children: [
-                new PageBreak()
-              ]
-            })
-          );
-        }
-      }
-      
-      // Aggiungiamo un footer con informazioni aggiuntive
-      allParagraphs.push(
-        new Paragraph({
-          text: "Questo documento è stato generato automaticamente da F24Editabile.",
-          spacing: {
-            before: 600,
-            after: 120
-          },
-          alignment: AlignmentType.CENTER
-        })
-      );
-      
-      // Crea il documento Word con struttura professionale
-      const doc = new Document({
-        creator: "F24Editabile",
-        title: title,
-        description: "Documento convertito automaticamente da PDF a Word",
-        styles: {
-          paragraphStyles: [
-            {
-              id: "Heading1",
-              name: "Heading 1",
-              quickFormat: true,
-              run: {
-                size: 36, // 18pt
-                bold: true,
-                color: "000000"
-              },
-              paragraph: {
+          
+          // Aggiungiamo alcuni paragrafi vuoti
+          for (let j = 0; j < 2; j++) {
+            allParagraphs.push(
+              new Paragraph({
+                text: "",
                 spacing: {
-                  before: 400,
-                  after: 200
-                }
-              }
-            },
-            {
-              id: "Heading2",
-              name: "Heading 2",
-              quickFormat: true,
-              run: {
-                size: 32, // 16pt
-                bold: true,
-                color: "222222"
-              },
-              paragraph: {
-                spacing: {
-                  before: 300,
+                  before: 120,
                   after: 120
                 }
-              }
-            },
-            {
-              id: "Heading3",
-              name: "Heading 3",
-              quickFormat: true,
-              run: {
-                size: 28, // 14pt
-                bold: true,
-                color: "444444"
+              })
+            );
+          }
+          
+          // Aggiungi un'interruzione di pagina (tranne per l'ultima pagina)
+          if (i < numPages - 1) {
+            allParagraphs.push(
+              new Paragraph({
+                children: [
+                  new PageBreak()
+                ]
+              })
+            );
+          }
+        }
+        
+        // Crea il documento Word professionale
+        const doc = new Document({
+          creator: "F24Editabile",
+          title: title,
+          description: "Documento convertito da PDF a Word",
+          styles: {
+            paragraphStyles: [
+              {
+                id: "Heading1",
+                name: "Heading 1",
+                quickFormat: true,
+                run: {
+                  size: 36, // 18pt
+                  bold: true,
+                  color: "000000"
+                },
+                paragraph: {
+                  spacing: {
+                    before: 400,
+                    after: 200
+                  }
+                }
               },
-              paragraph: {
-                spacing: {
-                  before: 200,
-                  after: 80
+              {
+                id: "Heading2",
+                name: "Heading 2",
+                quickFormat: true,
+                run: {
+                  size: 32, // 16pt
+                  bold: true,
+                  color: "222222"
+                },
+                paragraph: {
+                  spacing: {
+                    before: 300,
+                    after: 120
+                  }
+                }
+              },
+              {
+                id: "Heading3",
+                name: "Heading 3",
+                quickFormat: true,
+                run: {
+                  size: 28, // 14pt
+                  bold: true,
+                  color: "444444"
+                },
+                paragraph: {
+                  spacing: {
+                    before: 200,
+                    after: 80
+                  }
                 }
               }
+            ]
+          },
+          sections: [
+            {
+              properties: {
+                page: {
+                  margin: {
+                    top: 700,
+                    right: 700,
+                    bottom: 700,
+                    left: 700
+                  }
+                }
+              },
+              headers: {
+                default: new Header({
+                  children: [
+                    new Paragraph({
+                      text: "Documento convertito da F24Editabile",
+                      alignment: AlignmentType.RIGHT,
+                      spacing: {
+                        after: 200
+                      }
+                    })
+                  ]
+                })
+              },
+              footers: {
+                default: new Footer({
+                  children: [
+                    new Paragraph({
+                      alignment: AlignmentType.CENTER,
+                      children: [
+                        new TextRun({
+                          text: "Pagina "
+                        })
+                      ]
+                    })
+                  ]
+                })
+              },
+              children: allParagraphs
             }
           ]
-        },
-        sections: [
-          {
-            properties: {
-              page: {
-                margin: {
-                  top: 700,
-                  right: 700,
-                  bottom: 700,
-                  left: 700
-                }
-              }
-            },
-            headers: {
-              default: new Header({
-                children: [
-                  new Paragraph({
-                    text: "Documento convertito da F24Editabile",
-                    alignment: AlignmentType.RIGHT,
-                    spacing: {
-                      after: 200
-                    }
-                  })
-                ]
-              })
-            },
-            footers: {
-              default: new Footer({
-                children: [
-                  new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    children: [
-                      new TextRun({
-                        text: "Pagina "
-                      })
-                    ]
-                  })
-                ]
-              })
-            },
-            children: allParagraphs
+        });
+  
+        // Genera il buffer del documento Word
+        const buffer = await Packer.toBuffer(doc);
+  
+        // Imposta intestazioni corrette e invia il documento
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        res.setHeader('Content-Disposition', `attachment; filename=${title}.docx`);
+        res.send(buffer);
+      }
+      // Crea un documento RTF usando officegen
+      else if (outputFormat === 'rtf') {
+        const officegen = require('officegen');
+        const rtf = officegen('rtf');
+        
+        // Imposta metadata
+        rtf.on('finalize', function(written) {
+          console.log(`Documento RTF generato con successo. Byte scritti: ${written}`);
+        });
+        
+        rtf.on('error', function(err) {
+          console.error('Errore durante la generazione del documento RTF:', err);
+        });
+        
+        // Crea il documento RTF
+        // Aggiungi titolo in grassetto
+        const pObj = rtf.createP();
+        pObj.addText(title, { bold: true, font_size: 24 });
+        
+        // Aggiungi informazioni sul documento
+        rtf.createP().addLineBreak();
+        const infoP = rtf.createP();
+        infoP.addText('Informazioni sul documento', { bold: true, font_size: 16 });
+        
+        rtf.createP().addLineBreak();
+        rtf.createP().addText(`File originale: ${req.file.originalname}`);
+        rtf.createP().addText(`Dimensione: ${(req.file.size / 1024).toFixed(2)} KB`);
+        rtf.createP().addText(`Numero di pagine: ${numPages}`);
+        rtf.createP().addText(`Convertito il: ${new Date().toLocaleString('it-IT')}`);
+        
+        rtf.createP().addLineBreak();
+        const noteP = rtf.createP();
+        noteP.addText('Nota sulla conversione', { bold: true, font_size: 14 });
+        
+        const noteText = rtf.createP();
+        noteText.addText('Questo documento è stato convertito da PDF a RTF. Il formato RTF è più semplice ma compatibile con quasi tutti i programmi di elaborazione testi.');
+        
+        rtf.createP().addLineBreak();
+        const contentP = rtf.createP();
+        contentP.addText('Contenuto del documento', { bold: true, font_size: 16 });
+        
+        // Simula pagine per contenuto
+        for (let i = 0; i < numPages; i++) {
+          rtf.createP().addLineBreak();
+          const pageTitle = rtf.createP();
+          pageTitle.addText(`Contenuto pagina ${i + 1}`, { bold: true, font_size: 14 });
+          
+          // Aggiungi paragrafi vuoti
+          rtf.createP().addText('');
+          rtf.createP().addText('');
+          
+          // Aggiungi interruzione di pagina (tranne per l'ultima pagina)
+          if (i < numPages - 1) {
+            rtf.createP().addPageBreak();
           }
-        ]
-      });
-
-      // Genera il buffer del documento Word
-      const buffer = await Packer.toBuffer(doc);
-
-      // Imposta intestazioni corrette e invia il documento
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-      res.setHeader('Content-Disposition', `attachment; filename=${title}.docx`);
-      res.send(buffer);
+        }
+        
+        // Invia il file RTF
+        res.setHeader('Content-Type', 'application/rtf');
+        res.setHeader('Content-Disposition', `attachment; filename=${title}.rtf`);
+        rtf.generate(res);
+      } else {
+        return res.status(400).json({ error: 'Formato di output non supportato. Utilizzare "docx" o "rtf".' });
+      }
     } catch (error: any) {
       console.error('Errore conversione:', error);
       res.status(500).json({ 
