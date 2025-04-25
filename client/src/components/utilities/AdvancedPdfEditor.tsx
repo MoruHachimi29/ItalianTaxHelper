@@ -11,7 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
 import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import { 
   SquarePen, Type, ImagePlus, Eraser, RotateCw, 
   FileText, Download, Undo, Redo, Scissors,
@@ -165,8 +165,10 @@ export default function AdvancedPdfEditor() {
     if (activeTool === 'draw') {
       fabricCanvas.isDrawingMode = true;
       const brush = fabricCanvas.freeDrawingBrush;
-      brush.color = inkColor;
-      brush.width = inkWidth;
+      if (brush) {
+        brush.color = inkColor;
+        brush.width = inkWidth;
+      }
     }
   };
   
