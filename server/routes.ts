@@ -3,6 +3,10 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import fetch from "node-fetch";
+import multer from "multer";
+
+// Configurazione di multer per gestire i file caricati
+const upload = multer({ storage: multer.memoryStorage() });
 import { 
   insertFormSchema, 
   insertTutorialSchema, 
@@ -182,6 +186,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Errore nel recupero della notizia" });
     }
   });
+
+  // PDF to Word conversion endpoint - Temporaneamente commentato in attesa di installazione dipendenze
+  /*
+  app.post('/api/convert-pdf', upload.single('file'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'Nessun file caricato' });
+      }
+
+      const pdfBuffer = req.file.buffer;
+      const pdfDoc = await PDFDocument.load(pdfBuffer);
+      const pages = pdfDoc.getPages();
+
+      // Necessario installare pacchetto docx per questa funzionalità
+      // const doc = new Document({
+      //   sections: [{
+      //     properties: {},
+      //     children: await Promise.all(pages.map(async (page) => {
+      //       const text = await page.extractText();
+      //       return new Paragraph({
+      //         text: text,
+      //         spacing: {
+      //           after: 200
+      //         }
+      //       });
+      //     }))
+      //   }]
+      // });
+
+      // // Generate buffer
+      // const buffer = await Packer.toBuffer(doc);
+
+      // res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+      // res.setHeader('Content-Disposition', 'attachment; filename=converted.docx');
+      // res.send(buffer);
+
+      res.status(501).json({ error: 'Funzionalità temporaneamente non disponibile' });
+    } catch (error) {
+      console.error('Errore conversione:', error);
+      res.status(500).json({ error: 'Errore durante la conversione' });
+    }
+  });
+  */
   
   // Get the latest economic news from Italy and the world using NewsAPI
   app.get("/api/economic-news", async (req, res) => {
