@@ -187,49 +187,83 @@ export default function AdvancedPdfEditor() {
   
   // Inizializzazione del canvas Fabric
   const initCanvas = () => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current) {
+      console.error('Riferimento al canvas non disponibile');
+      return;
+    }
+    
+    console.log('Inizializzazione canvas...');
     
     // Se esiste già un canvas fabric, distruggilo
     if (fabricCanvasRef.current) {
+      console.log('Eliminazione canvas precedente');
       fabricCanvasRef.current.dispose();
     }
     
+    // Prepara il canvas HTML sottostante
+    const canvasEl = canvasRef.current;
+    // Imposta stili iniziali per visibilità e posizionamento
+    canvasEl.style.position = 'absolute';
+    canvasEl.style.zIndex = '100';
+    canvasEl.style.pointerEvents = 'auto';
+    
     // Crea un nuovo canvas fabric con opzioni di base
-    const fabricCanvas = new fabric.Canvas(canvasRef.current, {
-      isDrawingMode: false,
-      selection: true,
-      renderOnAddRemove: true,
-      stopContextMenu: true
-    });
-    
-    fabricCanvasRef.current = fabricCanvas;
-    
-    // Attendiamo il prossimo ciclo di rendering per assicurarci che il DOM sia aggiornato
-    setTimeout(() => {
-      // Imposta le dimensioni del canvas
-      updateCanvasSize();
-      
-      // Attiva il tool di disegno se necessario
-      if (activeTool === 'draw') {
-        fabricCanvas.isDrawingMode = true;
-        const brush = fabricCanvas.freeDrawingBrush;
-        if (brush) {
-          brush.color = inkColor;
-          brush.width = inkWidth;
-        }
-      }
-      
-      // Aggiungi eventi di gestione del canvas
-      fabricCanvas.on('object:added', function() {
-        console.log('Oggetto aggiunto al canvas');
-        fabricCanvas.renderAll();
+    try {
+      console.log('Creazione nuovo canvas Fabric');
+      const fabricCanvas = new fabric.Canvas(canvasRef.current, {
+        isDrawingMode: false,
+        selection: true,
+        renderOnAddRemove: true,
+        stopContextMenu: true,
+        preserveObjectStacking: true // Mantiene l'ordine di sovrapposizione degli oggetti
       });
       
-      fabricCanvas.on('object:modified', function() {
-        console.log('Oggetto modificato nel canvas');
-        fabricCanvas.renderAll();
+      fabricCanvasRef.current = fabricCanvas;
+      
+      // Aumenta la priorità dell'aggiornamento del canvas
+      requestAnimationFrame(() => {
+        // Prima imposta le dimensioni e la posizione
+        updateCanvasSize();
+        
+        // Poi, dopo un breve ritardo, configura il resto
+        setTimeout(() => {
+          if (!fabricCanvasRef.current) return;
+          
+          // Attiva il tool di disegno se necessario
+          if (activeTool === 'draw') {
+            fabricCanvas.isDrawingMode = true;
+            const brush = fabricCanvas.freeDrawingBrush;
+            if (brush) {
+              brush.color = inkColor;
+              brush.width = inkWidth;
+            }
+          }
+          
+          // Aggiungi eventi di gestione del canvas
+          fabricCanvas.on('object:added', function() {
+            console.log('Oggetto aggiunto al canvas');
+            fabricCanvas.renderAll();
+          });
+          
+          fabricCanvas.on('object:modified', function() {
+            console.log('Oggetto modificato nel canvas');
+            fabricCanvas.renderAll();
+          });
+          
+          // Forza un altro aggiornamento delle dimensioni
+          updateCanvasSize();
+          
+          console.log('Canvas completamente inizializzato');
+        }, 100);
       });
-    }, 200);
+    } catch (error) {
+      console.error('Errore durante l\'inizializzazione del canvas:', error);
+      toast({
+        title: "Errore",
+        description: "Problema nell'inizializzazione dell'editor",
+        variant: "destructive"
+      });
+    }
   };
   
   // Aggiorna le dimensioni e posizione del canvas
@@ -469,22 +503,37 @@ export default function AdvancedPdfEditor() {
     }
     
     try {
+      // Ottieni le coordinate centrali del canvas
+      const canvas = fabricCanvasRef.current;
+      const centerX = canvas.getWidth() / 2;
+      const centerY = canvas.getHeight() / 2;
+      
       // Creiamo un elemento di testo interattivo
       const text = new fabric.IText('Clicca per modificare', {
-        left: 100,
-        top: 100,
+        left: centerX - 100, // Posiziona verso il centro
+        top: centerY - 50,   // Posiziona verso il centro
         fontFamily: textFont,
         fontSize: textSize,
         fill: inkColor,
         opacity: opacity / 100,
         selectable: true,
-        editable: true
+        editable: true,
+        cornerColor: 'black', // Colore dei punti di ridimensionamento
+        cornerSize: 8, // Dimensione dei punti di ridimensionamento
+        borderColor: 'black', // Colore del bordo di selezione
+        hasControls: true, // Mostra i controlli per il ridimensionamento
+        hasBorders: true // Mostra i bordi di selezione
       });
       
       // Aggiungiamo l'elemento al canvas
-      fabricCanvasRef.current.add(text);
-      fabricCanvasRef.current.setActiveObject(text);
-      fabricCanvasRef.current.renderAll();
+      canvas.add(text);
+      canvas.setActiveObject(text);
+      
+      // Assicura che il testo sia visibile al di sopra di tutto
+      // Utilizza il canvas con 'any' per aggirare le limitazioni dei tipi
+      (canvas as any).bringForward(text);
+      
+      canvas.renderAll();
       
       console.log('Testo aggiunto con successo');
       
@@ -524,19 +573,24 @@ export default function AdvancedPdfEditor() {
     }
     
     try {
+      const canvas = fabricCanvasRef.current;
+      // Ottieni le coordinate centrali del canvas
+      const centerX = canvas.getWidth() / 2;
+      const centerY = canvas.getHeight() / 2;
+      
       let shape;
       
-      // Posizione e dimensioni predefinite
-      const x = 100;
-      const y = 100;
+      // Posizione centrale
+      const x = centerX - 75; // Centra la forma
+      const y = centerY - 25; // Centra la forma
       
       switch (selectedShape) {
         case 'rectangle':
           shape = new fabric.Rect({
             left: x,
             top: y,
-            width: 100,
-            height: 50,
+            width: 150,
+            height: 75,
             fill: 'transparent',
             stroke: inkColor,
             strokeWidth: inkWidth,
@@ -544,7 +598,8 @@ export default function AdvancedPdfEditor() {
             selectable: true,
             transparentCorners: false,
             cornerColor: 'black',
-            cornerSize: 8
+            cornerSize: 8,
+            borderColor: 'black'
           });
           break;
         case 'circle':
@@ -559,7 +614,8 @@ export default function AdvancedPdfEditor() {
             selectable: true,
             transparentCorners: false,
             cornerColor: 'black',
-            cornerSize: 8
+            cornerSize: 8,
+            borderColor: 'black'
           });
           break;
         case 'line':
@@ -570,7 +626,8 @@ export default function AdvancedPdfEditor() {
             selectable: true,
             transparentCorners: false,
             cornerColor: 'black',
-            cornerSize: 8
+            cornerSize: 8,
+            borderColor: 'black'
           });
           break;
         case 'arrow':
@@ -603,16 +660,22 @@ export default function AdvancedPdfEditor() {
             selectable: true,
             transparentCorners: false,
             cornerColor: 'black',
-            cornerSize: 8
+            cornerSize: 8,
+            borderColor: 'black'
           });
           break;
       }
       
       if (shape) {
         console.log('Forma creata, aggiunta al canvas');
-        fabricCanvasRef.current?.add(shape);
-        fabricCanvasRef.current?.setActiveObject(shape);
-        fabricCanvasRef.current?.renderAll();
+        canvas.add(shape);
+        canvas.setActiveObject(shape);
+        
+        // Sposta l'oggetto in cima alla pila di visualizzazione
+        const objects = canvas.getObjects();
+        canvas.moveTo(shape, objects.length - 1);
+        
+        canvas.renderAll();
         
         addOperation({
           type: 'shape',
