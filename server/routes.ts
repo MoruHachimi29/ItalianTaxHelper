@@ -182,6 +182,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Errore nel recupero della notizia" });
     }
   });
+
+  // PDF to Word conversion endpoint
+  app.post('/api/convert-pdf', upload.single('file'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'Nessun file caricato' });
+      }
+
+      const pdfBuffer = req.file.buffer;
+      const pdfDoc = await PDFDocument.load(pdfBuffer);
+      const pages = pdfDoc.getPages();
+
+      // Create Word document
+      const doc = new Document({
+        sections: [{
+          properties: {},
+          children: await Promise.all(pages.map(async (page) => {
+            const text = await page.extractText();
+            return new Paragraph({
+              text: text,
+              spacing: {
+                after: 200
+              }
+            });
+          }))
+        }]
+      });
+
+      // Generate buffer
+      const buffer = await Packer.toBuffer(doc);
+
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+      res.setHeader('Content-Disposition', 'attachment; filename=converted.docx');
+      res.send(buffer);
+
+    } catch (error) {
+      console.error('Errore conversione:', error);
+      res.status(500).json({ error: 'Errore durante la conversione' });
+    }
+    }
+  });
   
   // Get the latest economic news from Italy and the world using NewsAPI
   app.get("/api/economic-news", async (req, res) => {
