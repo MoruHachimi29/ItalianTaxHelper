@@ -121,6 +121,10 @@ export default function AdvancedPdfEditor() {
               setProgress(100);
               setTimeout(() => {
                 setIsProcessing(false);
+                toast({
+                  title: "Caricamento completato",
+                  description: "Il PDF è stato caricato con successo"
+                });
               }, 200);
               
               // Reset editor state
@@ -137,6 +141,11 @@ export default function AdvancedPdfEditor() {
             console.error('Errore nel caricamento del file');
             setErrorMessage("Si è verificato un errore nella lettura del file PDF.");
             setIsProcessing(false);
+            toast({
+              title: "Errore",
+              description: "Si è verificato un errore nella lettura del file PDF",
+              variant: "destructive"
+            });
           };
           
           // Inizia caricamento file
@@ -146,12 +155,22 @@ export default function AdvancedPdfEditor() {
           console.error('Errore nel caricamento del PDF:', error);
           setErrorMessage("Si è verificato un errore nel caricamento del PDF.");
           setIsProcessing(false);
+          toast({
+            title: "Errore",
+            description: "Si è verificato un errore nel caricamento del PDF",
+            variant: "destructive"
+          });
         }
       } else {
         setPdfFile(null);
         setPdfUrl(null);
         setPdfBytes(null);
         setErrorMessage("Per favore, seleziona un file PDF (.pdf)");
+        toast({
+          title: "Formato non valido",
+          description: "Per favore, seleziona un file PDF (.pdf)",
+          variant: "destructive"
+        });
       }
     }
   };

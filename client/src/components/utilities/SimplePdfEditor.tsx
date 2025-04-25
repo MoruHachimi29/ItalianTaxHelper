@@ -73,6 +73,10 @@ export default function SimplePdfEditor() {
               setProgress(100);
               setTimeout(() => {
                 setIsProcessing(false);
+                toast({
+                  title: "Caricamento completato",
+                  description: "Il PDF è stato caricato con successo"
+                });
               }, 200);
             }
           };
