@@ -103,8 +103,8 @@ export default function AdvancedPdfEditor() {
   const [watermarkOpacity, setWatermarkOpacity] = useState<number>(30);
   const [rotationAngle, setRotationAngle] = useState<number>(90);
   
-  // Gestione file
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Gestione file - versione ottimizzata
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       
@@ -112,36 +112,55 @@ export default function AdvancedPdfEditor() {
         setPdfFile(file);
         setErrorMessage(null);
         
-        // Caricamento e rendering del PDF
+        // Mostra subito l'interfaccia di caricamento
         setIsProcessing(true);
-        setProgress(10);
+        setProgress(20);
         
         try {
-          // Crea URL per anteprima
+          // Crea URL per anteprima immediatamente
           const fileUrl = URL.createObjectURL(file);
           setPdfUrl(fileUrl);
           
-          // Carica il PDF come ArrayBuffer per pdf-lib
-          const arrayBuffer = await file.arrayBuffer();
-          const bytes = new Uint8Array(arrayBuffer);
-          setPdfBytes(bytes);
+          // Utilizziamo FileReader invece di await per migliorare le prestazioni percepite
+          const reader = new FileReader();
           
-          // Simula un avanzamento progressivo
-          setProgress(50);
-          setTimeout(() => {
-            setProgress(90);
-            setTimeout(() => {
+          reader.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const percentLoaded = Math.round((event.loaded / event.total) * 70) + 20;
+              setProgress(Math.min(90, percentLoaded));
+            }
+          };
+          
+          reader.onload = (event) => {
+            if (event.target) {
+              const arrayBuffer = event.target.result as ArrayBuffer;
+              const bytes = new Uint8Array(arrayBuffer);
+              setPdfBytes(bytes);
+              
+              // Completa il caricamento
               setProgress(100);
-              setIsProcessing(false);
-            }, 500);
-          }, 700);
+              setTimeout(() => {
+                setIsProcessing(false);
+              }, 200);
+              
+              // Reset editor state
+              setCurrentPage(1);
+              setRotation(0);
+              setScale(1.0);
+              setEditingOperations([]);
+              setHistoryIndex(-1);
+            }
+          };
           
-          // Reset editor state
-          setCurrentPage(1);
-          setRotation(0);
-          setScale(1.0);
-          setEditingOperations([]);
-          setHistoryIndex(-1);
+          // In caso di errori
+          reader.onerror = () => {
+            console.error('Errore nel caricamento del file');
+            setErrorMessage("Si è verificato un errore nella lettura del file PDF.");
+            setIsProcessing(false);
+          };
+          
+          // Inizia caricamento file
+          reader.readAsArrayBuffer(file);
           
         } catch (error) {
           console.error('Errore nel caricamento del PDF:', error);
@@ -209,10 +228,10 @@ export default function AdvancedPdfEditor() {
   useEffect(() => {
     // Reinizializza il canvas quando cambia la pagina corrente
     if (pdfUrl && currentPage > 0) {
-      // Piccolo ritardo per attendere che react-pdf renderizzi la pagina
-      setTimeout(() => {
+      // Utilizziamo requestAnimationFrame per sincronizzarci con il ciclo di rendering
+      requestAnimationFrame(() => {
         initCanvas();
-      }, 200);
+      });
     }
   }, [currentPage, pdfUrl]);
   
@@ -547,7 +566,7 @@ export default function AdvancedPdfEditor() {
     }
   };
   
-  // Salvataggio del documento
+  // Salvataggio del documento - ottimizzato
   const saveDocument = async () => {
     if (!pdfBytes) return;
     
@@ -555,39 +574,37 @@ export default function AdvancedPdfEditor() {
     // con il pdf-lib per creare un nuovo PDF con le annotazioni
     
     setIsProcessing(true);
-    setProgress(10);
+    setProgress(30);
     
     try {
-      // Simula il processo di salvataggio
-      setTimeout(() => {
-        setProgress(50);
-        setTimeout(() => {
-          setProgress(90);
-          
-          // Crea un link per scaricare il PDF
-          const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = pdfFile?.name?.replace('.pdf', '_modificato.pdf') || 'documento_modificato.pdf';
-          link.click();
-          
-          // Pulisci
-          window.URL.revokeObjectURL(url);
-          
-          setProgress(100);
-          setTimeout(() => {
-            setIsProcessing(false);
-            
-            toast({
-              title: "PDF Salvato",
-              description: "Il documento è stato salvato con successo",
-              duration: 3000
-            });
-          }, 500);
-        }, 700);
-      }, 800);
+      // Crea un link per scaricare il PDF immediatamente
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
       
+      setProgress(70);
+      
+      // Crea e attiva il link di download
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = pdfFile?.name?.replace('.pdf', '_modificato.pdf') || 'documento_modificato.pdf';
+      
+      // Esegui il download in modo asincrono per migliorare la reattività dell'UI
+      requestAnimationFrame(() => {
+        link.click();
+        
+        // Pulisci risorse
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+          setProgress(100);
+          setIsProcessing(false);
+          
+          toast({
+            title: "PDF Salvato",
+            description: "Il documento è stato salvato con successo",
+            duration: 3000
+          });
+        }, 100);
+      });
     } catch (error) {
       console.error('Errore nel salvataggio del PDF:', error);
       setErrorMessage("Si è verificato un errore nel salvataggio del PDF.");
@@ -831,6 +848,18 @@ export default function AdvancedPdfEditor() {
                     file={pdfUrl}
                     onLoadSuccess={onDocumentLoadSuccess}
                     className="flex justify-center"
+                    loading={
+                      <div className="flex flex-col items-center justify-center p-8">
+                        <div className="animate-spin h-8 w-8 border-4 border-black border-t-transparent rounded-full mb-4"></div>
+                        <p>Caricamento documento...</p>
+                      </div>
+                    }
+                    externalLinkTarget="_blank"
+                    options={{
+                      cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.4.120/cmaps/',
+                      cMapPacked: true,
+                      standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.4.120/standard_fonts/'
+                    }}
                   >
                     <Page 
                       pageNumber={currentPage}
@@ -839,6 +868,8 @@ export default function AdvancedPdfEditor() {
                       className="shadow-lg"
                       renderTextLayer={false}
                       renderAnnotationLayer={false}
+                      loading={false}
+                      canvasBackground="transparent"
                     />
                   </Document>
                   
