@@ -20,6 +20,7 @@ import {
 } from "@shared/schema";
 import { PDFDocument } from "pdf-lib";
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, ImageRun, Header, Footer, PageBreak } from 'docx';
+import pdfParse from 'pdf-parse';
 import { getCurrentPublicDebt, getHistoricalPublicDebt, comparePublicDebt, supportedCountries } from "./controllers/publicDebtController";
 import { 
   getBonusCategories,
@@ -325,41 +326,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
           })
         );
         
-        // Spazio per il contenuto reale (che sarà estratto dal PDF e messo qui)
-        for (let i = 0; i < numPages; i++) {
-          allParagraphs.push(
-            new Paragraph({
-              text: `Contenuto pagina ${i + 1}`,
-              heading: HeadingLevel.HEADING_3,
-              spacing: {
-                before: 300,
-                after: 120
-              }
-            })
-          );
-          
-          // Aggiungiamo alcuni paragrafi vuoti
-          for (let j = 0; j < 2; j++) {
+        // Estrai il contenuto del PDF usando pdf-parse
+        let pdfContent = "";
+        try {
+          const pdfData = await pdfParse(pdfBuffer);
+          pdfContent = pdfData.text || "";
+          console.log(`Estratto ${pdfContent.length} caratteri dal PDF`);
+        } catch (parseError) {
+          console.error('Errore nell\'estrazione del testo dal PDF:', parseError);
+          pdfContent = "Non è stato possibile estrarre il testo dal PDF.";
+        }
+        
+        // Suddividi il contenuto in paragrafi
+        const paragraphsText = pdfContent
+          .split(/\n\s*\n/) // Divide per linee vuote
+          .filter(p => p.trim().length > 0); // Rimuovi paragrafi vuoti
+        
+        if (paragraphsText.length > 0) {
+          // Aggiungi il contenuto reale estratto dal PDF
+          for (let i = 0; i < Math.min(numPages, paragraphsText.length); i++) {
+            // Intestazione di pagina
             allParagraphs.push(
               new Paragraph({
-                text: "",
+                text: `Pagina ${i + 1}`,
+                heading: HeadingLevel.HEADING_3,
+                spacing: {
+                  before: 300,
+                  after: 120
+                }
+              })
+            );
+            
+            // Suddividi il contenuto della pagina in paragrafi più piccoli
+            const pageContent = paragraphsText[i] || "";
+            const pageLines = pageContent.split('\n')
+              .filter(line => line.trim().length > 0)
+              .map(line => line.trim());
+            
+            // Aggiungi ogni riga come un paragrafo
+            for (const line of pageLines) {
+              allParagraphs.push(
+                new Paragraph({
+                  text: line,
+                  spacing: {
+                    before: 80,
+                    after: 80
+                  }
+                })
+              );
+            }
+            
+            // Aggiungi un'interruzione di pagina tra le pagine (tranne l'ultima)
+            if (i < numPages - 1 && i < paragraphsText.length - 1) {
+              allParagraphs.push(
+                new Paragraph({
+                  children: [
+                    new PageBreak()
+                  ]
+                })
+              );
+            }
+          }
+        } else {
+          // Fallback in caso di errore nell'estrazione del testo
+          for (let i = 0; i < numPages; i++) {
+            allParagraphs.push(
+              new Paragraph({
+                text: `Contenuto pagina ${i + 1}`,
+                heading: HeadingLevel.HEADING_3,
+                spacing: {
+                  before: 300,
+                  after: 120
+                }
+              })
+            );
+            
+            allParagraphs.push(
+              new Paragraph({
+                text: "Il contenuto di questa pagina non è stato estratto correttamente. Il PDF potrebbe essere protetto o contenere elementi non convertibili in testo.",
                 spacing: {
                   before: 120,
                   after: 120
                 }
               })
             );
-          }
-          
-          // Aggiungi un'interruzione di pagina (tranne per l'ultima pagina)
-          if (i < numPages - 1) {
-            allParagraphs.push(
-              new Paragraph({
-                children: [
-                  new PageBreak()
-                ]
-              })
-            );
+            
+            // Aggiungi un'interruzione di pagina (tranne per l'ultima pagina)
+            if (i < numPages - 1) {
+              allParagraphs.push(
+                new Paragraph({
+                  children: [
+                    new PageBreak()
+                  ]
+                })
+              );
+            }
           }
         }
         
@@ -513,19 +574,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const contentP = rtf.createP();
         contentP.addText('Contenuto del documento', { bold: true, font_size: 16 });
         
-        // Simula pagine per contenuto
-        for (let i = 0; i < numPages; i++) {
-          rtf.createP().addLineBreak();
-          const pageTitle = rtf.createP();
-          pageTitle.addText(`Contenuto pagina ${i + 1}`, { bold: true, font_size: 14 });
-          
-          // Aggiungi paragrafi vuoti
-          rtf.createP().addText('');
-          rtf.createP().addText('');
-          
-          // Aggiungi interruzione di pagina (tranne per l'ultima pagina)
-          if (i < numPages - 1) {
-            rtf.createP().addPageBreak();
+        // Estrai il contenuto del PDF usando pdf-parse (riuso questo codice anche per RTF)
+        let pdfContent = "";
+        try {
+          const pdfData = await pdfParse(pdfBuffer);
+          pdfContent = pdfData.text || "";
+          console.log(`Estratto ${pdfContent.length} caratteri dal PDF per RTF`);
+        } catch (parseError) {
+          console.error('Errore nell\'estrazione del testo dal PDF per RTF:', parseError);
+          pdfContent = "Non è stato possibile estrarre il testo dal PDF.";
+        }
+        
+        // Suddividi il contenuto in paragrafi
+        const paragraphsText = pdfContent
+          .split(/\n\s*\n/) // Divide per linee vuote
+          .filter(p => p.trim().length > 0); // Rimuovi paragrafi vuoti
+        
+        if (paragraphsText.length > 0) {
+          // Aggiungi il contenuto reale estratto dal PDF
+          for (let i = 0; i < Math.min(numPages, paragraphsText.length); i++) {
+            // Intestazione della pagina
+            rtf.createP().addLineBreak();
+            const pageTitle = rtf.createP();
+            pageTitle.addText(`Contenuto pagina ${i + 1}`, { bold: true, font_size: 14 });
+            
+            // Suddividi il contenuto della pagina in paragrafi più piccoli
+            const pageContent = paragraphsText[i] || "";
+            const pageLines = pageContent.split('\n')
+              .filter(line => line.trim().length > 0)
+              .map(line => line.trim());
+            
+            // Aggiungi ogni riga come paragrafo
+            for (const line of pageLines) {
+              const p = rtf.createP();
+              p.addText(line);
+            }
+            
+            // Aggiungi un'interruzione di pagina (tranne per l'ultima pagina)
+            if (i < numPages - 1 && i < paragraphsText.length - 1) {
+              rtf.createP().addPageBreak();
+            }
+          }
+        } else {
+          // Fallback in caso di errore nell'estrazione del testo
+          for (let i = 0; i < numPages; i++) {
+            rtf.createP().addLineBreak();
+            const pageTitle = rtf.createP();
+            pageTitle.addText(`Contenuto pagina ${i + 1}`, { bold: true, font_size: 14 });
+            
+            const errorP = rtf.createP();
+            errorP.addText("Il contenuto di questa pagina non è stato estratto correttamente. Il PDF potrebbe essere protetto o contenere elementi non convertibili in testo.");
+            
+            // Aggiungi interruzione di pagina (tranne per l'ultima pagina)
+            if (i < numPages - 1) {
+              rtf.createP().addPageBreak();
+            }
           }
         }
         
