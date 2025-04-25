@@ -39,6 +39,7 @@ const PdfToWordConverterPage = lazy(() => import("@/pages/PdfToWordConverterPage
 const AdvancedPdfEditorPage = lazy(() => import("@/pages/AdvancedPdfEditorPage"));
 const SimplePdfEditorPage = lazy(() => import("@/pages/SimplePdfEditorPage"));
 const BasicPdfEditorPage = lazy(() => import("@/pages/BasicPdfEditorPage"));
+const UltraSimplePdfEditorPage = lazy(() => import("@/pages/UltraSimplePdfEditorPage"));
 const CodiceFiscalePage = lazy(() => import("@/pages/CodiceFiscalePage"));
 
 // Pagine del forum
@@ -112,6 +113,7 @@ function Router() {
           <Route path="/strumenti/pdf-editor-avanzato" component={AdvancedPdfEditorPage} />
           <Route path="/strumenti/pdf-editor-semplice" component={SimplePdfEditorPage} />
           <Route path="/strumenti/pdf-editor-base" component={BasicPdfEditorPage} />
+          <Route path="/strumenti/pdf-editor-ultra" component={UltraSimplePdfEditorPage} />
           <Route path="/strumenti/pdf-word" component={PdfToWordConverterPage} />
           <Route path="/contatti" component={ContactPage} />
           

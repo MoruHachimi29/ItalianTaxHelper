@@ -80,6 +80,13 @@ const toolsList = [
     path: "/strumenti/pdf-editor-base"
   },
   {
+    id: "pdf-editor-ultra",
+    title: "PDF Viewer Ultra",
+    description: "Soluzione ultra-leggera e robusta per visualizzare e scaricare i tuoi PDF. Garantisce la massima compatibilità e velocità senza problemi.",
+    icon: "👁️",
+    path: "/strumenti/pdf-editor-ultra"
+  },
+  {
     id: "pdf-to-word",
     title: "PDF a Word",
     description: "Converti documenti PDF in file Word editabili, mantenendo la formattazione originale, immagini e layout. Ideale per modificare documenti bloccati.",
