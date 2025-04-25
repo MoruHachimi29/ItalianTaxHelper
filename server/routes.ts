@@ -334,120 +334,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
           })
         );
         
-        // Estrai il contenuto del PDF usando pdf-parse con tecnica avanzata
+        // Estrai il contenuto del PDF usando pdf-parse con approccio diretto
+        // Usiamo l'approccio più semplice ma più affidabile per estrarre il testo
         let pdfContent = "";
         try {
-          const pdfData = await pdfParse(pdfBuffer, {
-            // Opzioni avanzate per l'estrazione di testo
-            pagerender: function(pageData: any) {
-              return pageData.getTextContent({ normalizeWhitespace: true });
-            }
-          });
+          // Uso diretto senza opzioni personalizzate per massimizzare la compatibilità
+          const pdfData = await pdfParse(pdfBuffer);
           
           pdfContent = pdfData.text || "";
           console.log(`Estratto ${pdfContent.length} caratteri dal PDF`);
+          
+          // Aggiungiamo dettagli dal PDF per arricchire l'output
+          if (pdfData.info) {
+            console.log('Informazioni PDF:', JSON.stringify(pdfData.info));
+          }
+          if (pdfData.metadata) {
+            console.log('Metadata PDF:', JSON.stringify(pdfData.metadata));
+          }
         } catch (parseError) {
           console.error('Errore nell\'estrazione del testo dal PDF:', parseError);
           pdfContent = "Non è stato possibile estrarre il testo dal PDF.";
         }
         
-        // Preprocessamento avanzato del testo per migliorare la formattazione
-        // Elimina spazi eccessivi e normalizza le interruzioni di riga
+        // Approccio semplificato che mantiene il testo originale
+        // Eliminiamo l'elaborazione sofisticata che potrebbe alterare il contenuto originale
+        
+        // Normalizza solo le interruzioni di riga per coerenza
         let processedContent = pdfContent
-          .replace(/\r\n/g, '\n')              // Normalizza interruzioni di riga
-          .replace(/\n{3,}/g, '\n\n')          // Riduci interruzioni di riga multiple
-          .replace(/[ \t]+/g, ' ')             // Riduci spazi multipli a uno solo
-          .replace(/ +\n/g, '\n')              // Rimuovi spazi a fine riga
-          .replace(/\n +/g, '\n')              // Rimuovi spazi a inizio riga
+          .replace(/\r\n/g, '\n')  // Normalizza interruzioni di riga
           .trim();
         
-        // Prima identifica possibili titoli nel testo
-        const lines = processedContent.split('\n');
-        const enhancedLines = lines.map(line => {
-          line = line.trim();
-          // Cerca di identificare titoli e sottotitoli in base a caratteristiche comuni:
-          // - Testo breve (meno di 60 caratteri)
-          // - Tutto maiuscolo o inizia con maiuscola
-          // - Non contiene punteggiatura comune nelle frasi (.,;:) a metà
-          // - Non termina con virgola o punto e virgola
-          const isPossibleHeading = 
-            line.length > 0 && 
-            line.length < 60 && 
-            (line === line.toUpperCase() || /^[A-Z0-9]/.test(line)) &&
-            !line.match(/[.,:;]\s+\w/) &&
-            !line.match(/[,;]$/);
-            
-          return {
-            text: line,
-            isPossibleHeading,
-            // Identifica il livello di heading in base alla lunghezza
-            headingLevel: isPossibleHeading 
-              ? (line.length < 25 ? HeadingLevel.HEADING_2 : HeadingLevel.HEADING_3) 
-              : undefined
-          };
-        });
+        // Dividi in righe ma mantieni il contenuto originale
+        const contentLines = processedContent.split('\n')
+          .filter(line => line.length > 0);  // Rimuovi solo le righe vuote
         
-        // Ricostruisci il contenuto in paragrafi logici
-        const enhancedParagraphs = [];
-        let currentParagraph = "";
-        
-        for (let i = 0; i < enhancedLines.length; i++) {
-          const line = enhancedLines[i];
-          
-          // Se è un titolo, completa il paragrafo precedente e inizia un nuovo gruppo
-          if (line.isPossibleHeading) {
-            if (currentParagraph.length > 0) {
-              enhancedParagraphs.push({
-                text: currentParagraph,
-                type: 'paragraph'
-              });
-              currentParagraph = "";
-            }
-            enhancedParagraphs.push({
-              text: line.text,
-              type: 'heading',
-              level: line.headingLevel
-            });
-          } 
-          // Se la linea è vuota, completa il paragrafo corrente
-          else if (line.text.length === 0) {
-            if (currentParagraph.length > 0) {
-              enhancedParagraphs.push({
-                text: currentParagraph,
-                type: 'paragraph'
-              });
-              currentParagraph = "";
-            }
-          } 
-          // Altrimenti, continua ad aggiungere al paragrafo corrente
-          else {
-            if (currentParagraph.length > 0) {
-              currentParagraph += " " + line.text;
-            } else {
-              currentParagraph = line.text;
-            }
-          }
-        }
-        
-        // Assicurati di aggiungere l'ultimo paragrafo se presente
-        if (currentParagraph.length > 0) {
-          enhancedParagraphs.push({
-            text: currentParagraph,
-            type: 'paragraph'
-          });
-        }
-                
-        // Dividi il contenuto in sezioni per pagina, usando circa lo stesso numero di paragrafi per pagina
-        const paragraphsPerPage = Math.max(1, Math.ceil(enhancedParagraphs.length / numPages));
-        const pageContent = [];
-        
-        for (let i = 0; i < numPages; i++) {
-          const startIdx = i * paragraphsPerPage;
-          const endIdx = Math.min(startIdx + paragraphsPerPage, enhancedParagraphs.length);
-          if (startIdx < enhancedParagraphs.length) {
-            pageContent.push(enhancedParagraphs.slice(startIdx, endIdx));
-          }
-        }
+        // Crea paragrafi semplici per ogni riga, senza perdere contenuto
+        const simpleParagraphs = contentLines.map(line => ({
+          text: line,
+          type: 'paragraph'
+        }));
+
+        // Mettiamo tutto il contenuto in una singola "pagina" per evitare perdite
+        const pageContent = [simpleParagraphs];
         
         if (pageContent.length > 0) {
           // Per ogni pagina di contenuto
@@ -468,19 +396,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             // Aggiungi ogni paragrafo formattato correttamente
             for (const paragraph of pageParagraphs) {
-              if (paragraph.type === 'heading') {
-                // È un titolo - formatta come tale
-                allParagraphs.push(
-                  new Paragraph({
-                    text: paragraph.text,
-                    heading: paragraph.level,
-                    spacing: {
-                      before: 240,
-                      after: 120
-                    },
-                    keepNext: true
-                  })
-                );
+              // Nel nostro approccio semplificato, tutti i paragrafi sono di tipo 'paragraph'
+              // Non ci saranno paragrafi di tipo 'heading' quindi possiamo omettere questo blocco
+              // ma lo manteniamo per retrocompatibilità e chiarezza
+              if (false && paragraph.type === 'heading') {
+                // Omesso - non ci saranno più elementi di tipo 'heading'
+                // poiché abbiamo semplificato l'approccio
               } else {
                 // È un paragrafo normale
                 // Verifica se è un elenco puntato o numerato
@@ -732,143 +653,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const contentP = rtf.createP();
         contentP.addText('Contenuto del documento', { bold: true, font_size: 16 });
         
-        // Estrai il contenuto del PDF usando pdf-parse con tecnica avanzata
+        // Estrai il contenuto del PDF usando pdf-parse con approccio diretto
+        // Usiamo l'approccio più semplice ma più affidabile per estrarre il testo
         let pdfContent = "";
         try {
-          const pdfData = await pdfParse(pdfBuffer, {
-            // Opzioni avanzate per l'estrazione di testo
-            pagerender: function(pageData: any) {
-              return pageData.getTextContent({ normalizeWhitespace: true });
-            }
-          });
+          // Uso diretto senza opzioni personalizzate per massimizzare la compatibilità
+          const pdfData = await pdfParse(pdfBuffer);
           
           pdfContent = pdfData.text || "";
           console.log(`Estratto ${pdfContent.length} caratteri dal PDF per RTF`);
+          
+          // Aggiungiamo dettagli dal PDF per arricchire l'output
+          if (pdfData.info) {
+            console.log('Informazioni PDF per RTF:', JSON.stringify(pdfData.info));
+          }
+          if (pdfData.metadata) {
+            console.log('Metadata PDF per RTF:', JSON.stringify(pdfData.metadata));
+          }
         } catch (parseError) {
           console.error('Errore nell\'estrazione del testo dal PDF per RTF:', parseError);
           pdfContent = "Non è stato possibile estrarre il testo dal PDF.";
         }
         
-        // Preprocessamento avanzato del testo per migliorare la formattazione
-        // Elimina spazi eccessivi e normalizza le interruzioni di riga
+        // Approccio semplificato che mantiene il testo originale
+        // Eliminiamo l'elaborazione sofisticata che potrebbe alterare il contenuto originale
+        
+        // Normalizza solo le interruzioni di riga per coerenza
         let processedContent = pdfContent
-          .replace(/\r\n/g, '\n')              // Normalizza interruzioni di riga
-          .replace(/\n{3,}/g, '\n\n')          // Riduci interruzioni di riga multiple
-          .replace(/[ \t]+/g, ' ')             // Riduci spazi multipli a uno solo
-          .replace(/ +\n/g, '\n')              // Rimuovi spazi a fine riga
-          .replace(/\n +/g, '\n')              // Rimuovi spazi a inizio riga
+          .replace(/\r\n/g, '\n')  // Normalizza interruzioni di riga
           .trim();
-          
-        // Prima identifica possibili titoli nel testo
-        const lines = processedContent.split('\n');
-        const enhancedLines = lines.map(line => {
-          line = line.trim();
-          // Cerca di identificare titoli e sottotitoli in base a caratteristiche comuni:
-          // - Testo breve (meno di 60 caratteri)
-          // - Tutto maiuscolo o inizia con maiuscola
-          // - Non contiene punteggiatura comune nelle frasi (.,;:) a metà
-          // - Non termina con virgola o punto e virgola
-          const isPossibleHeading = 
-            line.length > 0 && 
-            line.length < 60 && 
-            (line === line.toUpperCase() || /^[A-Z0-9]/.test(line)) &&
-            !line.match(/[.,:;]\s+\w/) &&
-            !line.match(/[,;]$/);
-            
-          return {
-            text: line,
-            isPossibleHeading,
-            // Categorizziamo la dimensione del font in base alla lunghezza
-            fontSize: isPossibleHeading 
-              ? (line.length < 25 ? 18 : 16) 
-              : 12
-          };
-        });
         
-        // Ricostruisci il contenuto in paragrafi logici
-        const enhancedParagraphs: Array<any> = [];
-        let currentParagraph = "";
+        // Dividi in righe ma mantieni il contenuto originale
+        const contentLines = processedContent.split('\n')
+          .filter(line => line.length > 0);  // Rimuovi solo le righe vuote
         
-        for (let i = 0; i < enhancedLines.length; i++) {
-          const line = enhancedLines[i];
-          
-          // Se è un titolo, completa il paragrafo precedente e inizia un nuovo gruppo
-          if (line.isPossibleHeading) {
-            if (currentParagraph.length > 0) {
-              enhancedParagraphs.push({
-                text: currentParagraph,
-                type: 'paragraph'
-              });
-              currentParagraph = "";
-            }
-            enhancedParagraphs.push({
-              text: line.text,
-              type: 'heading',
-              fontSize: line.fontSize
-            });
-          } 
-          // Se la linea è vuota, completa il paragrafo corrente
-          else if (line.text.length === 0) {
-            if (currentParagraph.length > 0) {
-              enhancedParagraphs.push({
-                text: currentParagraph,
-                type: 'paragraph'
-              });
-              currentParagraph = "";
-            }
-          } 
-          // Altrimenti, continua ad aggiungere al paragrafo corrente
-          else {
-            // Verifica se è un elenco puntato o numerato
-            const isBulletList = line.text.match(/^[\s]*[•\-\*]\s/);
-            const isNumberedList = line.text.match(/^[\s]*\d+[.)]\s/);
-            
-            if (isBulletList || isNumberedList) {
-              // Se è un elenco, lo gestiamo separatamente
-              if (currentParagraph.length > 0) {
-                enhancedParagraphs.push({
-                  text: currentParagraph,
-                  type: 'paragraph'
-                });
-                currentParagraph = "";
-              }
-              
-              const numberMatch = isNumberedList ? line.text.match(/^[\s]*(\d+)[.)]/) : null;
-              enhancedParagraphs.push({
-                text: line.text,
-                type: isBulletList ? 'bullet' : 'numbered',
-                // Per elenchi numerati, estrai il numero
-                number: numberMatch ? parseInt(numberMatch[1]) : null
-              });
-            } else {
-              if (currentParagraph.length > 0) {
-                currentParagraph += " " + line.text;
-              } else {
-                currentParagraph = line.text;
-              }
-            }
-          }
-        }
-        
-        // Assicurati di aggiungere l'ultimo paragrafo se presente
-        if (currentParagraph.length > 0) {
-          enhancedParagraphs.push({
-            text: currentParagraph,
-            type: 'paragraph'
-          });
-        }
-                
-        // Dividi il contenuto in sezioni per pagina, usando circa lo stesso numero di paragrafi per pagina
-        const paragraphsPerPage = Math.max(1, Math.ceil(enhancedParagraphs.length / numPages));
-        const pageContent = [];
-        
-        for (let i = 0; i < numPages; i++) {
-          const startIdx = i * paragraphsPerPage;
-          const endIdx = Math.min(startIdx + paragraphsPerPage, enhancedParagraphs.length);
-          if (startIdx < enhancedParagraphs.length) {
-            pageContent.push(enhancedParagraphs.slice(startIdx, endIdx));
-          }
-        }
+        // Crea paragrafi semplici per ogni riga, senza perdere contenuto
+        const simpleParagraphs = contentLines.map(line => ({
+          text: line,
+          type: 'paragraph'
+        }));
+
+        // Mettiamo tutto il contenuto in una singola "pagina" per evitare perdite
+        const pageContent = [simpleParagraphs];
         
         if (pageContent.length > 0) {
           // Per ogni pagina di contenuto
@@ -882,28 +708,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             // Aggiungi ogni paragrafo formattato correttamente
             for (const paragraph of pageParagraphs) {
-              if (paragraph.type === 'heading') {
-                // È un titolo - formatta come tale
-                rtf.createP().addLineBreak();
-                const headingP = rtf.createP();
-                headingP.addText(paragraph.text, { 
-                  bold: true, 
-                  font_size: paragraph.fontSize 
-                });
-              } else if (paragraph.type === 'bullet') {
-                // Elenco puntato
+              // Nel nostro approccio semplificato, tutti i paragrafi sono di tipo 'paragraph'
+              // Non ci saranno più tipi speciali come 'heading', 'bullet', o 'numbered'
+              
+              // Verifica se è un elenco puntato
+              const isBulletList = paragraph.text.match(/^[\s]*[•\-\*]\s/);
+              if (isBulletList) {
+                // Se sembra un elenco puntato, formattalo come tale
                 const listP = rtf.createP();
-                // Rimuovi il carattere di elenco originale e sostituiscilo
                 const content = paragraph.text.replace(/^[\s]*[•\-\*]\s/, '');
                 listP.addText("• " + content);
-              } else if (paragraph.type === 'numbered') {
-                // Elenco numerato
+              }
+              // Verifica se è un elenco numerato
+              else if (paragraph.text.match(/^[\s]*\d+[.)]\s/)) {
                 const listP = rtf.createP();
-                // Rimuovi il numero originale e formato e sostituiscilo
+                // Estrai il numero se presente
+                const match = paragraph.text.match(/^[\s]*(\d+)[.)]\s/);
+                const num = match ? match[1] : "1";
                 const content = paragraph.text.replace(/^[\s]*\d+[.)]\s/, '');
-                listP.addText(`${paragraph.number}. ${content}`);
-              } else {
-                // Paragrafo normale
+                listP.addText(`${num}. ${content}`);
+              } 
+              // Paragrafo normale
+              else {
                 const p = rtf.createP();
                 p.addText(paragraph.text);
               }
