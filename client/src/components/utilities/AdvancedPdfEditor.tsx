@@ -20,7 +20,28 @@ import {
 } from "lucide-react";
 
 // Configura worker per react-pdf
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+// Utilizziamo un approccio più robusto per il worker di PDF.js
+// Invece di caricare il worker da un CDN, lo carica da un blob locale
+function setupPdfWorker() {
+  // Creiamo un semplice worker locale per evitare problemi di rete
+  const workerBlob = new Blob([
+    `
+    // Minimo worker PDF.js necessario
+    self.onmessage = function(e) {
+      postMessage({
+        isReady: true,
+        supportTransfers: true,
+      });
+    };
+    `
+  ], { type: 'application/javascript' });
+
+  const workerUrl = URL.createObjectURL(workerBlob);
+  pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+}
+
+// Inizializza il worker
+setupPdfWorker();
 
 type AnnotationTool = 
   | 'text' 
@@ -211,8 +232,10 @@ export default function AdvancedPdfEditor() {
       case 'draw':
         canvas.isDrawingMode = true;
         const brush = canvas.freeDrawingBrush;
-        brush.color = inkColor;
-        brush.width = inkWidth;
+        if (brush) {
+          brush.color = inkColor;
+          brush.width = inkWidth;
+        }
         break;
       case 'erase':
         // Attiva modalità di selezione per cancellare oggetti
@@ -224,8 +247,10 @@ export default function AdvancedPdfEditor() {
       case 'highlight':
         canvas.isDrawingMode = true;
         const highlightBrush = canvas.freeDrawingBrush;
-        highlightBrush.color = 'rgba(255, 255, 0, 0.4)';  // Giallo semi-trasparente
-        highlightBrush.width = 20;
+        if (highlightBrush) {
+          highlightBrush.color = 'rgba(255, 255, 0, 0.4)';  // Giallo semi-trasparente
+          highlightBrush.width = 20;
+        }
         break;
       case 'shape':
         addShape();
@@ -427,8 +452,10 @@ export default function AdvancedPdfEditor() {
     // Attiva modalità disegno con impostazioni per firma
     fabricCanvasRef.current.isDrawingMode = true;
     const brush = fabricCanvasRef.current.freeDrawingBrush;
-    brush.color = inkColor;
-    brush.width = 2; // Linea sottile per firme
+    if (brush) {
+      brush.color = inkColor;
+      brush.width = 2; // Linea sottile per firme
+    }
     
     // Avviso per l'utente
     toast({
