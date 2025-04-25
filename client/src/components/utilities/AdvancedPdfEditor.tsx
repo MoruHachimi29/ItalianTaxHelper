@@ -194,25 +194,42 @@ export default function AdvancedPdfEditor() {
       fabricCanvasRef.current.dispose();
     }
     
-    // Crea un nuovo canvas fabric
+    // Crea un nuovo canvas fabric con opzioni di base
     const fabricCanvas = new fabric.Canvas(canvasRef.current, {
       isDrawingMode: false,
+      selection: true,
+      renderOnAddRemove: true,
+      stopContextMenu: true
     });
     
     fabricCanvasRef.current = fabricCanvas;
     
-    // Imposta le dimensioni del canvas
-    updateCanvasSize();
-    
-    // Attiva il tool di disegno se necessario
-    if (activeTool === 'draw') {
-      fabricCanvas.isDrawingMode = true;
-      const brush = fabricCanvas.freeDrawingBrush;
-      if (brush) {
-        brush.color = inkColor;
-        brush.width = inkWidth;
+    // Attendiamo il prossimo ciclo di rendering per assicurarci che il DOM sia aggiornato
+    setTimeout(() => {
+      // Imposta le dimensioni del canvas
+      updateCanvasSize();
+      
+      // Attiva il tool di disegno se necessario
+      if (activeTool === 'draw') {
+        fabricCanvas.isDrawingMode = true;
+        const brush = fabricCanvas.freeDrawingBrush;
+        if (brush) {
+          brush.color = inkColor;
+          brush.width = inkWidth;
+        }
       }
-    }
+      
+      // Aggiungi eventi di gestione del canvas
+      fabricCanvas.on('object:added', function() {
+        console.log('Oggetto aggiunto al canvas');
+        fabricCanvas.renderAll();
+      });
+      
+      fabricCanvas.on('object:modified', function() {
+        console.log('Oggetto modificato nel canvas');
+        fabricCanvas.renderAll();
+      });
+    }, 200);
   };
   
   // Aggiorna le dimensioni del canvas
@@ -222,8 +239,12 @@ export default function AdvancedPdfEditor() {
     const pageContainer = document.querySelector('.react-pdf__Page');
     if (pageContainer) {
       const { width, height } = pageContainer.getBoundingClientRect();
+      console.log(`Dimensioni pagina: ${width}x${height}`);
       fabricCanvasRef.current.setWidth(width);
       fabricCanvasRef.current.setHeight(height);
+      fabricCanvasRef.current.renderAll();
+    } else {
+      console.warn('Impossibile trovare il contenitore della pagina per il ridimensionamento del canvas');
     }
   };
   
@@ -237,6 +258,54 @@ export default function AdvancedPdfEditor() {
       });
     }
   }, [currentPage, pdfUrl]);
+  
+  // Inizializzazione canvas e gestione eventi
+  useEffect(() => {
+    const handleResize = () => {
+      if (fabricCanvasRef.current) {
+        console.log('Ridimensionamento canvas dopo resize della finestra');
+        updateCanvasSize();
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Aggiungiamo un observer per rilevare i cambiamenti nel DOM
+    const observer = new MutationObserver(() => {
+      if (fabricCanvasRef.current && document.querySelector('.react-pdf__Page')) {
+        console.log('Rilevata modifica nel DOM della pagina PDF');
+        updateCanvasSize();
+      }
+    });
+    
+    // Attendiamo il caricamento del PDF
+    const waitForPdfElement = setInterval(() => {
+      const pdfContainer = document.querySelector('.react-pdf__Document');
+      if (pdfContainer) {
+        clearInterval(waitForPdfElement);
+        console.log('PDF container trovato, configurazione observer');
+        observer.observe(pdfContainer, { 
+          childList: true, 
+          subtree: true,
+          attributes: true
+        });
+        
+        // Forza un aggiornamento delle dimensioni del canvas
+        setTimeout(updateCanvasSize, 500);
+      }
+    }, 200);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      observer.disconnect();
+      clearInterval(waitForPdfElement);
+      
+      // Pulizia canvas quando il componente viene smontato
+      if (fabricCanvasRef.current) {
+        fabricCanvasRef.current.dispose();
+      }
+    };
+  }, []);
   
   // Gestione strumenti di annotazione
   const setTool = (tool: AnnotationTool) => {
@@ -365,127 +434,304 @@ export default function AdvancedPdfEditor() {
   
   // Funzioni per le diverse operazioni
   const addTextAnnotation = () => {
-    if (!fabricCanvasRef.current) return;
+    console.log('Aggiunta testo...');
+    if (!fabricCanvasRef.current) {
+      console.error('Fabric canvas non disponibile');
+      toast({
+        title: "Errore",
+        description: "Impossibile aggiungere testo, ricarica la pagina",
+        variant: "destructive",
+        duration: 3000
+      });
+      return;
+    }
     
-    const text = new fabric.IText('Clicca per modificare', {
-      left: 100,
-      top: 100,
-      fontFamily: textFont,
-      fontSize: textSize,
-      fill: inkColor,
-      opacity: opacity / 100
-    });
-    
-    fabricCanvasRef.current.add(text);
-    fabricCanvasRef.current.setActiveObject(text);
-    
-    addOperation({
-      type: 'text',
-      description: 'Aggiunto testo'
-    });
+    try {
+      // Creiamo un elemento di testo interattivo
+      const text = new fabric.IText('Clicca per modificare', {
+        left: 100,
+        top: 100,
+        fontFamily: textFont,
+        fontSize: textSize,
+        fill: inkColor,
+        opacity: opacity / 100,
+        selectable: true,
+        editable: true
+      });
+      
+      // Aggiungiamo l'elemento al canvas
+      fabricCanvasRef.current.add(text);
+      fabricCanvasRef.current.setActiveObject(text);
+      fabricCanvasRef.current.renderAll();
+      
+      console.log('Testo aggiunto con successo');
+      
+      // Aggiungiamo l'operazione alla cronologia
+      addOperation({
+        type: 'text',
+        description: 'Aggiunto testo'
+      });
+      
+      toast({
+        title: "Testo aggiunto",
+        description: "Clicca sul testo per modificarlo",
+        duration: 2000
+      });
+    } catch (error) {
+      console.error('Errore nell\'aggiunta del testo:', error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore nell'aggiunta del testo",
+        variant: "destructive",
+        duration: 3000
+      });
+    }
   };
   
   const addShape = () => {
-    if (!fabricCanvasRef.current) return;
-    
-    let shape;
-    
-    switch (selectedShape) {
-      case 'rectangle':
-        shape = new fabric.Rect({
-          left: 100,
-          top: 100,
-          width: 100,
-          height: 50,
-          fill: 'transparent',
-          stroke: inkColor,
-          strokeWidth: inkWidth,
-          opacity: opacity / 100
-        });
-        break;
-      case 'circle':
-        shape = new fabric.Circle({
-          left: 100,
-          top: 100,
-          radius: 50,
-          fill: 'transparent',
-          stroke: inkColor,
-          strokeWidth: inkWidth,
-          opacity: opacity / 100
-        });
-        break;
-      case 'line':
-        shape = new fabric.Line([50, 100, 200, 100], {
-          stroke: inkColor,
-          strokeWidth: inkWidth,
-          opacity: opacity / 100
-        });
-        break;
-      case 'arrow':
-        // Freccia (combinazione di linea e triangolo)
-        const line = new fabric.Line([50, 100, 200, 100], {
-          stroke: inkColor,
-          strokeWidth: inkWidth,
-          opacity: opacity / 100
-        });
-        
-        const triangle = new fabric.Triangle({
-          left: 200 - 15,
-          top: 100 - 10,
-          width: 20,
-          height: 20,
-          fill: inkColor,
-          opacity: opacity / 100,
-          angle: 90
-        });
-        
-        shape = new fabric.Group([line, triangle]);
-        break;
+    console.log('Aggiunta forma:', selectedShape);
+    if (!fabricCanvasRef.current) {
+      console.error('Canvas non disponibile');
+      toast({
+        title: "Errore",
+        description: "Impossibile aggiungere la forma, ricarica la pagina",
+        variant: "destructive",
+        duration: 3000
+      });
+      return;
     }
     
-    if (shape) {
-      fabricCanvasRef.current.add(shape);
-      fabricCanvasRef.current.setActiveObject(shape);
+    try {
+      let shape;
       
-      addOperation({
-        type: 'shape',
-        description: `Aggiunta forma: ${selectedShape}`
+      // Posizione e dimensioni predefinite
+      const x = 100;
+      const y = 100;
+      
+      switch (selectedShape) {
+        case 'rectangle':
+          shape = new fabric.Rect({
+            left: x,
+            top: y,
+            width: 100,
+            height: 50,
+            fill: 'transparent',
+            stroke: inkColor,
+            strokeWidth: inkWidth,
+            opacity: opacity / 100,
+            selectable: true,
+            transparentCorners: false,
+            cornerColor: 'black',
+            cornerSize: 8
+          });
+          break;
+        case 'circle':
+          shape = new fabric.Circle({
+            left: x,
+            top: y,
+            radius: 50,
+            fill: 'transparent',
+            stroke: inkColor,
+            strokeWidth: inkWidth,
+            opacity: opacity / 100,
+            selectable: true,
+            transparentCorners: false,
+            cornerColor: 'black',
+            cornerSize: 8
+          });
+          break;
+        case 'line':
+          shape = new fabric.Line([x, y, x + 150, y], {
+            stroke: inkColor,
+            strokeWidth: inkWidth,
+            opacity: opacity / 100,
+            selectable: true,
+            transparentCorners: false,
+            cornerColor: 'black',
+            cornerSize: 8
+          });
+          break;
+        case 'arrow':
+          // Freccia (combinazione di linea e triangolo)
+          const lineStartX = x;
+          const lineStartY = y;
+          const lineEndX = x + 150;
+          const lineEndY = y;
+          
+          const line = new fabric.Line([lineStartX, lineStartY, lineEndX, lineEndY], {
+            stroke: inkColor,
+            strokeWidth: inkWidth,
+            opacity: opacity / 100,
+            selectable: true,
+          });
+          
+          const triangle = new fabric.Triangle({
+            left: lineEndX - 15,
+            top: lineEndY - 10,
+            width: 20,
+            height: 20,
+            fill: inkColor,
+            opacity: opacity / 100,
+            angle: 90
+          });
+          
+          shape = new fabric.Group([line, triangle], {
+            left: x,
+            top: y,
+            selectable: true,
+            transparentCorners: false,
+            cornerColor: 'black',
+            cornerSize: 8
+          });
+          break;
+      }
+      
+      if (shape) {
+        console.log('Forma creata, aggiunta al canvas');
+        fabricCanvasRef.current.add(shape);
+        fabricCanvasRef.current.setActiveObject(shape);
+        fabricCanvasRef.current.renderAll();
+        
+        addOperation({
+          type: 'shape',
+          description: `Aggiunta forma: ${selectedShape}`
+        });
+        
+        toast({
+          title: "Forma aggiunta",
+          description: `${selectedShape} aggiunto al documento`,
+          duration: 2000
+        });
+      }
+    } catch (error) {
+      console.error('Errore nell\'aggiunta della forma:', error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore nell'aggiunta della forma",
+        variant: "destructive",
+        duration: 3000
       });
     }
   };
   
   const addImageAnnotation = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!fabricCanvasRef.current || !e.target.files || e.target.files.length === 0) return;
+    console.log('Aggiunta immagine...');
+    if (!fabricCanvasRef.current || !e.target.files || e.target.files.length === 0) {
+      console.error('Canvas non disponibile o nessun file selezionato');
+      toast({
+        title: "Errore",
+        description: "Impossibile aggiungere l'immagine, riprova",
+        variant: "destructive",
+        duration: 3000
+      });
+      return;
+    }
     
-    const file = e.target.files[0];
-    const reader = new FileReader();
+    setIsProcessing(true);
+    setProgress(30);
     
-    reader.onload = (event) => {
-      if (!event.target || !fabricCanvasRef.current) return;
+    try {
+      const file = e.target.files[0];
+      console.log('File immagine selezionato:', file.name);
       
-      const imgObj = new Image();
-      imgObj.src = event.target.result as string;
+      const reader = new FileReader();
       
-      imgObj.onload = () => {
-        const image = new fabric.Image(imgObj, {
-          left: 100,
-          top: 100,
-          opacity: opacity / 100,
-          scaleX: 0.5,
-          scaleY: 0.5
-        });
+      reader.onload = (event) => {
+        if (!event.target || !fabricCanvasRef.current) {
+          setIsProcessing(false);
+          return;
+        }
         
-        fabricCanvasRef.current?.add(image);
-        fabricCanvasRef.current?.setActiveObject(image);
+        setProgress(70);
         
-        addOperation({
-          type: 'image',
-          description: `Aggiunta immagine: ${file.name}`
+        const imgObj = new Image();
+        imgObj.src = event.target.result as string;
+        
+        imgObj.onload = () => {
+          try {
+            console.log('Immagine caricata, dimensioni:', imgObj.width, imgObj.height);
+            
+            // Calcola un fattore di scala appropriato per l'immagine
+            const maxSize = 300;
+            const scaleFactor = Math.min(
+              maxSize / imgObj.width,
+              maxSize / imgObj.height,
+              1
+            );
+            
+            const image = new fabric.Image(imgObj, {
+              left: 100,
+              top: 100,
+              opacity: opacity / 100,
+              scaleX: scaleFactor,
+              scaleY: scaleFactor
+            });
+            
+            fabricCanvasRef.current.add(image);
+            fabricCanvasRef.current.setActiveObject(image);
+            fabricCanvasRef.current.renderAll();
+            
+            console.log('Immagine aggiunta al canvas');
+            
+            addOperation({
+              type: 'image',
+              description: `Aggiunta immagine: ${file.name}`
+            });
+            
+            toast({
+              title: "Immagine aggiunta",
+              description: "L'immagine è stata aggiunta al documento",
+              duration: 2000
+            });
+            
+            setIsProcessing(false);
+          } catch (error) {
+            console.error('Errore nell\'aggiunta dell\'immagine al canvas:', error);
+            setIsProcessing(false);
+            toast({
+              title: "Errore",
+              description: "Si è verificato un errore nell'aggiunta dell'immagine",
+              variant: "destructive",
+              duration: 3000
+            });
+          }
+        };
+        
+        imgObj.onerror = () => {
+          console.error('Errore nel caricamento dell\'immagine');
+          setIsProcessing(false);
+          toast({
+            title: "Errore",
+            description: "Si è verificato un errore nel caricamento dell'immagine",
+            variant: "destructive",
+            duration: 3000
+          });
+        };
+      };
+      
+      reader.onerror = () => {
+        console.error('Errore nella lettura del file');
+        setIsProcessing(false);
+        toast({
+          title: "Errore",
+          description: "Si è verificato un errore nella lettura del file",
+          variant: "destructive",
+          duration: 3000
         });
       };
-    };
-    
-    reader.readAsDataURL(file);
+      
+      reader.readAsDataURL(file);
+      
+    } catch (error) {
+      console.error('Errore generale nell\'aggiunta dell\'immagine:', error);
+      setIsProcessing(false);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore nell'aggiunta dell'immagine",
+        variant: "destructive",
+        duration: 3000
+      });
+    }
   };
   
   const deleteSelectedObjects = () => {
