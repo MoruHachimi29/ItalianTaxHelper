@@ -73,6 +73,13 @@ const toolsList = [
     path: "/strumenti/pdf-editor"
   },
   {
+    id: "pdf-editor-base",
+    title: "Editor PDF Base",
+    description: "Versione leggera e affidabile per modificare i tuoi PDF. Ottimizzata per prestazioni eccellenti, ideale per aggiungere filigrane ai documenti.",
+    icon: "📑",
+    path: "/strumenti/pdf-editor-base"
+  },
+  {
     id: "pdf-to-word",
     title: "PDF a Word",
     description: "Converti documenti PDF in file Word editabili, mantenendo la formattazione originale, immagini e layout. Ideale per modificare documenti bloccati.",
