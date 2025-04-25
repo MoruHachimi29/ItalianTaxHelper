@@ -16,7 +16,8 @@ import {
   SquarePen, Type, ImagePlus, Eraser, RotateCw, 
   FileText, Download, Undo, Redo, Scissors,
   Highlighter, Pencil, Circle, Square, 
-  FilePlus, X, Save, PanelLeft, PanelRight, Search
+  FilePlus, X, Save, PanelLeft, PanelRight, Search,
+  Link, MessageSquare, Hash
 } from "lucide-react";
 
 // Configurazione del worker PDF.js usando la versione minificata più recente che abbiamo scaricato
@@ -789,6 +790,12 @@ export default function AdvancedPdfEditor() {
       console.error('Errore nell\'applicazione della filigrana:', error);
       setErrorMessage("Si è verificato un errore nell'applicazione della filigrana.");
       setIsProcessing(false);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore nell'applicazione della filigrana",
+        variant: "destructive",
+        duration: 3000
+      });
     }
   };
   
@@ -835,6 +842,12 @@ export default function AdvancedPdfEditor() {
       console.error('Errore nel salvataggio del PDF:', error);
       setErrorMessage("Si è verificato un errore nel salvataggio del PDF.");
       setIsProcessing(false);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore nel salvataggio del PDF",
+        variant: "destructive",
+        duration: 3000
+      });
     }
   };
   
@@ -1042,6 +1055,24 @@ export default function AdvancedPdfEditor() {
                   label="Cancella" 
                   active={activeTool === 'erase'} 
                   onClick={() => setTool('erase')} 
+                />
+                <ToolbarButton 
+                  icon={Hash} 
+                  label="Numeri Pag." 
+                  active={activeTool === 'pageNumber'} 
+                  onClick={() => setTool('pageNumber')} 
+                />
+                <ToolbarButton 
+                  icon={Link} 
+                  label="Link" 
+                  active={activeTool === 'link'} 
+                  onClick={() => setTool('link')} 
+                />
+                <ToolbarButton 
+                  icon={MessageSquare} 
+                  label="Commento" 
+                  active={activeTool === 'comment'} 
+                  onClick={() => setTool('comment')} 
                 />
                 <div className="mt-auto">
                   <ToolbarButton 
