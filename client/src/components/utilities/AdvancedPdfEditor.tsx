@@ -232,14 +232,36 @@ export default function AdvancedPdfEditor() {
     }, 200);
   };
   
-  // Aggiorna le dimensioni del canvas
+  // Aggiorna le dimensioni e posizione del canvas
   const updateCanvasSize = () => {
     if (!fabricCanvasRef.current || !canvasRef.current) return;
     
     const pageContainer = document.querySelector('.react-pdf__Page');
     if (pageContainer) {
-      const { width, height } = pageContainer.getBoundingClientRect();
-      console.log(`Dimensioni pagina: ${width}x${height}`);
+      const { width, height, left, top } = pageContainer.getBoundingClientRect();
+      console.log(`Dimensioni pagina: ${width}x${height}; Posizione: ${left},${top}`);
+      
+      // Aggiorna le dimensioni del canvas HTML
+      canvasRef.current.style.width = `${width}px`;
+      canvasRef.current.style.height = `${height}px`;
+      
+      // Esplicitamente posiziona il canvas sopra il PDF usando position absolute
+      const pageParent = pageContainer.parentElement;
+      if (pageParent) {
+        const parentRect = pageParent.getBoundingClientRect();
+        const deltaLeft = left - parentRect.left;
+        const deltaTop = top - parentRect.top;
+        
+        console.log(`Posizionamento canvas: top=${deltaTop}, left=${deltaLeft}`);
+        
+        canvasRef.current.style.position = 'absolute';
+        canvasRef.current.style.top = `${deltaTop}px`;
+        canvasRef.current.style.left = `${deltaLeft}px`;
+        canvasRef.current.style.zIndex = '100'; // Valore molto alto per essere sicuri
+        canvasRef.current.style.pointerEvents = 'auto'; // Abilita gli eventi mouse sul canvas
+      }
+      
+      // Aggiorna canvas Fabric
       fabricCanvasRef.current.setWidth(width);
       fabricCanvasRef.current.setHeight(height);
       fabricCanvasRef.current.renderAll();
@@ -1444,32 +1466,52 @@ export default function AdvancedPdfEditor() {
               
               {pdfUrl && (
                 <div className="relative">
-                  <Document
-                    file={pdfUrl}
-                    onLoadSuccess={onDocumentLoadSuccess}
-                    className="flex justify-center"
-                    loading={
-                      <div className="flex flex-col items-center justify-center p-8">
-                        <div className="animate-spin h-8 w-8 border-4 border-black border-t-transparent rounded-full mb-4"></div>
-                        <p>Caricamento documento...</p>
-                      </div>
-                    }
-                  >
-                    <Page 
-                      pageNumber={currentPage}
-                      scale={scale}
-                      rotate={rotation}
-                      className="shadow-lg"
-                      renderTextLayer={false}
-                      renderAnnotationLayer={false}
-                    />
-                  </Document>
+                  {/* Contenitore PDF con z-index inferiore */}
+                  <div className="absolute top-0 left-0 right-0 mx-auto" style={{ zIndex: 1 }}>
+                    <Document
+                      file={pdfUrl}
+                      onLoadSuccess={onDocumentLoadSuccess}
+                      className="flex justify-center"
+                      loading={
+                        <div className="flex flex-col items-center justify-center p-8">
+                          <div className="animate-spin h-8 w-8 border-4 border-black border-t-transparent rounded-full mb-4"></div>
+                          <p>Caricamento documento...</p>
+                        </div>
+                      }
+                    >
+                      <Page 
+                        pageNumber={currentPage}
+                        scale={scale}
+                        rotate={rotation}
+                        className="shadow-lg"
+                        renderTextLayer={false}
+                        renderAnnotationLayer={false}
+                      />
+                    </Document>
+                  </div>
                   
-                  {/* Canvas di annotazione sovrapposto alla pagina PDF */}
+                  {/* Canvas di annotazione con z-index maggiore */}
                   <canvas
                     ref={canvasRef}
-                    className="absolute top-0 left-0 right-0 mx-auto pointer-events-auto z-10"
+                    className="absolute top-0 left-0 right-0 mx-auto pointer-events-auto"
+                    style={{ zIndex: 20 }}
                   />
+                  
+                  {/* Div trasparente per mantenere le dimensioni */}
+                  <div style={{ 
+                    visibility: 'hidden',
+                    pointerEvents: 'none' 
+                  }}>
+                    <Document file={pdfUrl} className="flex justify-center">
+                      <Page 
+                        pageNumber={currentPage}
+                        scale={scale}
+                        rotate={rotation}
+                        renderTextLayer={false}
+                        renderAnnotationLayer={false}
+                      />
+                    </Document>
+                  </div>
                 </div>
               )}
             </div>
