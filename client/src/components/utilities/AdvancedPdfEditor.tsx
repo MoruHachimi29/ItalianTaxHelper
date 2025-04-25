@@ -671,9 +671,9 @@ export default function AdvancedPdfEditor() {
         canvas.add(shape);
         canvas.setActiveObject(shape);
         
-        // Sposta l'oggetto in cima alla pila di visualizzazione
-        const objects = canvas.getObjects();
-        canvas.moveTo(shape, objects.length - 1);
+        // Assicura che la forma sia visibile al di sopra di tutto
+        // Utilizza il canvas con 'any' per aggirare le limitazioni dei tipi
+        (canvas as any).bringForward(shape);
         
         canvas.renderAll();
         
@@ -752,9 +752,14 @@ export default function AdvancedPdfEditor() {
               scaleY: scaleFactor
             });
             
-            fabricCanvasRef.current?.add(image);
-            fabricCanvasRef.current?.setActiveObject(image);
-            fabricCanvasRef.current?.renderAll();
+            if (fabricCanvasRef.current) {
+              const canvas = fabricCanvasRef.current;
+              canvas.add(image);
+              canvas.setActiveObject(image);
+              // Porta l'immagine in primo piano usando l'approccio con 'any'
+              (canvas as any).bringForward(image);
+              canvas.renderAll();
+            }
             
             console.log('Immagine aggiunta al canvas');
             
@@ -1037,9 +1042,14 @@ export default function AdvancedPdfEditor() {
       // Aggiungi metadati personalizzati (in un'implementazione reale, questo verrebbe utilizzato per incorporare il link nel PDF)
       group.set('linkUrl', url);
       
-      fabricCanvasRef.current?.add(group);
-      fabricCanvasRef.current?.setActiveObject(group);
-      fabricCanvasRef.current?.renderAll();
+      if (fabricCanvasRef.current) {
+        const canvas = fabricCanvasRef.current;
+        canvas.add(group);
+        canvas.setActiveObject(group);
+        // Porta il gruppo in primo piano
+        (canvas as any).bringForward(group);
+        canvas.renderAll();
+      }
       
       addOperation({
         type: 'annotate',
@@ -1115,8 +1125,13 @@ export default function AdvancedPdfEditor() {
         });
       });
       
-      fabricCanvasRef.current?.add(commentGroup);
-      fabricCanvasRef.current?.renderAll();
+      if (fabricCanvasRef.current) {
+        const canvas = fabricCanvasRef.current;
+        canvas.add(commentGroup);
+        // Porta il commento in primo piano
+        (canvas as any).bringForward(commentGroup);
+        canvas.renderAll();
+      }
       
       addOperation({
         type: 'annotate',
