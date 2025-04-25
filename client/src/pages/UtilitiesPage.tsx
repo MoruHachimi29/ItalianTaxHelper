@@ -78,6 +78,13 @@ const toolsList = [
     description: "Converti documenti PDF in file Word editabili, mantenendo la formattazione originale, immagini e layout. Ideale per modificare documenti bloccati.",
     icon: "📝",
     path: "/strumenti/pdf-word"
+  },
+  {
+    id: "advanced-pdf-editor",
+    title: "Editor PDF Professionale",
+    description: "Strumento avanzato di annotazione PDF ispirato a SmallPDF: evidenziatore, disegno a mano libera, firme, forme personalizzate, aggiunta di testo e immagini.",
+    icon: "🖋️",
+    path: "/strumenti/pdf-editor-avanzato"
   }
 ];
 
