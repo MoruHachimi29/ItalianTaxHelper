@@ -232,6 +232,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Errore nel recupero della notizia" });
     }
   });
+  
+  // Blog API endpoints
+  app.get("/api/blog", async (req, res) => {
+    try {
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+      
+      const { posts, totalCount } = await storage.getAllBlogPosts(page, limit);
+      res.json({ posts, totalCount, currentPage: page, totalPages: Math.ceil(totalCount / limit) });
+    } catch (error) {
+      console.error("Error fetching blog posts:", error);
+      res.status(500).json({ message: "Errore nel recupero dei post del blog" });
+    }
+  });
+  
+  app.get("/api/blog/latest", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 3;
+      const latestPosts = await storage.getLatestBlogPosts(limit);
+      res.json(latestPosts);
+    } catch (error) {
+      console.error("Error fetching latest blog posts:", error);
+      res.status(500).json({ message: "Errore nel recupero dei post recenti del blog" });
+    }
+  });
+  
+  app.get("/api/blog/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const post = await storage.getBlogPostBySlug(slug);
+      
+      if (!post) {
+        return res.status(404).json({ message: "Post non trovato" });
+      }
+      
+      res.json(post);
+    } catch (error) {
+      console.error("Error fetching blog post by slug:", error);
+      res.status(500).json({ message: "Errore nel recupero del post" });
+    }
+  });
+  
+  // Forum API endpoints 
+  app.get("/api/forum/categories", async (req, res) => {
+    try {
+      const categories = await storage.getAllForumCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching forum categories:", error);
+      res.status(500).json({ message: "Errore nel recupero delle categorie del forum" });
+    }
+  });
+  
+  app.get("/api/forum/topics/:categoryId", async (req, res) => {
+    try {
+      const { categoryId } = req.params;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
+      
+      const { topics, totalCount } = await storage.getForumTopicsByCategoryId(parseInt(categoryId), page, limit);
+      res.json({ topics, totalCount, currentPage: page, totalPages: Math.ceil(totalCount / limit) });
+    } catch (error) {
+      console.error("Error fetching forum topics:", error);
+      res.status(500).json({ message: "Errore nel recupero degli argomenti del forum" });
+    }
+  });
+  
+  app.get("/api/forum/topic/:topicId/posts", async (req, res) => {
+    try {
+      const { topicId } = req.params;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
+      
+      const { posts, totalCount } = await storage.getForumPostsByTopicId(parseInt(topicId), page, limit);
+      res.json({ posts, totalCount, currentPage: page, totalPages: Math.ceil(totalCount / limit) });
+    } catch (error) {
+      console.error("Error fetching forum posts:", error);
+      res.status(500).json({ message: "Errore nel recupero dei post" });
+    }
+  });
+  
+  app.get("/api/forum/latest-topics", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
+      const latestTopics = await storage.getLatestForumTopics(limit);
+      res.json(latestTopics);
+    } catch (error) {
+      console.error("Error fetching latest forum topics:", error);
+      res.status(500).json({ message: "Errore nel recupero degli argomenti recenti" });
+    }
+  });
+  
+  app.get("/api/forum/latest-posts", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
+      const latestPosts = await storage.getLatestForumPosts(limit);
+      res.json(latestPosts);
+    } catch (error) {
+      console.error("Error fetching latest forum posts:", error);
+      res.status(500).json({ message: "Errore nel recupero dei post recenti" });
+    }
+  });
 
   // Configurazione di multer per gestire i file caricati
   const upload = multer({ storage: multer.memoryStorage() });
