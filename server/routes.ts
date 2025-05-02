@@ -233,6 +233,149 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Economic News API endpoints
+  app.get("/api/economic-news", async (req, res) => {
+    try {
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const pageSize = req.query.pageSize ? parseInt(req.query.pageSize as string) : 10;
+      
+      // Se non c'è una chiave API, restituiamo notizie dal database
+      if (!NEWS_API_KEY) {
+        const allNews = await storage.getAllNews();
+        const totalCount = allNews.length;
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const paginatedNews = allNews.slice(startIndex, endIndex);
+        
+        return res.json({
+          articles: paginatedNews,
+          totalResults: totalCount,
+          currentPage: page,
+          totalPages: Math.ceil(totalCount / pageSize)
+        });
+      }
+      
+      // Utilizziamo News API per ottenere notizie economiche reali
+      const newsApiUrl = `${NEWS_API_URL}/top-headlines?country=it&category=business&apiKey=${NEWS_API_KEY}&page=${page}&pageSize=${pageSize}`;
+      
+      const response = await fetch(newsApiUrl);
+      const data = await response.json();
+      
+      if (!response.ok) {
+        console.error("News API error:", data);
+        throw new Error(data.message || "Errore nel recupero delle notizie economiche");
+      }
+      
+      res.json(data);
+    } catch (error) {
+      console.error("Error fetching economic news:", error);
+      res.status(500).json({ message: "Errore nel recupero delle notizie economiche" });
+    }
+  });
+  
+  app.get("/api/economic-news/search", async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const pageSize = req.query.pageSize ? parseInt(req.query.pageSize as string) : 10;
+      
+      if (!query) {
+        return res.status(400).json({ message: "Parametro di ricerca mancante" });
+      }
+      
+      // Se non c'è una chiave API, cerchiamo nelle notizie del database
+      if (!NEWS_API_KEY) {
+        const allNews = await storage.getAllNews();
+        const filteredNews = allNews.filter(news => 
+          news.title.toLowerCase().includes(query.toLowerCase()) || 
+          (news.content && news.content.toLowerCase().includes(query.toLowerCase()))
+        );
+        
+        const totalCount = filteredNews.length;
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const paginatedNews = filteredNews.slice(startIndex, endIndex);
+        
+        return res.json({
+          articles: paginatedNews,
+          totalResults: totalCount,
+          currentPage: page,
+          totalPages: Math.ceil(totalCount / pageSize)
+        });
+      }
+      
+      // Utilizziamo News API per cercare notizie
+      const newsApiUrl = `${NEWS_API_URL}/everything?q=${encodeURIComponent(query)}&language=it&apiKey=${NEWS_API_KEY}&page=${page}&pageSize=${pageSize}`;
+      
+      const response = await fetch(newsApiUrl);
+      const data = await response.json();
+      
+      if (!response.ok) {
+        console.error("News API search error:", data);
+        throw new Error(data.message || "Errore nella ricerca delle notizie");
+      }
+      
+      res.json(data);
+    } catch (error) {
+      console.error("Error searching economic news:", error);
+      res.status(500).json({ message: "Errore nella ricerca delle notizie" });
+    }
+  });
+  
+  app.get("/api/economic-news/category/:category", async (req, res) => {
+    try {
+      const { category } = req.params;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const pageSize = req.query.pageSize ? parseInt(req.query.pageSize as string) : 10;
+      
+      // Se non c'è una chiave API, restituiamo notizie dal database
+      if (!NEWS_API_KEY) {
+        const allNews = await storage.getAllNews();
+        // Simuliamo il filtraggio per categoria usando i tag (se disponibili)
+        const filteredNews = allNews.filter(news => 
+          news.tags && news.tags.includes(category)
+        );
+        
+        const totalCount = filteredNews.length;
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const paginatedNews = filteredNews.slice(startIndex, endIndex);
+        
+        return res.json({
+          articles: paginatedNews,
+          totalResults: totalCount,
+          currentPage: page,
+          totalPages: Math.ceil(totalCount / pageSize)
+        });
+      }
+      
+      // Utilizziamo News API per ottenere notizie per categoria
+      // News API supporta solo alcune categorie specifiche, quindi facciamo una ricerca
+      // basata sulla categoria come parola chiave se non è una categoria standard
+      const standardCategories = ["business", "entertainment", "general", "health", "science", "sports", "technology"];
+      let newsApiUrl;
+      
+      if (standardCategories.includes(category)) {
+        newsApiUrl = `${NEWS_API_URL}/top-headlines?country=it&category=${category}&apiKey=${NEWS_API_KEY}&page=${page}&pageSize=${pageSize}`;
+      } else {
+        newsApiUrl = `${NEWS_API_URL}/everything?q=${encodeURIComponent(category)}&language=it&apiKey=${NEWS_API_KEY}&page=${page}&pageSize=${pageSize}`;
+      }
+      
+      const response = await fetch(newsApiUrl);
+      const data = await response.json();
+      
+      if (!response.ok) {
+        console.error("News API category error:", data);
+        throw new Error(data.message || "Errore nel recupero delle notizie per categoria");
+      }
+      
+      res.json(data);
+    } catch (error) {
+      console.error("Error fetching economic news by category:", error);
+      res.status(500).json({ message: "Errore nel recupero delle notizie per categoria" });
+    }
+  });
+  
   // Blog API endpoints
   app.get("/api/blog", async (req, res) => {
     try {
