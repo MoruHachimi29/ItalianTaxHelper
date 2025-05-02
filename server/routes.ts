@@ -259,14 +259,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newsApiUrl = `${NEWS_API_URL}/top-headlines?country=it&category=business&apiKey=${NEWS_API_KEY}&page=${page}&pageSize=${pageSize}`;
       
       const response = await fetch(newsApiUrl);
-      const data = await response.json();
+      const data = await response.json() as {
+        status: string;
+        totalResults: number;
+        articles: Array<any>;
+        message?: string;
+      };
       
       if (!response.ok) {
         console.error("News API error:", data);
         throw new Error(data.message || "Errore nel recupero delle notizie economiche");
       }
       
-      res.json(data);
+      const totalPages = Math.ceil(data.totalResults / pageSize) || 1;
+      
+      // Aggiungiamo i campi mancanti alla risposta
+      const enrichedData = {
+        ...data,
+        currentPage: page,
+        pageSize,
+        totalPages
+      };
+      
+      res.json(enrichedData);
     } catch (error) {
       console.error("Error fetching economic news:", error);
       res.status(500).json({ message: "Errore nel recupero delle notizie economiche" });
@@ -308,14 +323,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newsApiUrl = `${NEWS_API_URL}/everything?q=${encodeURIComponent(query)}&language=it&apiKey=${NEWS_API_KEY}&page=${page}&pageSize=${pageSize}`;
       
       const response = await fetch(newsApiUrl);
-      const data = await response.json();
+      const data = await response.json() as {
+        status: string;
+        totalResults: number;
+        articles: Array<any>;
+        message?: string;
+      };
       
       if (!response.ok) {
         console.error("News API search error:", data);
         throw new Error(data.message || "Errore nella ricerca delle notizie");
       }
       
-      res.json(data);
+      const totalPages = Math.ceil(data.totalResults / pageSize) || 1;
+      
+      // Aggiungiamo i campi mancanti alla risposta
+      const enrichedData = {
+        ...data,
+        currentPage: page,
+        pageSize,
+        totalPages
+      };
+      
+      res.json(enrichedData);
     } catch (error) {
       console.error("Error searching economic news:", error);
       res.status(500).json({ message: "Errore nella ricerca delle notizie" });
@@ -331,9 +361,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Se non c'è una chiave API, restituiamo notizie dal database
       if (!NEWS_API_KEY) {
         const allNews = await storage.getAllNews();
-        // Simuliamo il filtraggio per categoria usando i tag (se disponibili)
+        // Simuliamo il filtraggio per categoria cercando nel titolo e nel contenuto
         const filteredNews = allNews.filter(news => 
-          news.tags && news.tags.includes(category)
+          news.title.toLowerCase().includes(category.toLowerCase()) ||
+          (news.content && news.content.toLowerCase().includes(category.toLowerCase()))
         );
         
         const totalCount = filteredNews.length;
@@ -362,14 +393,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const response = await fetch(newsApiUrl);
-      const data = await response.json();
+      const data = await response.json() as {
+        status: string;
+        totalResults: number;
+        articles: Array<any>;
+        message?: string;
+      };
       
       if (!response.ok) {
         console.error("News API category error:", data);
         throw new Error(data.message || "Errore nel recupero delle notizie per categoria");
       }
       
-      res.json(data);
+      const totalPages = Math.ceil(data.totalResults / pageSize) || 1;
+      
+      // Aggiungiamo i campi mancanti alla risposta
+      const enrichedData = {
+        ...data,
+        currentPage: page,
+        pageSize,
+        totalPages
+      };
+      
+      res.json(enrichedData);
     } catch (error) {
       console.error("Error fetching economic news by category:", error);
       res.status(500).json({ message: "Errore nel recupero delle notizie per categoria" });
