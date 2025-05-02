@@ -11,10 +11,15 @@ import { Input } from "@/components/ui/input";
 
 interface NewsArticle {
   title: string;
-  content: string;
-  source: string;
+  content?: string;
+  description?: string;
+  source: {
+    id: string | null;
+    name: string;
+  };
   url: string;
-  imageUrl: string | null;
+  imageUrl?: string | null;
+  urlToImage?: string;
   publishedAt: string;
   author: string | null;
 }
@@ -233,10 +238,10 @@ export default function EconomicNewsList({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {data?.articles.map((article, index) => (
               <Card key={index} className="overflow-hidden flex flex-col h-full">
-                {article.imageUrl && (
+                {(article.imageUrl || article.urlToImage) && (
                   <div className="h-48 overflow-hidden">
                     <img 
-                      src={article.imageUrl} 
+                      src={article.imageUrl || article.urlToImage} 
                       alt={article.title} 
                       className="w-full h-full object-cover"
                       onError={(e) => (e.currentTarget.style.display = "none")}
@@ -245,14 +250,14 @@ export default function EconomicNewsList({
                 )}
                 <CardHeader>
                   <div className="flex justify-between items-center mb-2">
-                    <Badge variant="outline">{article.source}</Badge>
+                    <Badge variant="outline">{article.source?.name ? String(article.source.name) : "News"}</Badge>
                     <span className="text-xs text-gray-500">{formatDate(article.publishedAt)}</span>
                   </div>
                   <CardTitle className="text-lg">{article.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <CardDescription className="text-gray-600">
-                    {article.content || "Leggi l'articolo completo per maggiori informazioni."}
+                    {article.description || article.content || "Leggi l'articolo completo per maggiori informazioni."}
                   </CardDescription>
                 </CardContent>
                 <CardFooter>
