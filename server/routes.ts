@@ -239,49 +239,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const page = req.query.page ? parseInt(req.query.page as string) : 1;
       const pageSize = req.query.pageSize ? parseInt(req.query.pageSize as string) : 10;
       
-      // Se non c'è una chiave API, restituiamo notizie dal database
-      if (!NEWS_API_KEY) {
-        const allNews = await storage.getAllNews();
-        const totalCount = allNews.length;
+      // Recuperiamo le notizie dal database
+      const allNews = await storage.getAllNews();
+      
+      // Se non c'è una chiave API o la pagina richiesta è 1 (prima pagina), usiamo le notizie locali
+      if (!NEWS_API_KEY || page === 1) {
+        console.log("Usando notizie dal database per /api/economic-news");
+        
+        // Adattiamo il formato delle notizie dal database al formato atteso dal frontend
+        const adaptedNews = allNews.map(news => ({
+          title: news.title,
+          content: news.content,
+          description: news.content,
+          publishedAt: news.publishDate,
+          author: news.author,
+          url: `#news-${news.id}`,
+          source: {
+            id: String(news.id),
+            name: "F24Editabile"
+          },
+          urlToImage: null
+        }));
+        
+        const totalCount = adaptedNews.length;
         const startIndex = (page - 1) * pageSize;
         const endIndex = startIndex + pageSize;
-        const paginatedNews = allNews.slice(startIndex, endIndex);
+        const paginatedNews = adaptedNews.slice(startIndex, endIndex);
         
         return res.json({
           articles: paginatedNews,
           totalResults: totalCount,
           currentPage: page,
+          pageSize,
           totalPages: Math.ceil(totalCount / pageSize)
         });
       }
       
-      // Utilizziamo News API per ottenere notizie economiche reali
-      const newsApiUrl = `${NEWS_API_URL}/top-headlines?country=it&category=business&apiKey=${NEWS_API_KEY}&page=${page}&pageSize=${pageSize}`;
-      
-      const response = await fetch(newsApiUrl);
-      const data = await response.json() as {
-        status: string;
-        totalResults: number;
-        articles: Array<any>;
-        message?: string;
-      };
-      
-      if (!response.ok) {
-        console.error("News API error:", data);
-        throw new Error(data.message || "Errore nel recupero delle notizie economiche");
+      // Per le pagine successive proviamo prima con la News API
+      try {
+        // Utilizziamo News API per ottenere notizie economiche reali
+        const newsApiUrl = `${NEWS_API_URL}/top-headlines?country=it&category=business&apiKey=${NEWS_API_KEY}&page=${page}&pageSize=${pageSize}`;
+        
+        const response = await fetch(newsApiUrl);
+        const data = await response.json() as {
+          status: string;
+          totalResults: number;
+          articles: Array<any>;
+          message?: string;
+        };
+        
+        if (!response.ok) {
+          console.error("News API error:", data);
+          throw new Error(data.message || "Errore nel recupero delle notizie economiche");
+        }
+        
+        // Se non ci sono risultati dall'API, usiamo quelle dal database
+        if (data.totalResults === 0 || data.articles.length === 0) {
+          throw new Error("Nessun risultato dalla News API");
+        }
+        
+        const totalPages = Math.ceil(data.totalResults / pageSize) || 1;
+        
+        // Aggiungiamo i campi mancanti alla risposta
+        const enrichedData = {
+          ...data,
+          currentPage: page,
+          pageSize,
+          totalPages
+        };
+        
+        return res.json(enrichedData);
+      } catch (apiError) {
+        console.log("Fallback al database: ", apiError.message);
+        
+        // Se c'è un errore con la News API, usiamo le notizie dal database come fallback
+        const adaptedNews = allNews.map(news => ({
+          title: news.title,
+          content: news.content,
+          description: news.content,
+          publishedAt: news.publishDate,
+          author: news.author,
+          url: `#news-${news.id}`,
+          source: {
+            id: String(news.id),
+            name: "F24Editabile"
+          },
+          urlToImage: null
+        }));
+        
+        const totalCount = adaptedNews.length;
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const paginatedNews = adaptedNews.slice(startIndex, endIndex);
+        
+        return res.json({
+          articles: paginatedNews,
+          totalResults: totalCount,
+          currentPage: page,
+          pageSize,
+          totalPages: Math.ceil(totalCount / pageSize)
+        });
       }
-      
-      const totalPages = Math.ceil(data.totalResults / pageSize) || 1;
-      
-      // Aggiungiamo i campi mancanti alla risposta
-      const enrichedData = {
-        ...data,
-        currentPage: page,
-        pageSize,
-        totalPages
-      };
-      
-      res.json(enrichedData);
     } catch (error) {
       console.error("Error fetching economic news:", error);
       res.status(500).json({ message: "Errore nel recupero delle notizie economiche" });
