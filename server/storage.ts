@@ -848,6 +848,63 @@ async function initializeDatabase() {
     ]);
   }
   
+  // Verifica se ci sono già delle categorie nel forum
+  const existingForumCategories = await db.select({ count: count() }).from(forumCategories);
+  if (existingForumCategories[0].count === 0) {
+    console.log("Inizializzazione delle categorie del forum...");
+    const now = new Date();
+    
+    await db.insert(forumCategories).values([
+      {
+        name: "F24 e Modulistica Fiscale",
+        description: "Discussioni sulla compilazione dei moduli F24, F23 e altre modulistiche fiscali",
+        slug: "f24-modulistica-fiscale",
+        iconName: "file-text",
+        order: 1,
+        createdAt: now,
+        updatedAt: now
+      },
+      {
+        name: "Novità Fiscali",
+        description: "Aggiornamenti, novità e discussioni sugli ultimi sviluppi in ambito fiscale e tributario",
+        slug: "novita-fiscali",
+        iconName: "newspaper",
+        order: 2,
+        createdAt: now,
+        updatedAt: now
+      },
+      {
+        name: "Partita IVA e Imprese",
+        description: "Discussioni per professionisti e imprese: fatturazione, adempimenti e agevolazioni",
+        slug: "partita-iva-imprese",
+        iconName: "briefcase",
+        order: 3,
+        createdAt: now,
+        updatedAt: now
+      },
+      {
+        name: "Tasse e Imposte",
+        description: "Domande e informazioni su IRPEF, IRES, IMU, IRAP e altre imposte",
+        slug: "tasse-imposte",
+        iconName: "landmark",
+        order: 4,
+        createdAt: now,
+        updatedAt: now
+      },
+      {
+        name: "Aiuto e Consigli",
+        description: "Richiedi aiuto per problemi specifici o condividi consigli pratici",
+        slug: "aiuto-consigli",
+        iconName: "help-circle",
+        order: 5,
+        createdAt: now,
+        updatedAt: now
+      }
+    ]);
+    
+    console.log("Categorie del forum inizializzate con successo");
+  }
+  
   // Verifica se ci sono già dei post nel blog
   const existingBlogPosts = await db.select({ count: count() }).from(blogPosts);
   if (existingBlogPosts[0].count === 0) {
