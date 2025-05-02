@@ -7,6 +7,7 @@ import {
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { signInWithGoogle, getGoogleAuthResult, type FirebaseUser } from "@/lib/firebase";
+import { UserCredential } from "firebase/auth";
 
 // Definisce l'interfaccia per l'oggetto utente
 interface User {
@@ -36,7 +37,7 @@ interface GoogleAuthData {
 }
 
 // Definisce il tipo di contesto per l'autenticazione
-type AuthContextType = {
+interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   error: Error | null;
@@ -44,13 +45,26 @@ type AuthContextType = {
   logoutMutation: UseMutationResult<void, Error, void>;
   registerMutation: UseMutationResult<User, Error, RegisterData>;
   googleAuthMutation: UseMutationResult<User, Error, void>;
+}
+
+// Crea un valore di default per il contesto (evita warning)
+const defaultAuthContext: AuthContextType = {
+  user: null,
+  isLoading: false,
+  error: null,
+  loginMutation: {} as UseMutationResult<User, Error, LoginData>,
+  logoutMutation: {} as UseMutationResult<void, Error, void>,
+  registerMutation: {} as UseMutationResult<User, Error, RegisterData>,
+  googleAuthMutation: {} as UseMutationResult<User, Error, void>
 };
 
-// Import del tipo UserCredential
-import { UserCredential } from "firebase/auth";
-
 // Crea il contesto per l'autenticazione
-export const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType>(defaultAuthContext);
+
+// Hook per utilizzare il contesto di autenticazione
+export function useAuth() {
+  return useContext(AuthContext);
+}
 
 // Componente provider per l'autenticazione
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -233,18 +247,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await signInWithGoogle();
         // Questo metodo fa un redirect e non restituisce un risultato direttamente
         // Il risultato verrà gestito in useEffect quando l'utente ritorna all'app
-        return null as any; // Solo per evitare errori di tipo
+        return {} as User; // Restituisci un oggetto vuoto, verrà ignorato perché il redirect avviene prima
       } catch (error) {
         console.error("Errore durante l'autenticazione con Google:", error);
         throw error;
       }
-    },
-    onSuccess: (userData: User) => {
-      queryClient.setQueryData(["/api/user"], userData);
-      toast({
-        title: "Accesso con Google completato",
-        description: `Benvenuto, ${userData.username}!`,
-      });
     },
     onError: (error: Error) => {
       toast({
@@ -270,13 +277,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-// Hook per utilizzare il contesto di autenticazione
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth deve essere utilizzato all'interno di un AuthProvider");
-  }
-  return context;
 }

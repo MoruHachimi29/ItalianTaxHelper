@@ -73,6 +73,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // API routes - all prefixed with /api
   
+  // Google authentication route
+  app.post("/api/auth/google", async (req, res) => {
+    try {
+      const { username, email, fullName } = req.body;
+      
+      // Verifica se esiste già un utente con questa email
+      const existingUser = await storage.getUserByUsername(username);
+      
+      let user;
+      if (existingUser) {
+        // Utente già registrato, effettua il login
+        user = existingUser;
+      } else {
+        // Crea un nuovo utente
+        user = await storage.createUser({
+          username,
+          email,
+          fullName,
+          // Creiamo una password casuale che non verrà mai usata
+          // l'utente userà sempre l'autenticazione Google
+          password: Math.random().toString(36).substring(2, 15) + 
+                    Math.random().toString(36).substring(2, 15)
+        });
+      }
+      
+      // Effettua il login dell'utente
+      req.login(user, (err) => {
+        if (err) {
+          console.error("Errore nel login dopo auth Google:", err);
+          return res.status(500).json({ message: "Errore durante l'autenticazione" });
+        }
+        return res.status(200).json(user);
+      });
+    } catch (error) {
+      console.error("Errore in auth/google:", error);
+      res.status(500).json({ message: "Errore durante l'autenticazione con Google" });
+    }
+  });
+  
   // Tutorial routes
   app.get("/api/tutorials", async (req, res) => {
     try {
