@@ -555,8 +555,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Parametro paese mancante" });
       }
       
-      const data = await getCurrentPublicDebt(country as string);
-      res.json(data);
+      // Passiamo direttamente req e res
+      await getCurrentPublicDebt(req, res);
     } catch (error) {
       console.error("Error fetching current public debt:", error);
       res.status(500).json({ error: "Errore nel recupero del debito pubblico corrente" });
@@ -571,9 +571,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Parametro paese mancante" });
       }
       
-      const numYears = years ? parseInt(years as string) : 10;
-      const data = await getHistoricalPublicDebt(country as string, numYears);
-      res.json(data);
+      // Passiamo direttamente req e res
+      await getHistoricalPublicDebt(req, res);
     } catch (error) {
       console.error("Error fetching historical public debt:", error);
       res.status(500).json({ error: "Errore nel recupero dei dati storici del debito pubblico" });
@@ -588,11 +587,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Parametri paesi mancanti" });
       }
       
-      const data = await comparePublicDebt(country1 as string, country2 as string);
-      res.json(data);
+      // Passiamo req e res
+      await comparePublicDebt(req, res);
     } catch (error) {
       console.error("Error comparing public debt:", error);
-      res.status(500).json({ error: "Errore nel confronto dei dati del debito pubblico" });
+      const errorMsg = error instanceof Error ? error.message : "Errore nel confronto dei dati del debito pubblico";
+      res.status(500).json({ error: errorMsg });
     }
   });
 

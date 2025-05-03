@@ -29,21 +29,33 @@ export const supportedCountries = [
 /**
  * Ottiene il debito pubblico corrente per un paese specifico
  */
-export const getCurrentPublicDebt = async (req: Request, res: Response) => {
-  const { country } = req.query;
+export const getCurrentPublicDebt = async (countryParam: string | Request, res?: Response) => {
+  let country: string;
   
-  if (!country || typeof country !== "string") {
-    return res.status(400).json({ error: "È necessario specificare un paese valido." });
+  // Gestione parametri sia come richiesta HTTP che come stringa diretta
+  if (typeof countryParam === 'string') {
+    country = countryParam;
+  } else if (countryParam.query && countryParam.query.country) {
+    country = countryParam.query.country as string;
+    res = res as Response;
+  } else {
+    if (res) {
+      return res.status(400).json({ error: "È necessario specificare un paese valido." });
+    } else {
+      throw new Error("È necessario specificare un paese valido.");
+    }
   }
 
   // Se useTestData è true, restituisci i dati di esempio
   if (useTestData) {
     // Controlliamo se il paese è tra quelli disponibili nei dati di esempio
     if (country in currentDebtData) {
-      return res.json(currentDebtData[country as keyof typeof currentDebtData]);
+      const data = currentDebtData[country as keyof typeof currentDebtData];
+      return res ? res.json(data) : data;
     } else {
       // Se il paese non è disponibile, usiamo l'Italia come fallback
-      return res.json(currentDebtData["Italia"]);
+      const data = currentDebtData["Italia"];
+      return res ? res.json(data) : data;
     }
   }
 
@@ -77,43 +89,100 @@ export const getCurrentPublicDebt = async (req: Request, res: Response) => {
     // Parsifica il risultato
     const content = completion.choices[0].message.content || "";
     const data = JSON.parse(content);
-    return res.json(data);
+    
+    if (res) {
+      return res.json(data);
+    } else {
+      return data;
+    }
   } catch (error) {
     console.error("Errore nel recupero del debito pubblico:", error);
     
     // In caso di errore, se abbiamo dati di esempio disponibili, li utilizziamo
     if (country in currentDebtData) {
       console.log("Utilizzo dati di esempio dopo errore API per", country);
-      return res.json(currentDebtData[country as keyof typeof currentDebtData]);
+      const data = currentDebtData[country as keyof typeof currentDebtData];
+      
+      if (res) {
+        return res.json(data);
+      } else {
+        return data;
+      }
     }
     
-    return res.status(500).json({ 
+    const errorResponse = { 
       error: "Si è verificato un errore durante il recupero dei dati sul debito pubblico.",
       details: error instanceof Error ? error.message : String(error)
-    });
+    };
+    
+    if (res) {
+      return res.status(500).json(errorResponse);
+    } else {
+      throw new Error(JSON.stringify(errorResponse));
+    }
   }
 };
 
 /**
  * Ottiene dati storici sul debito pubblico
  */
-export const getHistoricalPublicDebt = async (req: Request, res: Response) => {
-  const { country, years = "5" } = req.query;
+export const getHistoricalPublicDebt = async (countryParam: string | Request, yearsParam?: number | string | Response, res?: Response) => {
+  let country: string;
+  let numYears: number = 5;
   
-  if (!country || typeof country !== "string") {
-    return res.status(400).json({ error: "È necessario specificare un paese valido." });
+  // Gestione parametri sia come richiesta HTTP che come parametri diretti
+  if (typeof countryParam === 'string') {
+    country = countryParam;
+    
+    // Se yearsParam è un numero o una stringa, lo usiamo come years
+    if (typeof yearsParam === 'number') {
+      numYears = yearsParam;
+    } else if (typeof yearsParam === 'string') {
+      numYears = parseInt(yearsParam) || 5;
+    } else if (yearsParam && typeof yearsParam !== 'function') {
+      // Se yearsParam è l'oggetto Response, lo trattiamo come tale
+      res = yearsParam as Response;
+    }
+  } else if (countryParam.query) {
+    // È un oggetto Request
+    const query = countryParam.query;
+    country = query.country as string;
+    
+    if (!country || typeof country !== "string") {
+      if (res) {
+        return res.status(400).json({ error: "È necessario specificare un paese valido." });
+      } else {
+        throw new Error("È necessario specificare un paese valido.");
+      }
+    }
+    
+    // Verifichiamo se è presente il parametro years
+    if (query.years) {
+      numYears = parseInt(query.years as string) || 5;
+    }
+    
+    // Se yearsParam è l'oggetto Response, lo trattiamo come tale
+    if (yearsParam && typeof yearsParam === 'function') {
+      res = yearsParam as Response;
+    }
+  } else {
+    // Input non valido
+    if (res) {
+      return res.status(400).json({ error: "È necessario specificare un paese valido." });
+    } else {
+      throw new Error("È necessario specificare un paese valido.");
+    }
   }
-
-  // Convertiamo esplicitamente years in un numero e utilizziamo il valore richiesto
-  const numYears = parseInt(years as string) || 5;
   
   // Se useTestData è true, restituisci i dati di esempio
   if (useTestData) {
     if (country in historicalDebtData) {
-      return res.json(historicalDebtData[country as keyof typeof historicalDebtData]);
+      const data = historicalDebtData[country as keyof typeof historicalDebtData];
+      return res ? res.json(data) : data;
     } else {
       // Se il paese non è disponibile nei dati di esempio, usiamo l'Italia
-      return res.json(historicalDebtData["Italia"]);
+      const data = historicalDebtData["Italia"];
+      return res ? res.json(data) : data;
     }
   }
 
@@ -150,31 +219,78 @@ export const getHistoricalPublicDebt = async (req: Request, res: Response) => {
     // Parsifica il risultato
     const content = completion.choices[0].message.content || "";
     const data = JSON.parse(content);
-    return res.json(data);
+    
+    if (res) {
+      return res.json(data);
+    } else {
+      return data;
+    }
   } catch (error) {
     console.error("Errore nel recupero dei dati storici:", error);
     
     // In caso di errore, se abbiamo dati di esempio disponibili, li utilizziamo
     if (country in historicalDebtData) {
       console.log("Utilizzo dati storici di esempio dopo errore API per", country);
-      return res.json(historicalDebtData[country as keyof typeof historicalDebtData]);
+      const data = historicalDebtData[country as keyof typeof historicalDebtData];
+      
+      if (res) {
+        return res.json(data);
+      } else {
+        return data;
+      }
     }
     
-    return res.status(500).json({ 
+    const errorResponse = { 
       error: "Si è verificato un errore durante il recupero dei dati storici.",
       details: error instanceof Error ? error.message : String(error)
-    });
+    };
+    
+    if (res) {
+      return res.status(500).json(errorResponse);
+    } else {
+      throw new Error(JSON.stringify(errorResponse));
+    }
   }
 };
 
 /**
  * Confronta il debito pubblico tra due paesi
  */
-export const comparePublicDebt = async (req: Request, res: Response) => {
-  const { country1, country2 } = req.query;
+export const comparePublicDebt = async (
+  param1: string | Request,
+  param2?: string | Response,
+  res?: Response
+) => {
+  let country1: string;
+  let country2: string;
   
-  if (!country1 || !country2 || typeof country1 !== "string" || typeof country2 !== "string") {
-    return res.status(400).json({ error: "È necessario specificare due paesi validi per il confronto." });
+  // Gestione parametri sia come richiesta HTTP che come parametri diretti
+  if (typeof param1 === 'string' && typeof param2 === 'string') {
+    country1 = param1;
+    country2 = param2;
+  } else if (param1.query) {
+    // È un oggetto Request
+    const query = param1.query;
+    country1 = query.country1 as string;
+    country2 = query.country2 as string;
+    
+    // In questo caso, param2 è l'oggetto Response
+    res = param2 as Response;
+    
+    if (!country1 || !country2 || typeof country1 !== "string" || typeof country2 !== "string") {
+      if (res) {
+        return res.status(400).json({ error: "È necessario specificare due paesi validi per il confronto." });
+      } else {
+        throw new Error("È necessario specificare due paesi validi per il confronto.");
+      }
+    }
+  } else {
+    // Input non valido
+    if (param2 && typeof param2 !== 'string') {
+      return (param2 as Response).status(400).json({ error: "È necessario specificare due paesi validi per il confronto." });
+    } else {
+      throw new Error("È necessario specificare due paesi validi per il confronto.");
+    }
   }
   
   // Se useTestData è true, restituisci i dati di esempio
@@ -184,12 +300,15 @@ export const comparePublicDebt = async (req: Request, res: Response) => {
     const key2 = `${country2}-${country1}`;
     
     if (key1 in comparisonData) {
-      return res.json(comparisonData[key1 as keyof typeof comparisonData]);
+      const data = comparisonData[key1 as keyof typeof comparisonData];
+      return res ? res.json(data) : data;
     } else if (key2 in comparisonData) {
-      return res.json(comparisonData[key2 as keyof typeof comparisonData]);
+      const data = comparisonData[key2 as keyof typeof comparisonData];
+      return res ? res.json(data) : data;
     } else {
       // Se la combinazione specifica non è disponibile, usiamo Italia-Germania come fallback
-      return res.json(comparisonData["Italia-Germania"]);
+      const data = comparisonData["Italia-Germania"];
+      return res ? res.json(data) : data;
     }
   }
 
@@ -238,7 +357,12 @@ export const comparePublicDebt = async (req: Request, res: Response) => {
     // Parsifica il risultato
     const content = completion.choices[0].message.content || "";
     const data = JSON.parse(content);
-    return res.json(data);
+    
+    if (res) {
+      return res.json(data);
+    } else {
+      return data;
+    }
   } catch (error) {
     console.error("Errore nel confronto dei dati:", error);
     
@@ -248,15 +372,33 @@ export const comparePublicDebt = async (req: Request, res: Response) => {
     
     if (key1 in comparisonData) {
       console.log("Utilizzo dati di confronto di esempio dopo errore API per", key1);
-      return res.json(comparisonData[key1 as keyof typeof comparisonData]);
+      const data = comparisonData[key1 as keyof typeof comparisonData];
+      
+      if (res) {
+        return res.json(data);
+      } else {
+        return data;
+      }
     } else if (key2 in comparisonData) {
       console.log("Utilizzo dati di confronto di esempio dopo errore API per", key2);
-      return res.json(comparisonData[key2 as keyof typeof comparisonData]);
+      const data = comparisonData[key2 as keyof typeof comparisonData];
+      
+      if (res) {
+        return res.json(data);
+      } else {
+        return data;
+      }
     }
     
-    return res.status(500).json({ 
+    const errorResponse = { 
       error: "Si è verificato un errore durante il confronto dei dati sul debito pubblico.",
       details: error instanceof Error ? error.message : String(error)
-    });
+    };
+    
+    if (res) {
+      return res.status(500).json(errorResponse);
+    } else {
+      throw new Error(JSON.stringify(errorResponse));
+    }
   }
 };
