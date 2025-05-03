@@ -521,6 +521,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Bonus ISEE API endpoints
+  app.get("/api/bonus", getAllBonus);
+  app.get("/api/bonus/categories", getBonusCategories);
+  app.get("/api/bonus/isee-ranges", getIseeRanges);
+  app.get("/api/bonus/new", getNewBonus);
+  app.get("/api/bonus/expiring", getExpiringBonus);
+  app.get("/api/bonus/:id", getBonusById);
+
+  // Scadenze Fiscali API endpoints
+  app.get("/api/tax-deadlines", getAllTaxDeadlines);
+  app.get("/api/tax-deadlines/categories", getTaxDeadlineCategories);
+  app.get("/api/tax-deadlines/current-month", getCurrentMonthDeadlines);
+  app.get("/api/tax-deadlines/upcoming", getUpcomingDeadlines);
+  app.get("/api/tax-deadlines/:id", getTaxDeadlineById);
+
+  // Debito Pubblico API endpoints
+  app.get("/api/public-debt/countries", async (req, res) => {
+    try {
+      const countries = supportedCountries;
+      res.json({ countries });
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+      res.status(500).json({ error: "Errore nel recupero dei paesi" });
+    }
+  });
+  
+  app.get("/api/public-debt/current", async (req, res) => {
+    try {
+      const { country } = req.query;
+      
+      if (!country) {
+        return res.status(400).json({ error: "Parametro paese mancante" });
+      }
+      
+      const data = await getCurrentPublicDebt(country as string);
+      res.json(data);
+    } catch (error) {
+      console.error("Error fetching current public debt:", error);
+      res.status(500).json({ error: "Errore nel recupero del debito pubblico corrente" });
+    }
+  });
+  
+  app.get("/api/public-debt/historical", async (req, res) => {
+    try {
+      const { country, years } = req.query;
+      
+      if (!country) {
+        return res.status(400).json({ error: "Parametro paese mancante" });
+      }
+      
+      const numYears = years ? parseInt(years as string) : 10;
+      const data = await getHistoricalPublicDebt(country as string, numYears);
+      res.json(data);
+    } catch (error) {
+      console.error("Error fetching historical public debt:", error);
+      res.status(500).json({ error: "Errore nel recupero dei dati storici del debito pubblico" });
+    }
+  });
+  
+  app.get("/api/public-debt/compare", async (req, res) => {
+    try {
+      const { country1, country2 } = req.query;
+      
+      if (!country1 || !country2) {
+        return res.status(400).json({ error: "Parametri paesi mancanti" });
+      }
+      
+      const data = await comparePublicDebt(country1 as string, country2 as string);
+      res.json(data);
+    } catch (error) {
+      console.error("Error comparing public debt:", error);
+      res.status(500).json({ error: "Errore nel confronto dei dati del debito pubblico" });
+    }
+  });
+
   // Forum API endpoints 
   app.get("/api/forum/categories", async (req, res) => {
     try {
