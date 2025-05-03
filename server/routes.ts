@@ -635,6 +635,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Endpoint per la ricerca di topic
+  app.get("/api/forum/topics/search", async (req, res) => {
+    try {
+      const query = req.query.q as string || "";
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+      
+      // Se c'è una query di ricerca, usiamo searchForumTopics
+      if (query) {
+        const { topics, totalCount } = await storage.searchForumTopics(query, page, limit);
+        return res.json({ topics, totalCount, currentPage: page, totalPages: Math.ceil(totalCount / limit) });
+      } else {
+        // Altrimenti otteniamo i più recenti
+        const topics = await storage.getLatestForumTopics(limit);
+        return res.json({ 
+          topics, 
+          totalCount: topics.length, 
+          currentPage: 1, 
+          totalPages: 1 
+        });
+      }
+    } catch (error) {
+      console.error("Error searching forum topics:", error);
+      res.status(500).json({ message: "Errore nel recupero degli argomenti del forum" });
+    }
+  });
+  
   app.get("/api/forum/latest-topics", async (req, res) => {
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
@@ -654,6 +681,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching latest forum posts:", error);
       res.status(500).json({ message: "Errore nel recupero dei post recenti" });
+    }
+  });
+  
+  // Endpoint per ottenere i topic di una categoria tramite slug
+  app.get("/api/forum/categories/:categorySlug/topics", async (req, res) => {
+    try {
+      const { categorySlug } = req.params;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
+      
+      // Prima otteniamo la categoria tramite lo slug
+      const category = await storage.getForumCategoryBySlug(categorySlug);
+      
+      if (!category) {
+        return res.status(404).json({ message: "Categoria non trovata" });
+      }
+      
+      // Poi otteniamo i topic per quella categoria
+      const { topics, totalCount } = await storage.getForumTopicsByCategoryId(category.id, page, limit);
+      res.json({ 
+        topics, 
+        totalCount, 
+        currentPage: page, 
+        totalPages: Math.ceil(totalCount / limit),
+        category
+      });
+    } catch (error) {
+      console.error("Error fetching category topics:", error);
+      res.status(500).json({ message: "Errore nel recupero degli argomenti della categoria" });
     }
   });
 
