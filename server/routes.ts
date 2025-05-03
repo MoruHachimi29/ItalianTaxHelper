@@ -309,8 +309,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
         
         return res.json(enrichedData);
-      } catch (apiError) {
-        console.log("Fallback al database: ", apiError.message);
+      } catch (apiError: unknown) {
+        console.log("Fallback al database: ", apiError instanceof Error ? apiError.message : String(apiError));
         
         // Se c'è un errore con la News API, usiamo le notizie dal database come fallback
         const adaptedNews = allNews.map(news => ({
