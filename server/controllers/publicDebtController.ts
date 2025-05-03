@@ -268,11 +268,11 @@ export const comparePublicDebt = async (
   if (typeof param1 === 'string' && typeof param2 === 'string') {
     country1 = param1;
     country2 = param2;
-  } else if (param1.query) {
+  } else if (typeof param1 !== 'string' && 'query' in param1) {
     // È un oggetto Request
-    const query = param1.query;
-    country1 = query.country1 as string;
-    country2 = query.country2 as string;
+    const req = param1 as Request;
+    country1 = req.query.country1 as string;
+    country2 = req.query.country2 as string;
     
     // In questo caso, param2 è l'oggetto Response
     res = param2 as Response;
