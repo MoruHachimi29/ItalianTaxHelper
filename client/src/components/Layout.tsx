@@ -59,20 +59,7 @@ export default function Layout({ children }: LayoutProps) {
                     </div>
                   </Link>
                 </li>
-                <li>
-                  <Link href="/notizie">
-                    <div className={`text-gray-300 hover:text-white hover:underline ${location === "/notizie" ? "font-bold text-white" : ""}`}>
-                      Notizie
-                    </div>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/blog">
-                    <div className={`text-gray-300 hover:text-white hover:underline ${location === "/blog" || location.startsWith("/blog/") ? "font-bold text-white" : ""}`}>
-                      Blog
-                    </div>
-                  </Link>
-                </li>
+
                 <li>
                   <Link href="/forum">
                     <div className={`text-gray-300 hover:text-white hover:underline ${location === "/forum" || location.startsWith("/forum/") ? "font-bold text-white" : ""}`}>
@@ -171,24 +158,7 @@ export default function Layout({ children }: LayoutProps) {
                   Tutorial
                 </div>
               </Link>
-              <Link href="/notizie">
-                <div 
-                  className={`block px-3 py-2 rounded-md ${location === "/notizie" ? 
-                    "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Notizie
-                </div>
-              </Link>
-              <Link href="/blog">
-                <div 
-                  className={`block px-3 py-2 rounded-md ${location === "/blog" || location.startsWith("/blog/") ? 
-                    "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Blog
-                </div>
-              </Link>
+
               <Link href="/forum">
                 <div 
                   className={`block px-3 py-2 rounded-md ${location === "/forum" || location.startsWith("/forum/") ? 
@@ -315,16 +285,7 @@ export default function Layout({ children }: LayoutProps) {
                     <div className="text-gray-400 hover:text-white">Tutorial</div>
                   </Link>
                 </li>
-                <li>
-                  <Link href="/notizie">
-                    <div className="text-gray-400 hover:text-white">Notizie</div>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/blog">
-                    <div className="text-gray-400 hover:text-white">Blog</div>
-                  </Link>
-                </li>
+
                 <li>
                   <Link href="/forum">
                     <div className="text-gray-400 hover:text-white">Forum</div>
