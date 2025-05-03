@@ -20,9 +20,11 @@ const FormPage = lazy(() => import("@/pages/FormPage"));
 const ModulesPage = lazy(() => import("@/pages/ModulesPage"));
 const TutorialsPage = lazy(() => import("@/pages/TutorialsPage"));
 const VideoTutorialPage = lazy(() => import("@/pages/VideoTutorialPage"));
+/* Sezioni rimosse
 const NewsPage = lazy(() => import("@/pages/NewsPage"));
 const BlogPage = lazy(() => import("@/pages/BlogPage"));
 const BlogPostPage = lazy(() => import("@/pages/BlogPostPage"));
+*/
 const ContactPage = lazy(() => import("@/pages/ContactPage"));
 const UtilitiesPage = lazy(() => import("@/pages/UtilitiesPage"));
 const CurrencyConverterPage = lazy(() => import("@/pages/CurrencyConverterPage"));
@@ -95,9 +97,7 @@ function Router() {
           <Route path="/moduli/:formType" component={FormPage} />
           <Route path="/tutorial" component={TutorialsPage} />
           <Route path="/video-tutorial/:slug" component={VideoTutorialPage} />
-          <Route path="/notizie" component={NewsPage} />
-          <Route path="/blog" component={BlogPage} />
-          <Route path="/blog/:slug" component={BlogPostPage} />
+          {/* Le sezioni Notizie e Blog sono state rimosse */}
           <Route path="/strumenti" component={UtilitiesPage} />
           <Route path="/strumenti/stipendio-netto" component={NetSalaryCalculatorPage} />
           <Route path="/strumenti/debito-pubblico" component={PublicDebtTrackerPage} />
