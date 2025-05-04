@@ -43,6 +43,7 @@ const SimplePdfEditorPage = lazy(() => import("@/pages/SimplePdfEditorPage"));
 const BasicPdfEditorPage = lazy(() => import("@/pages/BasicPdfEditorPage"));
 const UltraSimplePdfEditorPage = lazy(() => import("@/pages/UltraSimplePdfEditorPage"));
 const CodiceFiscalePage = lazy(() => import("@/pages/CodiceFiscalePage"));
+const F24OrdinaryPage = lazy(() => import("./pages/F24OrdinaryPage")); // Added import
 
 // Pagine del forum
 const ForumPage = lazy(() => import("@/pages/ForumPage"));
@@ -53,11 +54,11 @@ const AuthPage = lazy(() => import("@/pages/AuthPage"));
 // Componente che fa scrollare all'inizio della pagina ad ogni cambio di route
 function ScrollToTop() {
   const [location] = useLocation();
-  
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location]);
-  
+
   return null;
 }
 
@@ -88,7 +89,7 @@ function Router() {
     <Layout>
       {/* Aggiungiamo il componente per scrollare all'inizio della pagina */}
       <ScrollToTop />
-      
+
       {/* Suspense per il lazy loading */}
       <Suspense fallback={<PageLoader />}>
         <Switch>
@@ -116,15 +117,16 @@ function Router() {
           <Route path="/strumenti/pdf-editor-ultra" component={UltraSimplePdfEditorPage} />
           <Route path="/strumenti/pdf-word" component={PdfToWordConverterPage} />
           <Route path="/contatti" component={ContactPage} />
-          
+          <Route path="/f24-ordinario" component={F24OrdinaryPage} /> {/* Added route */}
+
           {/* Rotte per il forum */}
           <Route path="/forum" component={ForumPage} />
           <Route path="/forum/topic/:slug" component={ForumTopicPage} />
           <ProtectedRoute path="/forum/nuovo-topic" component={NewForumTopicPage} />
-          
+
           {/* Autenticazione */}
           <Route path="/auth" component={AuthPage} />
-          
+
           <Route component={NotFound} />
         </Switch>
       </Suspense>
