@@ -1,7 +1,6 @@
 import { Link } from "wouter";
 import FormsList from "@/components/FormsList";
 import VideoTutorialPreview from "@/components/VideoTutorialPreview";
-import NewsList from "@/components/NewsList";
 import FAQSection from "@/components/FAQSection";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import SEO from "@/components/SEO";
