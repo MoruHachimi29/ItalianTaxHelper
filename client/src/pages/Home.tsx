@@ -55,9 +55,6 @@ export default function Home() {
       {/* Video Tutorial Preview */}
       <VideoTutorialPreview />
       
-      {/* News */}
-      <NewsList limit={3} />
-      
       {/* FAQ */}
       <FAQSection />
       
