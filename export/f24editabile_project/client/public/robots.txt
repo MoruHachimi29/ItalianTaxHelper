@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Moduli fiscali
+Allow: /form/*
+Allow: /moduli/*
+
+# Notizie economiche
+Allow: /news/*
+Allow: /notizie/*
+
+# Utilità
+Allow: /tools/*
+Allow: /strumenti/*
+
+# Tutorial
+Allow: /tutorials/*
+Allow: /guide/*
+
+# Sitemap
+Sitemap: https://f24editabile.replit.app/sitemap.xml

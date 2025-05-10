@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    text-align: center;
+  }
+  
+  /* Allineamento centrale per tutti i testi */
+  p, h1, h2, h3, h4, h5, h6, span, div, li, ul, ol, a, button, input, textarea, label, th, td {
+    text-align: center;
+  }
+}

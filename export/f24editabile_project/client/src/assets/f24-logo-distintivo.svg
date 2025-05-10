@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="220" height="40" viewBox="0 0 220 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background rectangle for F24 section with rounded corners -->
+  <rect x="0" y="4" width="70" height="32" rx="4" fill="black"/>
+  
+  <!-- F24 in white on black background -->
+  <path d="M10 8H26V13H16V17H24V22H16V32H10V8Z" fill="white"/>
+  <path d="M28 32V8H34L38 21H39L43 8H49V32H43V19H42L38 32H33V19H32V32H28Z" fill="white"/>
+  <path d="M52 8H66V13H58V17H64V22H58V27H66V32H52V8Z" fill="white"/>
+  
+  <!-- Editabile in black on transparent background -->
+  <path d="M80 8H100V13H86V17H98V22H86V27H100V32H80V8Z" fill="black"/>
+  <path d="M103 20C103 12 108 7 116 7C124 7 129 12 129 20C129 28 124 33 116 33C108 33 103 28 103 20ZM109 20C109 25 112 28 116 28C120 28 123 25 123 20C123 15 120 12 116 12C112 12 109 15 109 20Z" fill="black"/>
+  <path d="M132 8H138V32H132V8Z" fill="black"/>
+  <path d="M141 8H147V27H159V32H141V8Z" fill="black"/>
+  <path d="M163 8H183V13H169V17H181V22H169V27H183V32H163V8Z" fill="black"/>
+  <path d="M186 32V8H192V17H204V8H210V32H204V22H192V32H186Z" fill="black"/>
+  <path d="M213 8H219V32H213V8Z" fill="black"/>
+</svg>
