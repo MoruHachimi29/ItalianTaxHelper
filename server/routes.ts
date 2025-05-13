@@ -1,9 +1,5 @@
 import express, { Express, Request, Response, NextFunction } from "express";
 import { createServer, Server } from "http";
-import { db } from "./db";
-import { eq, and, asc, like, desc, sql, not, isNull, isNotNull, or } from "drizzle-orm";
-import { setupAuth } from "./auth";
-import { storage } from "./storage";
 import multer from "multer";
 import * as fs from "fs";
 import * as path from "path";
@@ -68,9 +64,6 @@ const NEWS_API_KEY = process.env.NEWS_API_KEY;
 const NEWS_API_URL = "https://newsapi.org/v2";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Setup authentication
-  setupAuth(app);
-  
   // API routes - all prefixed with /api
   
   // Google authentication route
