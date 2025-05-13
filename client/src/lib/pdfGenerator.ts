@@ -40,35 +40,32 @@ export async function createPDF(
     format: "a4"
   });
   
-  // Add the form background image with reduced opacity
+  // Add the form background image (con una gestione migliorata dell'immagine)
   try {
     const backgroundImage = formBackgrounds[formType as keyof typeof formBackgrounds];
     if (backgroundImage) {
-      const img = new Image();
-      img.src = backgroundImage;
+      // Utilizziamo un approccio più semplice e affidabile per caricare l'immagine
+      // Utilizzando l'URL diretto dell'immagine invece dell'oggetto Image
       
-      await new Promise<void>((resolve) => {
-        img.onload = () => {
-          // Add the image as a background with reduced opacity
-          doc.setGState(doc.addGState({ opacity: 0.1 }));
-          doc.addImage(
-            img,
-            'PNG',
-            10, // x position
-            30, // y position
-            190, // width
-            240, // height
-            `${formType}-background`, // alias
-            'NONE' // compression
-          );
-          // Reset opacity for text
-          doc.setGState(doc.addGState({ opacity: 1.0 }));
-          resolve();
-        };
-      });
+      // Impostiamo direttamente l'opacità del testo a 1.0 
+      // (evitiamo di impostare l'opacità dell'immagine che può causare problemi)
+      doc.setFillColor(0, 0, 0);
+      
+      // Aggiungiamo l'immagine come sfondo
+      doc.addImage(
+        backgroundImage,
+        'PNG',
+        10, // x position
+        30, // y position
+        190, // width
+        240, // height
+        undefined, // nessun alias (potrebbe causare conflitti)
+        'NONE' // no compression
+      );
     }
   } catch (error) {
     console.error("Error adding background image:", error);
+    // In caso di errore con l'immagine, continuiamo comunque con il resto del PDF
   }
   
   // Set font styles
