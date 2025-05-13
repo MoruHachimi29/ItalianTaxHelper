@@ -1,22 +1,26 @@
-import { defineConfig } from 'vite';
-import { fileURLToPath, URL } from 'node:url';
-import vue from '@vitejs/plugin-vue';
+import { fileURLToPath, URL } from 'node:url'
+
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+  ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@assets': fileURLToPath(new URL('../attached_assets', import.meta.url)),
-      '@shared': fileURLToPath(new URL('../shared', import.meta.url)),
-    },
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
   },
   server: {
-    port: 5000,
-  },
-  build: {
-    outDir: '../dist',
-    emptyOutDir: true,
-  },
-});
+    host: '0.0.0.0',
+    port: 3000,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      }
+    }
+  }
+})
