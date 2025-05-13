@@ -109,15 +109,9 @@ app.use((req, res, next) => {
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
-    // In produzione, prova a servire l'app Vue compilata
-    // se disponibile, altrimenti serve l'app React
-    try {
-      serveVueApp(app);
-      console.log("[express] Serving Vue.js application");
-    } catch (error) {
-      console.log("[express] Vue.js application not available, serving React application");
-      serveStatic(app);
-    }
+    // In produzione, servi l'app Vue compilata
+    serveVueApp(app);
+    console.log("[express] Serving Vue.js application");
   }
 
   // ALWAYS serve the app on port 5000

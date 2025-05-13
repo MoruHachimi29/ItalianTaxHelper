@@ -16,11 +16,16 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 3000,
+    hmr: {
+      clientPort: 443 // Necessario per Replit
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true
       }
-    }
+    },
+    // Consente l'accesso da tutti gli host in ambiente Replit
+    allowedHosts: ['localhost', '.replit.dev', '.repl.co', '.repl.it'],
   }
 })

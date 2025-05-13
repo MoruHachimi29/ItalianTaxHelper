@@ -1,4 +1,5 @@
 # .replit.deploy
-entrypoint = "server/deploy-index.js"
+entrypoint = "dist/server/deploy-index.js"
 run = "NODE_ENV=production node dist/server/deploy-index.js"
 language = "nodejs"
+buildCommand = "./deploy-vue.sh"

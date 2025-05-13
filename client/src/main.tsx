@@ -1,113 +1,39 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-import App from "./App";
-import "./index.css";
+console.log('Questo file è un placeholder. La vera applicazione è in vue-app/');
 
-/**
- * Ottimizzazioni per migliorare Core Web Vitals e performance
- * - Implementa rendering progressivo
- * - Aggiunge monitoraggio delle metriche web vitals 
- * - Utilizza strategia ottimale per FCP e LCP
- */
+// Verifica se siamo su Replit
+const isReplit = window.location.hostname.includes('replit');
 
-// Monitora Web Vitals (FCP, LCP, CLS, FID)
-const reportWebVitals = () => {
-  if ('performance' in window && 'PerformanceObserver' in window) {
-    try {
-      // FCP (First Contentful Paint)
-      const fcpObserver = new PerformanceObserver((entryList) => {
-        const entries = entryList.getEntries();
-        if (entries.length > 0) {
-          console.log('FCP:', entries[0].startTime, 'ms');
-          fcpObserver.disconnect();
-        }
-      });
-      fcpObserver.observe({ type: 'paint', buffered: true });
-
-      // LCP (Largest Contentful Paint)
-      const lcpObserver = new PerformanceObserver((entryList) => {
-        const entries = entryList.getEntries();
-        if (entries.length > 0) {
-          console.log('LCP:', entries[entries.length - 1].startTime, 'ms');
-          lcpObserver.disconnect();
-        }
-      });
-      lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-
-      // CLS (Cumulative Layout Shift)
-      const clsObserver = new PerformanceObserver((entryList) => {
-        let clsValue = 0;
-        for (const entry of entryList.getEntries()) {
-          if (!entry.hadRecentInput) {
-            clsValue += (entry as any).value;
-          }
-        }
-        console.log('CLS:', clsValue);
-      });
-      clsObserver.observe({ type: 'layout-shift', buffered: true });
-
-      // FID (First Input Delay)
-      const fidObserver = new PerformanceObserver((entryList) => {
-        for (const entry of entryList.getEntries()) {
-          console.log('FID:', (entry as any).processingStart - (entry as any).startTime, 'ms');
-        }
-      });
-      fidObserver.observe({ type: 'first-input', buffered: true });
-    } catch (e) {
-      console.log('Web Vitals measurement not supported in this browser');
-    }
-  }
-};
-
-// Rimuovi il loading spinner
-const removeLoadingSpinner = () => {
-  setTimeout(() => {
-    const spinner = document.getElementById('loading-spinner');
-    if (spinner) {
-      spinner.style.opacity = '0';
-      setTimeout(() => {
-        spinner.style.display = 'none';
-      }, 300);
-    }
-  }, 100);
-};
-
-// Strategia di rendering ottimizzata per Core Web Vitals
-const renderApp = () => {
-  // Create the root element for React rendering
-  createRoot(document.getElementById("root")!).render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  );
-  
-  // Rimuovi lo spinner di caricamento
-  removeLoadingSpinner();
-  
-  // Monitora metriche di performance in produzione
-  if (import.meta.env.PROD) {
-    reportWebVitals();
-  }
-};
-
-// Utilizziamo requestIdleCallback per renderizzare durante il tempo di inattività
-// migliorando i tempi di interattività della pagina
-const scheduleRender = () => {
-  if ('requestIdleCallback' in window) {
-    (window as any).requestIdleCallback(() => {
-      renderApp();
-    }, { timeout: 1000 }); // Timeout massimo di 1 secondo
-  } else {
-    // Fallback per browser che non supportano requestIdleCallback
-    setTimeout(renderApp, 0);
-  }
-};
-
-// Verifica se il documento è già interattivo
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
-  // Se è già pronto, pianifica il rendering durante tempo di inattività
-  scheduleRender();
-} else {
-  // Altrimenti attendi che sia pronto
-  document.addEventListener('DOMContentLoaded', scheduleRender);
-}
+// Non reindirizzare, mostra solo il messaggio
+document.body.innerHTML = `
+<div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif;">
+  <div style="max-width: 600px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <h1 style="margin-top: 0; color: #333;">F24Editabile - Vue.js</h1>
+    <p>L'applicazione è stata migrata a Vue.js. Per avviare correttamente l'applicazione:</p>
+    
+    <div style="margin: 20px 0; padding: 15px; background-color: #f0f8ff; border-radius: 8px; border: 1px solid #b3d8ff;">
+      <strong>In ambiente Replit:</strong>
+      <ol style="margin-top: 10px; padding-left: 20px;">
+        <li>Apri una nuova shell nel riquadro "Shell"</li>
+        <li>Esegui: <code style="background: #f1f1f1; padding: 2px 4px; border-radius: 3px;">./start-vue.sh</code></li>
+        <li>Utilizza l'URL generato per accedere all'app Vue.js</li>
+      </ol>
+    </div>
+    
+    <p>Per una migliore esperienza, segui le istruzioni nel README.md del progetto.</p>
+    
+    <div style="margin-top: 20px; padding: 10px; background-color: #fff8e6; border-left: 4px solid #ffcc00; border-radius: 4px;">
+      <strong>Nota:</strong> In ambiente di produzione (deployment), l'app Vue.js verrà servita automaticamente
+      attraverso il file <code>server/deploy-index.js</code>.
+    </div>
+    
+    <div style="margin-top: 20px; text-align: center;">
+      <button 
+        onclick="window.location.reload()" 
+        style="padding: 10px 20px; background: #000; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;"
+      >
+        Ricarica pagina
+      </button>
+    </div>
+  </div>
+</div>
+`;
