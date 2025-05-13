@@ -25,7 +25,7 @@ export default function AuthPage() {
         <div className="max-w-2xl mx-auto">
           <h1 className="text-3xl font-bold mb-6 text-center">Funzionalità di login disabilitata</h1>
           
-          <Alert variant="warning" className="mb-6">
+          <Alert variant="destructive" className="mb-6">
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Funzionalità non disponibile</AlertTitle>
             <AlertDescription>

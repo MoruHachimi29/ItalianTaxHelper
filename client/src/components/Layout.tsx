@@ -1,9 +1,7 @@
 import { ReactNode, useState } from "react";
 import { Link, useLocation } from "wouter";
 import logoPath from "@/assets/f24-logo-latest.png";
-import { Menu, X, LogIn, UserCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
+import { Menu, X } from "lucide-react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -12,14 +10,9 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, isLoading: isAuthLoading, logoutMutation } = useAuth();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
-  };
-  
-  const handleLogout = () => {
-    logoutMutation.mutate();
   };
 
   return (
@@ -86,31 +79,7 @@ export default function Layout({ children }: LayoutProps) {
               </ul>
             </nav>
 
-            {/* Auth buttons */}
-            <div className="hidden md:flex items-center ml-4 space-x-2">
-              {isAuthLoading ? (
-                <div className="w-24 h-8 bg-gray-800 animate-pulse rounded"></div>
-              ) : user ? (
-                <div className="flex items-center">
-                  <Link href="/profilo">
-                    <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white flex items-center gap-1">
-                      <UserCircle size={16} />
-                      <span className="max-w-24 truncate">{user.username}</span>
-                    </Button>
-                  </Link>
-                  <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white" onClick={handleLogout}>
-                    Esci
-                  </Button>
-                </div>
-              ) : (
-                <Link href="/auth">
-                  <Button variant="outline" size="sm" className="flex items-center gap-1 bg-white text-black hover:bg-gray-100 border-white">
-                    <LogIn size={16} />
-                    Accedi
-                  </Button>
-                </Link>
-              )}
-            </div>
+            {/* Rimossa la sezione di login */}
 
             {/* Mobile Menu Button */}
             <button 
@@ -187,44 +156,7 @@ export default function Layout({ children }: LayoutProps) {
                 </div>
               </Link>
               
-              {/* Auth buttons for mobile */}
-              <div className="border-t border-gray-700 mt-4 pt-4">
-                {isAuthLoading ? (
-                  <div className="px-3 py-2 animate-pulse bg-gray-800 rounded"></div>
-                ) : user ? (
-                  <>
-                    <Link href="/profilo">
-                      <div 
-                        className="flex items-center px-3 py-2 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <UserCircle size={18} className="mr-2" />
-                        {user.username}
-                      </div>
-                    </Link>
-                    <div 
-                      className="flex items-center px-3 py-2 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white cursor-pointer"
-                      onClick={() => {
-                        handleLogout();
-                        setMobileMenuOpen(false);
-                      }}
-                    >
-                      <LogIn size={18} className="mr-2 rotate-180" />
-                      Esci
-                    </div>
-                  </>
-                ) : (
-                  <Link href="/auth">
-                    <div 
-                      className="flex items-center px-3 py-2 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <LogIn size={18} className="mr-2" />
-                      Accedi / Registrati
-                    </div>
-                  </Link>
-                )}
-              </div>
+              {/* Rimossa la sezione di login per mobile */}
             </div>
           </div>
         </div>
