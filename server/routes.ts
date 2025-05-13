@@ -559,7 +559,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Le API del forum sono state rimosse
-
   // Configurazione di multer per gestire i file caricati
   const upload = multer({ storage: multer.memoryStorage() });
 
