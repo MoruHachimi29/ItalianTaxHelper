@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { serveVueApp } from "./static-vue";
 import path from "path";
 import { fileURLToPath } from "url";
 import compression from "compression"; // Per la compressione GZIP
@@ -108,7 +109,15 @@ app.use((req, res, next) => {
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
-    serveStatic(app);
+    // In produzione, prova a servire l'app Vue compilata
+    // se disponibile, altrimenti serve l'app React
+    try {
+      serveVueApp(app);
+      console.log("[express] Serving Vue.js application");
+    } catch (error) {
+      console.log("[express] Vue.js application not available, serving React application");
+      serveStatic(app);
+    }
   }
 
   // ALWAYS serve the app on port 5000
