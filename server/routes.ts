@@ -47,31 +47,7 @@ const NEWS_API_URL = "https://newsapi.org/v2";
 export async function registerRoutes(app: Express): Promise<Server> {
   // API routes - all prefixed with /api
   
-  // API utente semplificata senza autenticazione
-  app.get("/api/user", (req, res) => {
-    // Restituisce sempre una risposta non autenticata
-    res.status(401).json({ message: "Non autenticato" });
-  });
-  
-  // Risposta semplificata per l'autenticazione Google
-  app.post("/api/auth/google", (req, res) => {
-    res.status(401).json({ message: "Funzionalità di login disabilitata" });
-  });
-  
-  // Risposta semplificata per il login
-  app.post("/api/login", (req, res) => {
-    res.status(401).json({ message: "Funzionalità di login disabilitata" });
-  });
-  
-  // Risposta semplificata per la registrazione
-  app.post("/api/register", (req, res) => {
-    res.status(401).json({ message: "Funzionalità di registrazione disabilitata" });
-  });
-  
-  // Risposta semplificata per il logout
-  app.post("/api/logout", (req, res) => {
-    res.status(200).json({ message: "Logout effettuato con successo" });
-  });
+  // Le API di autenticazione sono state rimosse
 
   
   // Tutorial routes
