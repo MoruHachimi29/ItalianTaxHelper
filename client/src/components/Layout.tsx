@@ -53,13 +53,7 @@ export default function Layout({ children }: LayoutProps) {
                   </Link>
                 </li>
 
-                <li>
-                  <Link href="/forum">
-                    <div className={`text-gray-300 hover:text-white hover:underline ${location === "/forum" || location.startsWith("/forum/") ? "font-bold text-white" : ""}`}>
-                      Forum
-                    </div>
-                  </Link>
-                </li>
+                {/* Sezione forum rimossa */}
                 <li>
                   <Link href="/strumenti">
                     <div 
@@ -128,15 +122,7 @@ export default function Layout({ children }: LayoutProps) {
                 </div>
               </Link>
 
-              <Link href="/forum">
-                <div 
-                  className={`block px-3 py-2 rounded-md ${location === "/forum" || location.startsWith("/forum/") ? 
-                    "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Forum
-                </div>
-              </Link>
+              {/* Sezione forum rimossa dal menu mobile */}
               <Link href="/strumenti">
                 <div 
                   className={`block px-3 py-2 rounded-md ${location === "/strumenti" || location.startsWith("/strumenti/") ? 
@@ -218,11 +204,7 @@ export default function Layout({ children }: LayoutProps) {
                   </Link>
                 </li>
 
-                <li>
-                  <Link href="/forum">
-                    <div className="text-gray-400 hover:text-white">Forum</div>
-                  </Link>
-                </li>
+                {/* Sezione forum rimossa dal footer */}
                 <li>
                   <Link href="/strumenti">
                     <div className="text-gray-400 hover:text-white">

@@ -45,10 +45,7 @@ const UltraSimplePdfEditorPage = lazy(() => import("@/pages/UltraSimplePdfEditor
 const CodiceFiscalePage = lazy(() => import("@/pages/CodiceFiscalePage"));
 const F24OrdinaryPage = lazy(() => import("./pages/F24OrdinaryPage")); // Added import
 
-// Pagine del forum
-const ForumPage = lazy(() => import("@/pages/ForumPage"));
-const ForumTopicPage = lazy(() => import("@/pages/ForumTopicPage"));
-const NewForumTopicPage = lazy(() => import("@/pages/NewForumTopicPage"));
+// Pagine del forum rimosse
 const AuthPage = lazy(() => import("@/pages/AuthPage"));
 
 // Componente che fa scrollare all'inizio della pagina ad ogni cambio di route
@@ -119,10 +116,7 @@ function Router() {
           <Route path="/contatti" component={ContactPage} />
           <Route path="/f24-ordinario" component={F24OrdinaryPage} /> {/* Added route */}
 
-          {/* Rotte per il forum */}
-          <Route path="/forum" component={ForumPage} />
-          <Route path="/forum/topic/:slug" component={ForumTopicPage} />
-          <ProtectedRoute path="/forum/nuovo-topic" component={NewForumTopicPage} />
+          {/* Rotte per il forum rimosse */}
 
           {/* Autenticazione */}
           <Route path="/auth" component={AuthPage} />
