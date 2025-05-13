@@ -57,10 +57,8 @@
     <!-- Font e Icone ottimizzati per prestazioni -->
     <!-- Preload e display=swap per migliorare Core Web Vitals e ridurre CLS (Cumulative Layout Shift) -->
     <!-- Ottimizzazione font con display=swap per prevenire FOIT e migliorare FCP -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap&text=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.,%" />
-    <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fBBc4.woff2" crossorigin="anonymous" />
-    <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff2" crossorigin="anonymous" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap&text=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.,%" rel="stylesheet" media="print" onload="this.media='all'" />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
 
     <!-- Icone: caricamento ottimizzato utilizzando preload e display=swap -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/icon?family=Material+Icons&display=block" />
@@ -68,7 +66,7 @@
 
     <!-- Fallback per browser senza JS -->
     <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     </noscript>
   </head>
@@ -107,7 +105,7 @@
     </style>
 
     <script>
-      // Nascondi lo spinner quando l'applicazione è caricata
+      // Nascondi lo spinner quando l'applicazione e caricata
       document.addEventListener('DOMContentLoaded', function() {
         const spinner = document.getElementById('loading-spinner');
         if (spinner) {
@@ -121,7 +119,7 @@
       });
     </script>
 
-    <!-- Carica il JavaScript principale con priorità alta -->
+    <!-- Carica il JavaScript principale con priorita alta -->
     <script type="module" src="/src/main.tsx"></script>
 
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
