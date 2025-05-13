@@ -1,60 +1,129 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 220.9 39.3% 11%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 224 71.4% 4.1%;
-    --radius: 0.5rem;
-  }
- 
-  .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 210 20% 98%;
-    --primary-foreground: 220.9 39.3% 11%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 216 12.2% 83.9%;
-  }
+/* Tema personalizzato e stili aggiuntivi */
+:root {
+  --header-height: 64px;
 }
 
-@layer base {
-  * {
-    @apply border-border;
+/* Stili personalizzati per i form */
+.form-input {
+  @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+.form-helper-text {
+  @apply mt-1 text-sm text-gray-500;
+}
+
+.form-error {
+  @apply mt-1 text-sm text-red-600;
+}
+
+/* Stilizzazione del pulsante principale */
+.btn-primary {
+  @apply inline-flex items-center justify-center px-4 py-2 bg-black text-white font-medium rounded-md hover:bg-gray-800 transition;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center px-4 py-2 bg-white text-black font-medium rounded-md border border-gray-300 hover:bg-gray-100 transition;
+}
+
+/* Stili per layout griglia */
+.form-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+/* Stili per container con shadow */
+.shadow-card {
+  @apply bg-white rounded-lg shadow-md p-6;
+}
+
+/* Stili per intestazioni di sezione */
+.section-title {
+  @apply text-2xl md:text-3xl font-bold text-center mb-8;
+}
+
+/* Stili per sottotitoli */
+.section-subtitle {
+  @apply text-xl font-semibold mb-4;
+}
+
+/* Stili per testo enfatizzato */
+.emphasized-text {
+  @apply text-black font-medium;
+}
+
+/* Stili per tooltip */
+.tooltip {
+  @apply absolute z-10 bg-black text-white text-sm px-2 py-1 rounded opacity-0 invisible transition-opacity;
+}
+
+.tooltip-trigger:hover .tooltip {
+  @apply opacity-100 visible;
+}
+
+/* Stili per le animazioni */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Stili per il layout sticky header */
+.sticky-header {
+  @apply sticky top-0 z-50 bg-black text-white shadow-md;
+}
+
+/* Stili per i campi di input specializzati */
+.tax-code-input {
+  @apply uppercase;
+}
+
+.currency-input {
+  @apply text-right;
+}
+
+/* Stili per i messaggi di notifica */
+.notification {
+  @apply fixed bottom-4 right-4 p-4 rounded-md shadow-lg transition-all transform;
+}
+
+.notification-success {
+  @apply bg-green-500 text-white;
+}
+
+.notification-error {
+  @apply bg-red-500 text-white;
+}
+
+.notification-info {
+  @apply bg-blue-500 text-white;
+}
+
+/* Stili per la versione mobile */
+@media (max-width: 768px) {
+  .mobile-menu {
+    @apply fixed inset-0 z-50 bg-white flex flex-col;
   }
-  body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+  
+  .mobile-menu-header {
+    @apply flex items-center justify-between p-4 border-b;
+  }
+  
+  .mobile-menu-content {
+    @apply flex-1 overflow-y-auto py-4;
+  }
+  
+  .mobile-menu-footer {
+    @apply p-4 border-t;
   }
 }
